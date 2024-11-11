@@ -6,59 +6,37 @@ import {
   ScrollRestoration,
 } from "@remix-run/react";
 import "./tailwind.css";
-// import { useLayoutEffect as useLayoutEffectOrig } from "react";
 
-// const canUseDOM = !!(
-//   typeof window !== "undefined" &&
-//   window.document &&
-//   window.document.createElement
-// );
-
-// const useLayoutEffect = canUseDOM ? useLayoutEffectOrig : () => {};
-
-const groups: Array<string> = [];
-
-const MUTED_GROUPS = [
-  "WebCamDisplay useEffect",
-  "usePhotoboothState getNextStatus",
-  "usePhotoboothState reducer",
-  "Photobooth",
-  "Photobooth useSpring onChange",
+const COLLAPSED_GROUPS = [
+  "useDeviceIds",
+  "usePlayVideo.playVideo",
+  "usePlayVideo.playVideo.onloadedmetadata",
+  "useFormData.onChangeForm",
+  "useFormData.onChangeForm.setFormData",
 ];
 
-const groupOrig = console.group;
-const groupEndOrig = console.groupEnd;
-const logOrig = console.log;
+const group = console.group;
+const groupCollapsed = console.groupCollapsed;
 
-const group = (name: string, ...rest: any[]) => {
-  // logOrig("=asdfa\n=====\n=====\n=====\n=====\n=====\n");
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+console.group = function () {
+  // eslint-disable-next-line prefer-rest-params
+  const args = Array.from(arguments);
 
-  groups.push(name);
-  groupOrig(name, ...rest);
-  12;
-};
-
-const groupEnd = () => {
-  groups.pop();
-  groupEndOrig();
-};
-
-const log = (...args: any[]) => {
-  if (groups.length > 0) {
-    const lastGroup = groups[groups.length - 1];
-    // logOrig("=====\n=====\n=====\n=====\n=====\n=====\n");
-    // logOrig({ lastGroup, canLog: !MUTED_GROUPS.includes(lastGroup) });
-    if (!MUTED_GROUPS.includes(lastGroup)) {
-      logOrig(...args);
-    }
+  if (args.length > 0 && COLLAPSED_GROUPS.includes(args[0])) {
+    groupCollapsed.apply(console, args);
   } else {
-    logOrig(...args);
+    group.apply(console, args);
   }
 };
 
-console.group = group;
-console.log = log;
-console.groupEnd = groupEnd;
+// console.groupEnd = function (label:any) {
+//   // eslint-disable-next-line prefer-rest-params
+//   const args = Array.from(arguments); // ES5
+//   // args.unshift(LOG_PREFIX + ": ");
+
+//   groupEnd.apply(console, args);
+// };
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -74,10 +52,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Mountains+of+Christmas:wght@400;700&display=swap"
-          rel="stylesheet"
-        ></link>
       </head>
       <body>
         {children}

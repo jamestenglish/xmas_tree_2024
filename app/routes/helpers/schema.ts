@@ -1,12 +1,12 @@
-import z from "zod";
+import { union, literal, object, string } from "zod";
 
-export const intentSchema = z.union([
-  z.literal("yetiize"),
-  z.literal("print"),
-  z.literal("saveImg"),
+export const intentSchema = union([
+  literal("yetiize"),
+  literal("print"),
+  literal("saveImg"),
 ]);
 
-export const printActionFormSchema = z.object({
-  imgSrc: z.string(),
+export const printActionFormSchema = object({
+  imgSrc: string(),
   intent: intentSchema,
 });

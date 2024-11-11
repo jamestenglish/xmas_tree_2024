@@ -24,7 +24,18 @@ module.exports = {
   // Base config
   extends: ["eslint:recommended"],
   rules: {
-    "import/no-unresolved": ["error", "never"],
+    // "import/no-unresolved": ["error", "never"],
+    "react-hooks/exhaustive-deps": "warn",
+    "no-unused-vars": "off",
+    "@typescript-eslint/no-unused-vars": [
+      "warn", // or "error"
+      {
+        argsIgnorePattern: "^_",
+        varsIgnorePattern: "^_",
+        caughtErrorsIgnorePattern: "^_",
+      },
+    ],
+    "jsx-a11y/media-has-caption": "off",
   },
 
   overrides: [
@@ -51,6 +62,7 @@ module.exports = {
           typescript: {},
         },
       },
+      rules: { "jsx-a11y/media-has-caption": "off" },
     },
 
     // Typescript
@@ -74,6 +86,7 @@ module.exports = {
         "plugin:import/recommended",
         "plugin:import/typescript",
       ],
+      rules: { "jsx-a11y/media-has-caption": "off" },
     },
 
     // Node
