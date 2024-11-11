@@ -3,12 +3,12 @@ import saveCaptureResultsForIndex, {
   RefObjType,
 } from "../functions/saveCaptureResultsForIndex";
 import { useCallback } from "react";
-import { SetCaptureDataArgs } from "./useCaptureDataLocalStorage";
+import { CaptureDataType } from "./useCaptureDataLocalStorage";
 
 const useOnCapture = (
   refsObj: RefObjType,
   formData: FormDataProps,
-  setCaptureData: React.Dispatch<React.SetStateAction<SetCaptureDataArgs>>,
+  setCaptureData: React.Dispatch<React.SetStateAction<CaptureDataType>>,
 ) => {
   const onCapture = useCallback(() => {
     const doCapture = async () => {

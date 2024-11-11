@@ -59,7 +59,7 @@ const usePlayVideo = ({
         },
       });
       const tracks = stream.getVideoTracks();
-      console.log({ tracks });
+      console.log("----", { tracks });
       const settings = tracks[0].getSettings();
       setDimensions(
         settings.height && settings.width

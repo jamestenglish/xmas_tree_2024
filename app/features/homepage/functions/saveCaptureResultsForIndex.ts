@@ -1,7 +1,7 @@
 import { VideoContainerRef } from "~/features/video-output/components/VideoSelectorTypes";
 import { PromiseStateType } from "~/features/led-detection/functions/imageProcessingTypes";
 
-import { SetCaptureDataArgs } from "../hooks/useCaptureDataLocalStorage";
+import { CaptureDataType } from "../hooks/useCaptureDataLocalStorage";
 
 export type RefObjType = {
   frontRef: React.RefObject<VideoContainerRef>;
@@ -33,7 +33,7 @@ const getCapturePromises = (
 export type SaveCaptureResultsForIndexArgs = {
   refsObj: RefObjType;
   ledIndex: number;
-  setCaptureData: React.Dispatch<React.SetStateAction<SetCaptureDataArgs>>;
+  setCaptureData: React.Dispatch<React.SetStateAction<CaptureDataType>>;
   promiseObj?: PromiseStateType;
   positionPrefix?: string;
 };

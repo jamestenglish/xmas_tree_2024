@@ -3,10 +3,11 @@ import Select from "~/features/ui/components/Select";
 import VideoContainer from "~/features/video-output/components/VideoContainer";
 import type { VideoContainerRef } from "./VideoSelectorTypes";
 import { OnChangeFormType } from "~/features/common/hooks/useFormData";
+import { DeviceMetaType } from "~/features/homepage/hooks/useDeviceMeta";
 
 interface DeviceSelectorProps {
   onChangeForm: OnChangeFormType;
-  deviceIds: string[];
+  deviceMetas: DeviceMetaType[];
   position: string;
 }
 
@@ -17,16 +18,16 @@ export interface VideoSelectorProps extends DeviceSelectorProps {
 const DeviceSelector = ({
   position,
   onChangeForm,
-  deviceIds,
+  deviceMetas,
 }: DeviceSelectorProps) => {
   return (
     <div className="mb-6 grid gap-6 md:grid-cols-6">
       <Select id={`${position}DeviceId`} onChange={onChangeForm}>
         <option value=""></option>
-        {deviceIds.map((deviceId) => {
+        {deviceMetas.map(({ deviceId, label }) => {
           return (
             <option key={deviceId} value={deviceId}>
-              {deviceId}
+              {label}-{deviceId}
             </option>
           );
         })}
@@ -37,14 +38,19 @@ const DeviceSelector = ({
 
 const VideoSelector = forwardRef<VideoContainerRef, VideoSelectorProps>(
   (
-    { onChangeForm, deviceIds, selectedDeviceId, position }: VideoSelectorProps,
+    {
+      onChangeForm,
+      deviceMetas,
+      selectedDeviceId,
+      position,
+    }: VideoSelectorProps,
     ref,
   ) => {
     return (
       <>
         <DeviceSelector
           onChangeForm={onChangeForm}
-          deviceIds={deviceIds}
+          deviceMetas={deviceMetas}
           position={position}
         />
         {selectedDeviceId && (

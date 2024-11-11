@@ -3,14 +3,15 @@ import { useState } from "react";
 import Button from "~/features/ui/components/Button";
 import { useLocalStorageInternalRemove } from "~/features/common/hooks/useLocalStorageInternal";
 import VideoSelector from "~/features/video-output/components/VideoSelector";
-import useDeviceIds from "../hooks/useDeviceIds";
+import useDeviceMeta from "../hooks/useDeviceMeta";
 import useFormData from "~/features/common/hooks/useFormData";
 import useQuadrantRefs from "../hooks/useQuadrantRefs";
 import useCaptureDataLocalStorage, {
-  SetCaptureDataArgs,
+  CaptureDataType,
 } from "../hooks/useCaptureDataLocalStorage";
 import CalibrationButton from "./CalibrationButton";
 import useOnCapture from "../hooks/useOnCapture";
+import NormalizeButton from "./NormalizeButton";
 
 export default function Homepage() {
   const { formData, onChangeForm } = useFormData();
@@ -18,16 +19,25 @@ export default function Homepage() {
   const { frontRef, backRef, leftRef, rightRef } = refsObj;
   const removeKeys = useLocalStorageInternalRemove();
 
-  const deviceIds = useDeviceIds();
-  const [captureData, setCaptureData] = useState<SetCaptureDataArgs>({});
-  useCaptureDataLocalStorage(captureData);
+  const deviceMetas = useDeviceMeta();
+  const [captureData, setCaptureData] = useState<CaptureDataType>({});
+  const [calibrationData, setCalibrationData] = useState<CaptureDataType>({});
+
+  useCaptureDataLocalStorage(captureData, "captureData");
+  useCaptureDataLocalStorage(calibrationData, "calibrationData");
+
   const { onCapture } = useOnCapture(refsObj, formData, setCaptureData);
 
   return (
     <>
       <div className="p-12">
         <p className="text-2xl">Inital Calibation</p>
-        <CalibrationButton refsObj={refsObj} setCaptureData={setCaptureData} />
+        <CalibrationButton
+          refsObj={refsObj}
+          setCaptureData={setCalibrationData}
+        />
+
+        <NormalizeButton />
 
         <p className="text-2xl">Tree Light Calibrator</p>
 
@@ -56,7 +66,7 @@ export default function Homepage() {
           <p>Front</p>
           <VideoSelector
             onChangeForm={onChangeForm}
-            deviceIds={deviceIds}
+            deviceMetas={deviceMetas}
             selectedDeviceId={formData?.frontDeviceId}
             position="front"
             ref={frontRef}
@@ -67,7 +77,7 @@ export default function Homepage() {
           <p>Right</p>
           <VideoSelector
             onChangeForm={onChangeForm}
-            deviceIds={deviceIds}
+            deviceMetas={deviceMetas}
             selectedDeviceId={formData?.rightDeviceId}
             position="right"
             ref={rightRef}
@@ -78,7 +88,7 @@ export default function Homepage() {
           <p>Back</p>
           <VideoSelector
             onChangeForm={onChangeForm}
-            deviceIds={deviceIds}
+            deviceMetas={deviceMetas}
             selectedDeviceId={formData?.backDeviceId}
             position="back"
             ref={backRef}
@@ -89,7 +99,7 @@ export default function Homepage() {
           <p>Left</p>
           <VideoSelector
             onChangeForm={onChangeForm}
-            deviceIds={deviceIds}
+            deviceMetas={deviceMetas}
             selectedDeviceId={formData?.leftDeviceId}
             position="left"
             ref={leftRef}

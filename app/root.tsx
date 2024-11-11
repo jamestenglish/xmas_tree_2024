@@ -8,8 +8,8 @@ import {
 import "./tailwind.css";
 
 const COLLAPSED_GROUPS = [
-  "useDeviceIds",
-  "usePlayVideo.playVideo",
+  "useDeviceMeta",
+  // "usePlayVideo.playVideo",
   "usePlayVideo.playVideo.onloadedmetadata",
   "useFormData.onChangeForm",
   "useFormData.onChangeForm.setFormData",

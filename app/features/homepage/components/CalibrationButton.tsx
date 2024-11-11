@@ -3,14 +3,14 @@ import { useCallback, useState } from "react";
 import Button from "~/features/ui/components/Button";
 import { PromiseStateType } from "~/features/led-detection/functions/imageProcessingTypes";
 import getPromiseWithResolver from "~/features/common/functions/getPromiseWithResolver";
-import { SetCaptureDataArgs } from "../hooks/useCaptureDataLocalStorage";
+import { CaptureDataType } from "../hooks/useCaptureDataLocalStorage";
 import saveCaptureResultsForIndex, {
   RefObjType,
 } from "../functions/saveCaptureResultsForIndex";
 
 export type CalibrationButtonProps = {
   refsObj: RefObjType;
-  setCaptureData: React.Dispatch<React.SetStateAction<SetCaptureDataArgs>>;
+  setCaptureData: React.Dispatch<React.SetStateAction<CaptureDataType>>;
 };
 
 type CalibrationStateType =
@@ -106,7 +106,6 @@ const CalibrationButton = ({
         ledIndex,
         setCaptureData,
         promiseObj: newPromiseObj,
-        positionPrefix: "calibrate_",
       });
 
       console.log("advance 2");

@@ -3,12 +3,16 @@ import { useEffect } from "react";
 import useLocalStorageInternal from "~/features/common/hooks/useLocalStorageInternal";
 import { LedPosProps } from "~/features/led-detection/functions/imageProcessingTypes";
 
-export interface SetCaptureDataArgs {
+export interface CaptureDataType {
   [key: string]: Array<LedPosProps>;
 }
-const useCaptureDataLocalStorage = (captureData: SetCaptureDataArgs) => {
+const useCaptureDataLocalStorage = (
+  captureData: CaptureDataType,
+  key: string,
+) => {
   const [_captureDataStorage, setCaptureDataStorage] =
-    useLocalStorageInternal<SetCaptureDataArgs>(`captureData`, {});
+    useLocalStorageInternal<CaptureDataType>(key, {});
+
   useEffect(() => {
     const captureDataWithoutImages = Object.keys(captureData).reduce(
       (acc, key) => {
