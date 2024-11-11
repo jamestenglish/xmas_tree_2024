@@ -30,14 +30,6 @@ console.group = function () {
   }
 };
 
-// console.groupEnd = function (label:any) {
-//   // eslint-disable-next-line prefer-rest-params
-//   const args = Array.from(arguments); // ES5
-//   // args.unshift(LOG_PREFIX + ": ");
-
-//   groupEnd.apply(console, args);
-// };
-
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">

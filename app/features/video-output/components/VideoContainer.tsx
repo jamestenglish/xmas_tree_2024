@@ -85,10 +85,6 @@ const usePlayVideo = ({
   }, [deviceId, position, setDimensions, setVideoElement]);
 };
 
-// const defaultPromiseArg = {
-//   promise: Promise.resolve(null),
-//   resolve: () => true,
-// };
 const VideoContainer = forwardRef<VideoContainerRef, VideoContainerProps>(
   ({ deviceId, position }: VideoContainerProps, ref) => {
     const [videoElement, setVideoElement] = useState<HTMLVideoElement | null>(
