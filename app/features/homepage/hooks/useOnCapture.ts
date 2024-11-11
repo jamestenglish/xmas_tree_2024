@@ -10,8 +10,6 @@ const useOnCapture = (
   formData: FormDataProps,
   setCaptureData: React.Dispatch<React.SetStateAction<SetCaptureDataArgs>>,
 ) => {
-  // const { frontRef, backRef, leftRef, rightRef } = refsObj;
-
   const onCapture = useCallback(() => {
     const doCapture = async () => {
       if (!formData?.numLights) {
