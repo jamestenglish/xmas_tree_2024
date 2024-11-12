@@ -14,6 +14,69 @@ import { canvasHeight, canvasWidth } from "./constants";
 const imgUrl =
   "https://images.chesscomfiles.com/uploads/v1/images_users/tiny_mce/petrikeckman/phpE4U0RQ.png";
 
+type EditableImageProps = {
+  img: ImageType;
+  isSelected: boolean;
+  onSelect: (e: Konva.KonvaEventObject<MouseEvent>) => void;
+  onTransformEnd: (e: Konva.KonvaEventObject<Event>) => void;
+};
+// Separate component for each editable image with transformer support
+function EditableImage({
+  img,
+  isSelected,
+  onSelect,
+  onTransformEnd,
+}: EditableImageProps) {
+  const [image] = useImage(img.src);
+  const shapeRef = useRef<Konva.Image>(null);
+  const trRef = useRef<Konva.Transformer>(null);
+
+  // Attach transformer on image selection
+  useEffect(() => {
+    if (isSelected && trRef.current && shapeRef.current) {
+      trRef.current.nodes([shapeRef.current]);
+      trRef.current.getLayer()?.batchDraw();
+    }
+  }, [isSelected]);
+
+  return (
+    <>
+      <KonvaImage
+        image={image}
+        x={img.x}
+        y={img.y}
+        width={img.width}
+        height={img.height}
+        rotation={img.rotation}
+        draggable
+        onClick={onSelect}
+        onTap={onSelect}
+        ref={shapeRef}
+        onTransformEnd={onTransformEnd}
+        onDragEnd={onTransformEnd}
+
+        // onDragEnd={(e) => {
+        //   // Update image position on drag end
+        //   const node = e.target;
+        //   onTransformEnd(e, img.id, { x: node.x(), y: node.y() });
+        // }}
+      />
+      {isSelected && (
+        <Transformer
+          ref={trRef}
+          rotateEnabled={true}
+          boundBoxFunc={(oldBox, newBox) => {
+            // Limit resizing to avoid negative sizes
+            if (newBox.width < 5 || newBox.height < 5) {
+              return oldBox;
+            }
+            return newBox;
+          }}
+        />
+      )}
+    </>
+  );
+}
 type ImageType = {
   id: string;
   src: string;
@@ -29,9 +92,9 @@ type LineType = {
 };
 
 type CanvasEditorProps = {
-  testCanvasRef: React.RefObject<HTMLCanvasElement>;
+  setImgUrl: React.Dispatch<React.SetStateAction<string>>;
 };
-function CanvasEditor({ testCanvasRef }: CanvasEditorProps) {
+function CanvasEditor({ setImgUrl }: CanvasEditorProps) {
   const [lines, setLines] = useState<Array<LineType>>([]);
   const [images, setImages] = useState<Array<ImageType>>([]);
   const [isDrawing, setIsDrawing] = useState<boolean>(false);
@@ -136,18 +199,22 @@ function CanvasEditor({ testCanvasRef }: CanvasEditorProps) {
       if (stageRef.current) {
         const uri = stageRef.current.toDataURL();
 
-        if (testCanvasRef.current) {
-          const context = testCanvasRef.current.getContext("2d");
-          await new Promise((resolve) => {
-            const img = new Image();
-            img.onload = function () {
-              context?.drawImage(img, 0, 0, canvasWidth, canvasHeight); // Or at whatever offset you like
-              resolve(null);
-            };
-            img.src = uri;
-          });
-        }
-        console.log(uri);
+        // if (testCanvasRef.current) {
+        //   const context = testCanvasRef.current.getContext("2d");
+        //   await new Promise((resolve) => {
+        //     const img = new Image();
+        //     const ii = document.getElementById("testImg") as HTMLImageElement;
+        //     ii.src = uri;
+        //     img.onload = function () {
+        //       context?.drawImage(img, 0, 0); //, canvasWidth, canvasHeight); // Or at whatever offset you like
+        //       resolve(null);
+        //     };
+        //     img.src = uri;
+        //   });
+
+        setImgUrl(uri);
+        // }
+        // console.log(uri);
         // we also can save uri as file
         // but in the demo on Konva website it will not work
         // because of iframe restrictions
@@ -156,7 +223,7 @@ function CanvasEditor({ testCanvasRef }: CanvasEditorProps) {
       }
     };
     handleExportAsync();
-  }, [testCanvasRef]);
+  }, [setImgUrl]);
 
   return (
     <div>
@@ -180,8 +247,8 @@ function CanvasEditor({ testCanvasRef }: CanvasEditorProps) {
             <Line
               key={i}
               points={line.points}
-              stroke="black"
-              strokeWidth={2}
+              stroke="purple"
+              strokeWidth={20}
               tension={0.5}
               lineCap="round"
               lineJoin="round"
@@ -203,70 +270,6 @@ function CanvasEditor({ testCanvasRef }: CanvasEditorProps) {
         </Layer>
       </Stage>
     </div>
-  );
-}
-
-type EditableImageProps = {
-  img: ImageType;
-  isSelected: boolean;
-  onSelect: (e: Konva.KonvaEventObject<MouseEvent>) => void;
-  onTransformEnd: (e: Konva.KonvaEventObject<Event>) => void;
-};
-// Separate component for each editable image with transformer support
-function EditableImage({
-  img,
-  isSelected,
-  onSelect,
-  onTransformEnd,
-}: EditableImageProps) {
-  const [image] = useImage(img.src);
-  const shapeRef = useRef<Konva.Image>(null);
-  const trRef = useRef<Konva.Transformer>(null);
-
-  // Attach transformer on image selection
-  useEffect(() => {
-    if (isSelected && trRef.current && shapeRef.current) {
-      trRef.current.nodes([shapeRef.current]);
-      trRef.current.getLayer()?.batchDraw();
-    }
-  }, [isSelected]);
-
-  return (
-    <>
-      <KonvaImage
-        image={image}
-        x={img.x}
-        y={img.y}
-        width={img.width}
-        height={img.height}
-        rotation={img.rotation}
-        draggable
-        onClick={onSelect}
-        onTap={onSelect}
-        ref={shapeRef}
-        onTransformEnd={onTransformEnd}
-        onDragEnd={onTransformEnd}
-
-        // onDragEnd={(e) => {
-        //   // Update image position on drag end
-        //   const node = e.target;
-        //   onTransformEnd(e, img.id, { x: node.x(), y: node.y() });
-        // }}
-      />
-      {isSelected && (
-        <Transformer
-          ref={trRef}
-          rotateEnabled={true}
-          boundBoxFunc={(oldBox, newBox) => {
-            // Limit resizing to avoid negative sizes
-            if (newBox.width < 5 || newBox.height < 5) {
-              return oldBox;
-            }
-            return newBox;
-          }}
-        />
-      )}
-    </>
   );
 }
 

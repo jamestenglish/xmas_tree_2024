@@ -5,7 +5,7 @@ import { useRef, useEffect, useMemo, useState } from "react";
 import pos2 from "./pos2";
 // import Button from "~/features/ui/components/Button";
 import { useForm } from "react-hook-form";
-import CanvasEditor from "./CanvasEditor";
+import CanvasEditor from "./CanvasEditor.client";
 import { canvasHeight, canvasWidth } from "./constants";
 
 THREE.ColorManagement.enabled = true;
@@ -19,8 +19,8 @@ THREE.ColorManagement.enabled = true;
 // https://konvajs.org/docs/sandbox/Image_Resize.html
 // https://react-canvas-editor.github.io/react-canvas-editor/ <------
 // https://github.com/React-Canvas-Editor/react-canvas-editor <-----
-const imgUrl =
-  "https://images.chesscomfiles.com/uploads/v1/images_users/tiny_mce/petrikeckman/phpE4U0RQ.png";
+// const imgUrl =
+//   "https://images.chesscomfiles.com/uploads/v1/images_users/tiny_mce/petrikeckman/phpE4U0RQ.png";
 
 export interface CylinderFormDataProps {
   cylinderOpacity?: number;
@@ -64,12 +64,12 @@ const points = [new THREE.Vector3(0, -10, 0), new THREE.Vector3(0, 10, 0)];
 
 type CylinderSceneProps = {
   cylinderOpacity?: number;
-  version: number;
+  imgUrl: string;
 };
 
 const CylinderScene = ({
   cylinderOpacity = 0.3,
-  version,
+  imgUrl,
 }: CylinderSceneProps) => {
   const texture = useTexture(imgUrl);
   const cylinderHeight = 20;
@@ -77,7 +77,7 @@ const CylinderScene = ({
   const lineRef = useRef<THREE.BufferGeometry>(null);
 
   const spheres = useMemo(() => {
-    console.log({ version });
+    // console.log({ version });
     // function generateSpheres(): SphereProps[] {
     const generatedSpheres: SphereProps[] = [];
 
@@ -86,11 +86,11 @@ const CylinderScene = ({
     ) as HTMLCanvasElement;
     const sampleContext = sampleCanvas.getContext("2d");
     // // TODO JTE turn off
-    // if (sampleContext && texture.image) {
-    //   sampleCanvas.width = texture.image.width;
-    //   sampleCanvas.height = texture.image.height;
-    //   sampleContext.drawImage(texture.image, 0, 0);
-    // }
+    if (sampleContext && texture.image) {
+      sampleCanvas.width = texture.image.width;
+      sampleCanvas.height = texture.image.height;
+      sampleContext.drawImage(texture.image, 0, 0);
+    }
 
     const sampleCanvas2 = document.getElementById(
       "testCanvas2",
@@ -121,7 +121,7 @@ const CylinderScene = ({
     return generatedSpheres;
     // }
     // return generateSpheres();
-  }, [texture.image, version]);
+  }, [texture.image]);
 
   useEffect(() => {
     console.log({ curent: lineRef.current });
@@ -202,8 +202,10 @@ const ThreeClient = () => {
 
   const testCanvasRef = useRef<HTMLCanvasElement>(null);
 
-  // const [version, setVersion] = useState<number>(0);
-  const [version] = useState<number>(0);
+  const [imgUrl, setImgUrl] = useState<string>(
+    "https://images.chesscomfiles.com/uploads/v1/images_users/tiny_mce/petrikeckman/phpE4U0RQ.png",
+  );
+  // const [version] = useState<number>(0);
 
   // const strokeWidth = 20;
 
@@ -277,10 +279,7 @@ const ThreeClient = () => {
             camera={{ position: [0, 0, 15], fov: 75 }}
           >
             <color attach="background" args={["#112233"]} />
-            <CylinderScene
-              cylinderOpacity={cylinderOpacity}
-              version={version}
-            />
+            <CylinderScene cylinderOpacity={cylinderOpacity} imgUrl={imgUrl} />
             <OrbitControls />
           </Canvas>
           <div
@@ -290,13 +289,15 @@ const ThreeClient = () => {
               border: "1px solid black",
             }}
           >
-            <CanvasEditor testCanvasRef={testCanvasRef} />
+            <CanvasEditor setImgUrl={setImgUrl} />
           </div>
         </div>
         <div className="flex flex-row gap-2">
           <canvas
             id="testCanvas"
             ref={testCanvasRef}
+            width={canvasWidth}
+            height={canvasHeight}
             style={{
               width: `${canvasWidth}px`,
               height: `${canvasHeight}px`,
@@ -311,6 +312,7 @@ const ThreeClient = () => {
           />
         </div>
       </div>
+      <img id="testImg" alt="foo" />
     </>
   );
 };
