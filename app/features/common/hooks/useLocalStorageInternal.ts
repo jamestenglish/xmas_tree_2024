@@ -21,12 +21,14 @@ export default function useLocalStorageInternal<T>(
   const [_, setKeys] = useLocalStorage<Array<string>>("INTERNAL_KEYS", [], {
     initializeWithValue: false,
   });
+
   useEffect(() => {
     setKeys((prev) => {
       const set = new Set([...prev, key]);
       return Array.from(set);
     });
   }, [key, setKeys]);
+
   const result = useLocalStorage<T>(key, initialValue, {
     initializeWithValue: false,
     ...options,

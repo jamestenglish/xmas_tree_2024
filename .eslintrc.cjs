@@ -22,7 +22,9 @@ module.exports = {
   ignorePatterns: ["!**/.server", "!**/.client"],
 
   // Base config
-  extends: ["eslint:recommended"],
+  extends: ["eslint:recommended", "plugin:@react-three/recommended"],
+  plugins: ["@react-three"],
+
   rules: {
     // "import/no-unresolved": ["error", "never"],
     "react-hooks/exhaustive-deps": "warn",
@@ -42,12 +44,14 @@ module.exports = {
     // React
     {
       files: ["**/*.{js,jsx,ts,tsx}"],
-      plugins: ["react", "jsx-a11y"],
+      plugins: ["react", "jsx-a11y", "@react-three"],
+
       extends: [
         "plugin:react/recommended",
         "plugin:react/jsx-runtime",
         "plugin:react-hooks/recommended",
         "plugin:jsx-a11y/recommended",
+        "plugin:@react-three/recommended",
       ],
       settings: {
         react: {
@@ -68,7 +72,7 @@ module.exports = {
     // Typescript
     {
       files: ["**/*.{ts,tsx}"],
-      plugins: ["@typescript-eslint", "import"],
+      plugins: ["@typescript-eslint", "import", "@react-three"],
       parser: "@typescript-eslint/parser",
       settings: {
         "import/internal-regex": "^~/",
@@ -85,8 +89,12 @@ module.exports = {
         "plugin:@typescript-eslint/recommended",
         "plugin:import/recommended",
         "plugin:import/typescript",
+        "plugin:@react-three/recommended",
       ],
-      rules: { "jsx-a11y/media-has-caption": "off" },
+      rules: {
+        "jsx-a11y/media-has-caption": "off",
+        "react/no-unknown-property": ["off", { ignore: ["JSX"] }],
+      },
     },
 
     // Node

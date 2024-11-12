@@ -2,11 +2,10 @@ import { forwardRef } from "react";
 import Select from "~/features/ui/components/Select";
 import VideoContainer from "~/features/video-output/components/VideoContainer";
 import type { VideoContainerRef } from "./VideoSelectorTypes";
-import { OnChangeFormType } from "~/features/common/hooks/useFormData";
 import { DeviceMetaType } from "~/features/homepage/hooks/useDeviceMeta";
+import { useFormContext } from "react-hook-form";
 
 interface DeviceSelectorProps {
-  onChangeForm: OnChangeFormType;
   deviceMetas: DeviceMetaType[];
   position: string;
 }
@@ -15,14 +14,11 @@ export interface VideoSelectorProps extends DeviceSelectorProps {
   selectedDeviceId?: string;
 }
 
-const DeviceSelector = ({
-  position,
-  onChangeForm,
-  deviceMetas,
-}: DeviceSelectorProps) => {
+const DeviceSelector = ({ position, deviceMetas }: DeviceSelectorProps) => {
+  const { register } = useFormContext();
   return (
     <div className="mb-6 grid gap-6 md:grid-cols-6">
-      <Select id={`${position}DeviceId`} onChange={onChangeForm}>
+      <Select {...register(`${position}DeviceId`)}>
         <option value=""></option>
         {deviceMetas.map(({ deviceId, label }) => {
           return (
@@ -37,22 +33,12 @@ const DeviceSelector = ({
 };
 
 const VideoSelector = forwardRef<VideoContainerRef, VideoSelectorProps>(
-  (
-    {
-      onChangeForm,
-      deviceMetas,
-      selectedDeviceId,
-      position,
-    }: VideoSelectorProps,
-    ref,
-  ) => {
+  ({ deviceMetas, position }: VideoSelectorProps, ref) => {
+    const { watch } = useFormContext();
+    const selectedDeviceId = watch(`${position}DeviceId`);
     return (
       <>
-        <DeviceSelector
-          onChangeForm={onChangeForm}
-          deviceMetas={deviceMetas}
-          position={position}
-        />
+        <DeviceSelector deviceMetas={deviceMetas} position={position} />
         {selectedDeviceId && (
           <VideoContainer
             ref={ref}

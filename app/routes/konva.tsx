@@ -2,8 +2,8 @@ import { type MetaFunction } from "@remix-run/node";
 
 // import Three from "~/features/three/components/Three.jsx";
 
-import Three from "~/features/three/components/Three";
-import { ClientOnly } from "remix-utils/client-only";
+// import Konva from "~/features/three/components/CanvasEditor";
+// import { ClientOnly } from "remix-utils/client-only";
 
 export const meta: MetaFunction = () => {
   return [
@@ -12,6 +12,6 @@ export const meta: MetaFunction = () => {
   ];
 };
 
-export default function ThreePage() {
-  return <ClientOnly fallback={null}>{() => <Three />}</ClientOnly>;
-}
+// export default function ThreePage() {
+//   return <ClientOnly fallback={null}>{() => <Konva />}</ClientOnly>;
+// }
