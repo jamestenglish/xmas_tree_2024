@@ -139,7 +139,6 @@ function CanvasEditor({ setImgUrl }: CanvasEditorProps) {
   // Continue freehand drawing
   const handleMouseMove = useCallback(
     (e: Konva.KonvaEventObject<MouseEvent>) => {
-      console.log({ isDrawing });
       if (!isDrawing) return;
       const stage = e.target.getStage();
       const point = stage?.getPointerPosition();

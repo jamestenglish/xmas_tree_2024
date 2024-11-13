@@ -1,180 +1,218 @@
-import { useEffect, useRef, useState } from "react";
-import { Timeline, TimelineModel, TimelineRow } from "animation-timeline-js";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import {
+  Timeline,
+  TimelineInteractionMode,
+  TimelineModel,
+  TimelineRow,
+} from "animation-timeline-js";
+import useInitTimelineListeners from "../hooks/useInitTimelineListeners";
+import useInitTimeline from "../hooks/useInitTimeline";
+import TimelineButtons from "./TimelineButtons";
 
-function generateHTMLOutlineListNodes(timeline: Timeline, rows: TimelineRow[]) {
-  const outlineContainer = document.getElementById("outline-container");
+const initialModel: TimelineModel = {
+  rows: [
+    {
+      keyframes: [
+        {
+          val: 0,
+          group: "a",
+        },
+        {
+          val: 3000,
+          group: "a",
+        },
+        {
+          val: 3500,
+          group: "b",
+        },
+        {
+          val: 4000,
+          group: "b",
+        },
+      ],
+    },
+    {
+      keyframes: [
+        {
+          val: 50,
+          group: "c",
+        },
+        {
+          val: 1000,
+          group: "c",
+        },
+      ],
+    },
+    {
+      keyframes: [
+        {
+          val: 100,
+        },
+        {
+          val: 1500,
+        },
+      ],
+    },
+    {
+      keyframes: [
+        {
+          val: 100,
+        },
+        {
+          val: 1500,
+        },
+      ],
+    },
+    {
+      keyframes: [
+        {
+          val: 100,
+        },
+        {
+          val: 1500,
+        },
+      ],
+    },
+    {
+      keyframes: [
+        {
+          val: 100,
+        },
+        {
+          val: 1500,
+        },
+      ],
+    },
+    {
+      keyframes: [
+        {
+          val: 100,
+        },
+        {
+          val: 1500,
+        },
+      ],
+    },
+    {
+      keyframes: [
+        {
+          val: 100,
+        },
+        {
+          val: 1500,
+        },
+      ],
+    },
+  ],
+} as const;
 
-  const options = timeline.getOptions();
-  const headerElement = document.getElementById("outline-header");
-  if (!headerElement) {
-    return;
-  }
-  headerElement.style.maxHeight = headerElement.style.minHeight =
-    options.headerHeight + "px";
-  // headerElement.style.backgroundColor = options.headerFillColor;
-  if (!outlineContainer) {
-    console.log("Error: Cannot find html element to output outline/tree view");
-    return;
-  }
-  outlineContainer.innerHTML = "";
-
-  rows.forEach(function (row, index) {
-    var div = document.createElement("div");
-    div.classList.add("outline-node");
-    const h =
-      (row.style ? row.style.height : 0) ||
-      (options.rowsStyle ? options.rowsStyle.height : 0);
-    div.style.maxHeight = div.style.minHeight = h + "px";
-    div.style.marginBottom =
-      ((options.rowsStyle ? options.rowsStyle.marginBottom : 0) || 0) + "px";
-    div.innerText = "Track " + index;
-    div.id = div.innerText;
-    var alreadyAddedWithSuchNameElement = document.getElementById(
-      div.innerText,
-    );
-    // Combine outlines with the same name:
-    if (alreadyAddedWithSuchNameElement) {
-      var increaseSize =
-        Number.parseInt(alreadyAddedWithSuchNameElement.style.maxHeight) +
-        (h ?? 0);
-      alreadyAddedWithSuchNameElement.style.maxHeight =
-        alreadyAddedWithSuchNameElement.style.minHeight = increaseSize + "px";
-
-      return;
-    }
-    if (outlineContainer) {
-      outlineContainer.appendChild(div);
-    }
-  });
-}
-
-type TimelineComponentProps = {
-  time?: number;
-  model: TimelineModel;
+type OutlineNodeProps = {
+  row: TimelineRow;
+  timeline: Timeline | undefined;
+  index: number;
 };
 
-function TimelineComponent({ model, time }: TimelineComponentProps) {
+function OutlineNode({ row, timeline, index }: OutlineNodeProps) {
+  if (!timeline) {
+    return null;
+  }
+  const options = timeline.getOptions();
+  const h =
+    (row.style ? row.style.height : 0) ||
+    (options.rowsStyle ? options.rowsStyle.height : 0);
+
+  const marginBottom =
+    ((options.rowsStyle ? options.rowsStyle.marginBottom : 0) || 0) + "px";
+  return (
+    <div
+      style={{ maxHeight: `${h}px`, minHeight: `${h}px`, marginBottom }}
+      className="outline-node"
+    >
+      Track {index}
+    </div>
+  );
+}
+
+function TimelineComponent() {
   const timelineElRef = useRef<HTMLDivElement>(null);
-  const [timeline, setTimeline] = useState<Timeline>();
+  const outlineContainerRef = useRef<HTMLDivElement>(null);
+  const outlineScrollContainerRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    let newTimeline: Timeline | null = null;
-    // On component init
-    if (timelineElRef.current) {
-      newTimeline = new Timeline({ id: timelineElRef.current });
-      // Here you can subscribe on timeline component events
-      setTimeline(newTimeline);
-    }
+  const [model, setModel] = useState<TimelineModel>(initialModel);
 
-    // cleanup on component unmounted.
-    return () => newTimeline?.dispose();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [timelineElRef.current]);
+  const [interactionMode, setInteractionMode] =
+    useState<TimelineInteractionMode>(TimelineInteractionMode.Pan);
+
+  const { timeline } = useInitTimeline({ timelineElRef });
+
+  useInitTimelineListeners({
+    timeline,
+    outlineContainerRef,
+    outlineScrollContainerRef,
+  });
 
   // Example to subscribe and pass model or time update:
   useEffect(() => {
     timeline?.setModel(model);
+    timeline?.setTime(0);
   }, [model, timeline]);
 
-  // Example to subscribe and pass model or time update:
-  useEffect(() => {
-    if (time || time === 0) {
-      timeline?.setTime(time);
-    }
-  }, [time, timeline]);
+  const onWheelScroll = useCallback(
+    (event: React.WheelEvent<HTMLDivElement>) => {
+      // Set scroll back to timeline when mouse scroll over the outline
+      if (timeline) {
+        const unknownEvent = event as unknown;
+        const coercedEvent = unknownEvent as WheelEvent;
+        timeline._handleWheelEvent(coercedEvent);
+      }
+    },
+    [timeline],
+  );
 
   return (
     <>
-      <div className="toolbar">
-        <button
-          className="button mat-icon material-icons mat-icon-no-color"
-          title="Timeline selection mode"
-          // onClick="selectMode()"
-        >
-          tab_unselected
-        </button>
-        <button
-          className="button mat-icon material-icons mat-icon-no-color"
-          title="Timeline pan mode with the keyframe selection."
-          // onclick="panMode(true)"
-        >
-          pan_tool_alt
-        </button>
-        <button
-          className="button mat-icon material-icons mat-icon-no-color"
-          title="Timeline pan mode non interactive"
-          // onclick="panMode(false)"
-        >
-          pan_tool
-        </button>
-        <button
-          className="button mat-icon material-icons mat-icon-no-color"
-          title="Timeline zoom mode. Also ctrl + scroll can be used."
-          // onclick="zoomMode()"
-        >
-          search
-        </button>
-        <button
-          className="button mat-icon material-icons mat-icon-no-color"
-          title="Only view mode."
-          // onclick="noneMode()"
-        >
-          visibility
-        </button>
-        <div
-          style={{ width: "1px", background: "gray", height: "100%}" }}
-        ></div>
-        <button
-          className="button mat-icon material-icons mat-icon-no-color"
-          title="Use external player to play\stop the timeline. For the demo simple setInterval is used."
-          // onclick="onPlayClick()"
-        >
-          play_arrow
-        </button>
-        <button
-          className="button mat-icon material-icons mat-icon-no-color"
-          title="Use external player to play\stop the timeline. For the demo simple setInterval is used."
-          // onclick="onPauseClick()"
-        >
-          pause
-        </button>
-        <div style={{ flex: 1 }}></div>
-        <button
-          className="flex-left button mat-icon material-icons mat-icon-no-color"
-          title="Remove selected keyframe"
-          // onclick="removeKeyframe()"
-        >
-          close
-        </button>
-        <button
-          className="flex-left button mat-icon material-icons mat-icon-no-color"
-          title="Add new track with the keyframe"
-          // onclick="addKeyframe()"
-        >
-          add
-        </button>
-        <div className="links">
-          <a
-            className="git-hub-link"
-            href="https://github.com/ievgennaida/animation-timeline-control"
-          >
-            GitHub
-          </a>
+      <div className="timeline-component">
+        <div className="toolbar">
+          <TimelineButtons
+            interactionMode={interactionMode}
+            setInteractionMode={setInteractionMode}
+            timeline={timeline}
+            model={model}
+            timelineElRef={timelineElRef}
+            setModel={setModel}
+          />
         </div>
-      </div>
-      <footer>
-        <div className="outline">
-          <div className="outline-header" id="outline-header"></div>
-          <div
-            className="outline-scroll-container"
-            id="outline-scroll-container"
-            // onWheel="outlineMouseWheel(arguments[0])"
-          >
-            <div className="outline-items" id="outline-container"></div>
+        <footer>
+          <div className="outline">
+            <div className="outline-header" id="outline-header"></div>
+            <div
+              className="outline-scroll-container"
+              id="outline-scroll-container"
+              ref={outlineScrollContainerRef}
+              onWheel={onWheelScroll}
+            >
+              <div
+                className="outline-items"
+                id="outline-container"
+                ref={outlineContainerRef}
+              >
+                {model.rows.map((row, index) => {
+                  return (
+                    <OutlineNode
+                      /*TODO JTE*/
+                      key={index}
+                      row={row}
+                      index={index}
+                      timeline={timeline}
+                    />
+                  );
+                })}
+              </div>
+            </div>
           </div>
-        </div>
-        <div ref={timelineElRef} id="timeline"></div>
-      </footer>
+          <div ref={timelineElRef} id="timeline"></div>
+        </footer>
+      </div>
     </>
   );
 }

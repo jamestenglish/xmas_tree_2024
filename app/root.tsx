@@ -44,6 +44,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" />
+        {/* TODO JTE load only when needed */}
         <link
           href="https://fonts.googleapis.com/icon?family=Material+Icons&amp;display=block"
           rel="stylesheet"

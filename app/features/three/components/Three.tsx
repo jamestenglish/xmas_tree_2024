@@ -257,82 +257,75 @@ const ThreeClient = () => {
 
   return (
     <>
-      <div className="p-6">
-        <div className="mb-6 grid gap-6 md:grid-cols-6">
-          <div>
-            <label
-              htmlFor="first_name"
-              className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
-            >
-              Opacity
-            </label>
-            <input
-              type="number"
-              className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
-              placeholder="100"
-              required
-              {...register("cylinderOpacity")}
-            />
+      <div className="app-container">
+        <div className="tmp-main">
+          <div className="content">
+            <div className="p-6">
+              <div className="mb-6 grid gap-6 md:grid-cols-6">
+                <div>
+                  <label
+                    htmlFor="first_name"
+                    className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
+                  >
+                    Opacity
+                  </label>
+                  <input
+                    type="number"
+                    className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
+                    placeholder="100"
+                    required
+                    {...register("cylinderOpacity")}
+                  />
+                </div>
+              </div>
+              <div className="flex flex-row gap-2">
+                <Canvas
+                  style={{ height: "100vh" }}
+                  camera={{ position: [0, 0, 15], fov: 75 }}
+                >
+                  <color attach="background" args={["#112233"]} />
+                  <CylinderScene
+                    cylinderOpacity={cylinderOpacity}
+                    imgUrl={imgUrl}
+                  />
+                  <OrbitControls />
+                </Canvas>
+                <div
+                  style={{
+                    // width: "640px",
+                    // height: "480px",
+                    border: "1px solid black",
+                  }}
+                >
+                  <CanvasEditor setImgUrl={setImgUrl} />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-        <div className="flex flex-row gap-2">
-          <Canvas
-            style={{ height: "100vh" }}
-            camera={{ position: [0, 0, 15], fov: 75 }}
-          >
-            <color attach="background" args={["#112233"]} />
-            <CylinderScene cylinderOpacity={cylinderOpacity} imgUrl={imgUrl} />
-            <OrbitControls />
-          </Canvas>
-          <div
-            style={{
-              // width: "640px",
-              // height: "480px",
-              border: "1px solid black",
-            }}
-          >
-            <CanvasEditor setImgUrl={setImgUrl} />
-          </div>
-        </div>
-        <div>
-          <TimelineComponent
-            time={0}
-            model={{
-              rows: [
-                {
-                  keyframes: [
-                    {
-                      val: 40,
-                    },
-                    {
-                      val: 3000,
-                    },
-                  ],
-                },
-              ],
-            }}
-          ></TimelineComponent>
-        </div>
-        <div className="flex flex-row gap-2">
-          <canvas
-            id="testCanvas"
-            ref={testCanvasRef}
-            width={canvasWidth}
-            height={canvasHeight}
-            style={{
-              width: `${canvasWidth}px`,
-              height: `${canvasHeight}px`,
-            }}
-          />
-          <canvas
-            id="testCanvas2"
-            style={{
-              width: `${canvasWidth}px`,
-              height: `${canvasHeight}px`,
-            }}
-          />
-        </div>
+        <TimelineComponent></TimelineComponent>
       </div>
+
+      <div className="flex flex-row gap-2">
+        <canvas
+          id="testCanvas"
+          ref={testCanvasRef}
+          width={canvasWidth}
+          height={canvasHeight}
+          style={{
+            width: `${canvasWidth}px`,
+            height: `${canvasHeight}px`,
+          }}
+        />
+        <canvas
+          id="testCanvas2"
+          style={{
+            width: `${canvasWidth}px`,
+            height: `${canvasHeight}px`,
+          }}
+        />
+      </div>
+
       <img id="testImg" alt="foo" />
     </>
   );
