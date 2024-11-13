@@ -20,6 +20,7 @@
     "@remix-run/react": "^2.11.2",
     "@remix-run/serve": "^2.11.2",
     "@types/three": "^0.169.0",
+    "animation-timeline-js": "^2.3.5",
     "axios": "^1.7.7",
     "clsx": "^2.1.1",
     "i": "^0.3.7",

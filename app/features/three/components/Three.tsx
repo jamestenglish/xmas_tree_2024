@@ -7,6 +7,8 @@ import pos2 from "./pos2";
 import { useForm } from "react-hook-form";
 import CanvasEditor from "./CanvasEditor.client";
 import { canvasHeight, canvasWidth } from "./constants";
+import TimelineComponent from "./TimelineComponent.client";
+import "../assets/demo.css";
 
 THREE.ColorManagement.enabled = true;
 
@@ -291,6 +293,25 @@ const ThreeClient = () => {
           >
             <CanvasEditor setImgUrl={setImgUrl} />
           </div>
+        </div>
+        <div>
+          <TimelineComponent
+            time={0}
+            model={{
+              rows: [
+                {
+                  keyframes: [
+                    {
+                      val: 40,
+                    },
+                    {
+                      val: 3000,
+                    },
+                  ],
+                },
+              ],
+            }}
+          ></TimelineComponent>
         </div>
         <div className="flex flex-row gap-2">
           <canvas
