@@ -17,26 +17,21 @@ const useInitTimeline = ({ timelineElRef }: UseInitTimelineArgs) => {
         headerHeight: 45,
         snapEnabled: true,
         snapAllKeyframesOnMove: true,
-        // snapStep: 3,
-        snapStep: 250,
-        // stepSmallPx: 119,
-        // stepPx: 120,
-        // stepSmallPx: 120 / 4 + 85,
-
-        // denominators: [1, 12],
-        // denominators: [1, 30],
+        snapStep: 200,
+        rowsStyle: {
+          fillColor: "white",
+        },
       });
       // Here you can subscribe on timeline component events
       setTimeline(newTimeline);
+      console.log({ newTimeline });
     }
 
     // cleanup on component unmounted.
     return () => {
       newTimeline?.dispose();
     };
-    // TODO JTE do I need this disable?
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [timelineElRef.current]);
+  }, [timelineElRef]);
 
   return { timeline };
 };

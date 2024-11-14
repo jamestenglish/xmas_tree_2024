@@ -6,6 +6,7 @@ import {
 import clsx from "clsx";
 import { useCallback, useEffect, useState } from "react";
 import useTimelineInteractions from "../hooks/useTimelineInteractions";
+import createRow from "../functions/createRow";
 
 type TimelineButtonsProps = {
   interactionMode: TimelineInteractionMode;
@@ -94,23 +95,23 @@ export default function TimelineButtons({
     }
   }, [timeline]);
 
-  const onRemoveKeyFrame = useCallback(() => {
-    if (timeline) {
-      // Add keyframe
-      // TODO JTE
-      const currentModel = timeline.getModel();
-      if (currentModel && currentModel.rows) {
-        currentModel.rows.forEach((row) => {
-          if (row.keyframes) {
-            row.keyframes = row.keyframes.filter((p) => !p.selected);
-          }
-        });
-        timeline.setModel(currentModel);
-      }
-    }
-  }, [timeline]);
+  // const onRemoveKeyFrame = useCallback(() => {
+  //   if (timeline) {
+  //     // Add keyframe
+  //     // TODO JTE
+  //     const currentModel = timeline.getModel();
+  //     if (currentModel && currentModel.rows) {
+  //       currentModel.rows.forEach((row) => {
+  //         if (row.keyframes) {
+  //           row.keyframes = row.keyframes.filter((p) => !p.selected);
+  //         }
+  //       });
+  //       timeline.setModel(currentModel);
+  //     }
+  //   }
+  // }, [timeline]);
 
-  const onAddKeyFrame = useCallback(() => {
+  const onAddTrack = useCallback(() => {
     if (timeline) {
       // Add keyframe
       // const currentModel = timeline.getModel();
@@ -121,9 +122,10 @@ export default function TimelineButtons({
 
       setModel((prev) => {
         const prevRows = prev.rows;
+        const newRow = createRow({ start: timeline.getTime() });
         return {
           ...prev,
-          rows: [...prevRows, { keyframes: [{ val: timeline.getTime() }] }],
+          rows: [...prevRows, newRow],
         };
       });
     }
@@ -131,6 +133,7 @@ export default function TimelineButtons({
 
   // TODO JTE rewind interaction
   // TODO JTE reset zoom interaction
+  // TODO JTE add group, remove group
 
   return (
     <>
@@ -206,19 +209,20 @@ export default function TimelineButtons({
         fast_rewind
       </button>
       <div style={{ flex: 1 }}></div>
-      <button
+      {/* <button
         className="flex-left button mat-icon material-icons mat-icon-no-color"
         title="Remove selected keyframe"
         onClick={onRemoveKeyFrame}
       >
         close
-      </button>
+      </button> */}
       <button
-        className="flex-left button mat-icon material-icons mat-icon-no-color"
+        className="flex-left button"
         title="Add new track with the keyframe"
-        onClick={onAddKeyFrame}
+        onClick={onAddTrack}
       >
-        add
+        <span className="mat-icon material-icons mat-icon-no-color">add</span>
+        <span> Add Track</span>
       </button>
     </>
   );

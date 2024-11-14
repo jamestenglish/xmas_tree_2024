@@ -12,12 +12,16 @@ type UseInitTimelineListenersType = {
   timeline: Timeline | undefined;
   outlineContainerRef: React.RefObject<HTMLDivElement>;
   outlineScrollContainerRef: React.RefObject<HTMLDivElement>;
+  setSelectedGroupId: React.Dispatch<
+    React.SetStateAction<string | null | undefined>
+  >;
 };
 
 const useInitTimelineListeners = ({
   timeline,
   outlineContainerRef,
   outlineScrollContainerRef,
+  setSelectedGroupId,
 }: UseInitTimelineListenersType) => {
   if (timeline) {
     timeline.onSelected(function (obj) {
@@ -46,26 +50,41 @@ const useInitTimelineListeners = ({
       logDraggingMessage(obj, "dragfinished");
     });
 
-    timeline.onContextMenu(function (obj) {
-      if (obj.args) {
-        obj.args.preventDefault();
-      }
-      logDraggingMessage(obj, "addKeyframe");
+    // timeline.onContextMenu(function (obj) {
+    //   if (obj.args) {
+    //     obj.args.preventDefault();
+    //   }
+    //   logDraggingMessage(obj, "addKeyframe");
 
-      obj.elements.forEach((p) => {
-        if (p.type === "row" && p.row) {
-          if (!p.row?.keyframes) {
-            p.row.keyframes = [];
-          }
-          p.row?.keyframes?.push({ val: obj.point?.val || 0 });
-        }
-      });
-      timeline.redraw();
-    });
+    //   obj.elements.forEach((p) => {
+    //     if (p.type === "row" && p.row) {
+    //       if (!p.row?.keyframes) {
+    //         p.row.keyframes = [];
+    //       }
+    //       p.row?.keyframes?.push({ val: obj.point?.val || 0 });
+    //     }
+    //   });
+    //   timeline.redraw();
+    // });
 
     timeline.onMouseDown(function (obj) {
       const type = obj.target ? obj.target.type : "";
       if (obj.pos) {
+        console.log({ targ: obj.target });
+        let groupId: string | null | undefined;
+        if (obj?.target?.group) {
+          if (typeof obj.target.group === "string") {
+            groupId = obj.target.group;
+          }
+        }
+        if (obj?.target?.keyframe) {
+          if (typeof obj.target.keyframe.group === "string") {
+            groupId = obj.target.keyframe.group;
+          }
+        }
+        if (groupId) {
+          setSelectedGroupId(groupId);
+        }
         logMessage(
           "mousedown:" +
             obj.val +
