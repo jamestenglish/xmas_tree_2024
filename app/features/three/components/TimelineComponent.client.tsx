@@ -1,14 +1,23 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import {
-  Timeline,
-  TimelineInteractionMode,
-  // TimelineKeyframe,
-} from "animation-timeline-js";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import { Timeline, TimelineInteractionMode } from "animation-timeline-js";
 import useInitTimelineListeners from "../hooks/useInitTimelineListeners";
 import useInitTimeline from "../hooks/useInitTimeline";
 import TimelineButtons from "./TimelineButtons";
-import { v7 } from "uuid";
-import createRow, { TimelineRowExtra } from "../functions/createRow";
+import createRow, {
+  createSelectedGroup,
+  createUnselectedGroup,
+  TimelineGroupExtra,
+  TimelineRowExtra,
+} from "../functions/createRow";
+import { produce, setAutoFreeze } from "immer";
+
+setAutoFreeze(false);
 
 type TimelineModelExtra = {
   rows: TimelineRowExtra[];
@@ -39,40 +48,18 @@ function OutlineNode({ row, timeline, setModel, index }: OutlineNodeProps) {
         return prev;
       }
 
-      const prevRowIndex = prev.rows.findIndex((prevRow) => {
-        return prevRow?.id === row?.id;
+      const next = produce(prev, (draft) => {
+        draft.rows.forEach((prevRow) => {
+          if (prevRow?.id === row?.id) {
+            const newGroup = createUnselectedGroup();
+            const currentTime = timeline.getTime();
+            prevRow?.keyframes?.push(
+              { val: currentTime, group: newGroup },
+              { val: currentTime + 1000, group: newGroup },
+            );
+          }
+        });
       });
-
-      if (prevRowIndex < 0) {
-        return prev;
-      }
-
-      const prevRow = prev.rows[prevRowIndex];
-      const prevKeyframes = prevRow?.keyframes ?? [];
-      const groupId = v7();
-      const currentTime = timeline.getTime();
-      console.log({ currentTime, timeline });
-      const newKeyframes = [
-        ...prevKeyframes,
-        { val: currentTime, group: groupId },
-        { val: currentTime + 1000, group: groupId },
-      ];
-      const newRow = {
-        ...prevRow,
-        keyframes: newKeyframes,
-      };
-      const newRows = [
-        ...prev.rows.slice(0, prevRowIndex),
-        newRow,
-        ...prev.rows.slice(prevRowIndex + 1),
-      ];
-
-      const next = {
-        ...prev,
-        rows: newRows,
-      };
-
-      console.log({ next });
 
       return next;
     });
@@ -107,41 +94,105 @@ function OutlineNode({ row, timeline, setModel, index }: OutlineNodeProps) {
   );
 }
 
-// type FindGroupStartIndexArgs = {
-//   keyframes: TimelineKeyframe[];
-//   selectedGroupId: string;
-// };
-// const findKeyframeStartIndex = ({
-//   keyframes,
-//   selectedGroupId,
-// }: FindGroupStartIndexArgs) => {
-//   const index = keyframes.findIndex(
-//     (keyframe) => keyframe.group === selectedGroupId,
-//   );
+type FindAllGroupIdsType = {
+  model: TimelineModelExtra;
+};
+const findAllGroupIds = ({ model }: FindAllGroupIdsType) => {
+  const allGroupIds: string[] = [];
+  model.rows.forEach((row) => {
+    if (row?.keyframes) {
+      row.keyframes.forEach((keyframe) => {
+        if (typeof keyframe?.group !== "string" && keyframe?.group?.id) {
+          allGroupIds.push(keyframe?.group?.id);
+        }
+      });
+    }
+  });
+  return allGroupIds;
+};
 
-//   return index;
-// };
+type ReplaceGroupWithIdType = {
+  selectedGroupId: string | null;
+  model: TimelineModelExtra;
+  newGroup: TimelineGroupExtra;
+};
 
-// type UseSelectGroupArgs = {
-//   selectedGroupId: string | null | undefined;
-//   model: TimelineModelExtra;
-// };
-// const useSelectGroup = ({ selectedGroupId, model }: UseSelectGroupArgs) => {
-//   if (!selectedGroupId) {
-//     return;
-//   }
-//   // const rowIndex = model?.rows?.findIndex((row) => )
-// };
+const replaceGroupWithId = ({
+  selectedGroupId,
+  model,
+  newGroup,
+}: ReplaceGroupWithIdType) => {
+  const newModel = produce(model, (draft) => {
+    draft.rows.forEach((row) => {
+      if (row?.keyframes) {
+        row.keyframes.forEach((keyframe) => {
+          if (typeof keyframe?.group !== "string" && keyframe?.group?.id) {
+            const groupId = keyframe?.group?.id;
+            if (groupId === selectedGroupId) {
+              const selected = newGroup.selected;
+              keyframe.selected = selected;
+              keyframe.group = newGroup;
+            }
+          }
+        });
+      }
+    });
+  });
+
+  return newModel;
+};
+
+type UseSelectedGroupIdType = {
+  selectedGroupId: string | null;
+  model: TimelineModelExtra;
+};
+
+const useSelectedGroupId = ({
+  selectedGroupId,
+  model,
+}: UseSelectedGroupIdType) => {
+  const newModel = useMemo(() => {
+    console.log({ selectedGroupId });
+    const allGroupsIds = findAllGroupIds({ model });
+    let modelUpdates = model;
+
+    allGroupsIds.forEach((groupId) => {
+      const unselectedGroup = createUnselectedGroup(groupId);
+      modelUpdates = replaceGroupWithId({
+        selectedGroupId: groupId,
+        model: modelUpdates,
+        newGroup: unselectedGroup,
+      });
+    });
+
+    if (selectedGroupId) {
+      const selectedGroup = createSelectedGroup(selectedGroupId);
+
+      modelUpdates = replaceGroupWithId({
+        selectedGroupId: selectedGroupId,
+        model: modelUpdates,
+        newGroup: selectedGroup,
+      });
+    }
+    return modelUpdates;
+  }, [model, selectedGroupId]);
+
+  return newModel;
+};
 
 function TimelineComponent() {
   const timelineElRef = useRef<HTMLDivElement>(null);
   const outlineContainerRef = useRef<HTMLDivElement>(null);
   const outlineScrollContainerRef = useRef<HTMLDivElement>(null);
-  const [_selectedGroupId, setSelectedGroupId] = useState<string | null>();
+  const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
 
-  const [model, setModel] = useState<TimelineModelExtra>(initialModel);
+  const [oldModel, setModel] = useState<TimelineModelExtra>(initialModel);
 
-  // useSelectGroup({ selectedGroupId });
+  const model = useSelectedGroupId({
+    selectedGroupId,
+    model: oldModel,
+  });
+
   const [interactionMode, setInteractionMode] =
     useState<TimelineInteractionMode>(TimelineInteractionMode.Pan);
 
@@ -156,6 +207,7 @@ function TimelineComponent() {
 
   // Example to subscribe and pass model or time update:
   useEffect(() => {
+    console.log("setting model", { model });
     timeline?.setModel(model);
     // timeline?.setTime(0);
   }, [model, timeline]);

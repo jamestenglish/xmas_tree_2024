@@ -1,4 +1,5 @@
 import { Timeline } from "animation-timeline-js";
+import { TimelineGroupExtra } from "../functions/createRow";
 
 const logMessage = (...args: Array<unknown>) => {
   console.log("TIMELINE LOG", ...args);
@@ -12,9 +13,7 @@ type UseInitTimelineListenersType = {
   timeline: Timeline | undefined;
   outlineContainerRef: React.RefObject<HTMLDivElement>;
   outlineScrollContainerRef: React.RefObject<HTMLDivElement>;
-  setSelectedGroupId: React.Dispatch<
-    React.SetStateAction<string | null | undefined>
-  >;
+  setSelectedGroupId: React.Dispatch<React.SetStateAction<string | null>>;
 };
 
 const useInitTimelineListeners = ({
@@ -71,18 +70,28 @@ const useInitTimelineListeners = ({
       const type = obj.target ? obj.target.type : "";
       if (obj.pos) {
         console.log({ targ: obj.target });
-        let groupId: string | null | undefined;
+        let groupId: string | null = null;
+        let from = "";
         if (obj?.target?.group) {
-          if (typeof obj.target.group === "string") {
-            groupId = obj.target.group;
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const unknownGroup = obj?.target?.group as any;
+          if (unknownGroup?.id) {
+            const groupExtra = unknownGroup as TimelineGroupExtra;
+            groupId = groupExtra.id ?? null;
+            from = "group";
           }
         }
         if (obj?.target?.keyframe) {
-          if (typeof obj.target.keyframe.group === "string") {
-            groupId = obj.target.keyframe.group;
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const unknownGroup = obj.target.keyframe.group as any;
+          if (unknownGroup?.id) {
+            const groupExtra = unknownGroup as TimelineGroupExtra;
+            groupId = groupExtra.id ?? null;
+            from = "keyframe";
           }
         }
         if (groupId) {
+          console.log("groupId", groupId, from);
           setSelectedGroupId(groupId);
         }
         logMessage(

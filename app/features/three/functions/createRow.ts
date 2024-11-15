@@ -1,27 +1,66 @@
-import { TimelineKeyframe, TimelineRow } from "animation-timeline-js";
+import {
+  TimelineKeyframe,
+  TimelineRanged,
+  TimelineRow,
+  TimelineSelectable,
+} from "animation-timeline-js";
 import { TimelineGroup } from "animation-timeline-js/lib/models/timelineGroup";
 import { v7 } from "uuid";
 
-// TODO JTE use TimelineGroup for styling
-export interface TimelineKeyframeExtra extends TimelineKeyframe {
-  group?: string | TimelineGroup;
-  groupId?: string;
+export interface TimelineGroupExtra extends TimelineGroup {
+  id?: string;
+  selected?: boolean;
 }
 
-export interface TimelineRowExtra extends TimelineRow {
+export interface TimelineKeyframeExtra
+  extends TimelineKeyframe,
+    TimelineSelectable,
+    TimelineRanged {
+  group?: string | TimelineGroupExtra;
+}
+
+export interface TimelineRowExtra extends TimelineRow, TimelineRanged {
   keyframes?: TimelineKeyframeExtra[] | null;
   id?: string;
 }
-
-//  export type TimelineRowExtra = TimelineRow & { id?: string };
 
 type CreateRowArgs = {
   start?: number;
   end?: number;
 };
 
+export function createUnselectedGroup(existingGroupId?: string) {
+  const groupId = existingGroupId ?? v7();
+
+  const group: TimelineGroupExtra = {
+    id: groupId,
+    style: {
+      // TODO JTE
+      fillColor: "green",
+    },
+    selected: false,
+  };
+
+  return group;
+}
+
+export function createSelectedGroup(existingGroupId?: string) {
+  const groupId = existingGroupId ?? v7();
+
+  const group: TimelineGroupExtra = {
+    id: groupId,
+    style: {
+      // TODO JTE
+      fillColor: "blue",
+    },
+    selected: false,
+  };
+
+  return group;
+}
+
 const createRow = ({ start = 0, end = undefined }: CreateRowArgs = {}) => {
-  const groupId = v7();
+  const group = createUnselectedGroup();
   const row: TimelineRowExtra = {
     id: v7(),
     style: {
@@ -33,12 +72,11 @@ const createRow = ({ start = 0, end = undefined }: CreateRowArgs = {}) => {
     keyframes: [
       {
         val: start,
-        group: groupId,
+        group: group,
       },
       {
         val: end ?? start + 1000,
-        group: groupId,
-        // hidden: true,
+        group: group,
       },
     ],
   };
