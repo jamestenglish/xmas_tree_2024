@@ -1,12 +1,14 @@
 import { Timeline, TimelineInteractionMode } from "animation-timeline-js";
 import { useCallback, useEffect } from "react";
+import { useShallow } from "zustand/react/shallow";
+import useEditorStore from "~/features/tree-editor/hooks/useEditorStore";
 
 type UseTimelineInteractionsType = {
   timeline: Timeline | undefined;
-  interactionMode: TimelineInteractionMode;
-  setInteractionMode: React.Dispatch<
-    React.SetStateAction<TimelineInteractionMode>
-  >;
+  // interactionMode: TimelineInteractionMode;
+  // setInteractionMode: React.Dispatch<
+  //   React.SetStateAction<TimelineInteractionMode>
+  // >;
 };
 
 export type OnSelectModelType = () => void;
@@ -16,9 +18,15 @@ export type OnNoneModeType = OnSelectModelType;
 
 const useTimelineInteractions = ({
   timeline,
-  interactionMode,
-  setInteractionMode,
+  // interactionMode,
+  // setInteractionMode,
 }: UseTimelineInteractionsType) => {
+  const { interactionMode, setInteractionMode } = useEditorStore(
+    useShallow((state) => ({
+      interactionMode: state.interactionMode,
+      setInteractionMode: state.setInteractionMode,
+    })),
+  );
   // sync to timeline
   useEffect(() => {
     if (timeline) {

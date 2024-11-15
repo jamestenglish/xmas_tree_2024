@@ -1,36 +1,42 @@
 import {
   Timeline,
   TimelineInteractionMode,
-  TimelineModel,
+  // TimelineModel,
 } from "animation-timeline-js";
 import clsx from "clsx";
 import { useCallback, useEffect, useState } from "react";
-import useTimelineInteractions from "../../tree-timeline/hooks/useTimelineInteractions";
-import createRow from "../functions/createRow";
+import useTimelineInteractions from "./hooks/useTimelineInteractions";
+// import createRow from "./functions/createRow";
+import useEditorStore from "../tree-editor/hooks/useEditorStore";
+import { useShallow } from "zustand/react/shallow";
 
 type TimelineButtonsProps = {
-  interactionMode: TimelineInteractionMode;
+  // interactionMode: TimelineInteractionMode;
   timeline: Timeline | undefined;
-  model: TimelineModel;
+  // model: TimelineModel;
   timelineElRef: React.RefObject<HTMLDivElement>;
-  setModel: React.Dispatch<React.SetStateAction<TimelineModel>>;
-  setInteractionMode: React.Dispatch<
-    React.SetStateAction<TimelineInteractionMode>
-  >;
+  // setModel: React.Dispatch<React.SetStateAction<TimelineModel>>;
+  // setInteractionMode: React.Dispatch<
+  //   React.SetStateAction<TimelineInteractionMode>
+  // >;
 };
 
 const playStep = 50;
 
 export default function TimelineButtons({
   timeline,
-  model,
+  // model,
   timelineElRef,
-  setModel,
-  interactionMode,
-  setInteractionMode,
+  // setModel,
+  // interactionMode,
+  // setInteractionMode,
 }: TimelineButtonsProps) {
   const { onSelectModel, onPaneMode, onZoomMode, onNoneMode } =
-    useTimelineInteractions({ timeline, interactionMode, setInteractionMode });
+    useTimelineInteractions({
+      timeline,
+      // interactionMode,
+      // setInteractionMode
+    });
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
 
   const moveTimelineIntoTheBounds = useCallback(() => {
@@ -111,25 +117,34 @@ export default function TimelineButtons({
   //   }
   // }, [timeline]);
 
+  // const addRow = useEditorStore((state) => state.addRow);
+  const { addRow, interactionMode } = useEditorStore(
+    useShallow((state) => ({
+      addRow: state.addRow,
+      interactionMode: state.interactionMode,
+    })),
+  );
   const onAddTrack = useCallback(() => {
     if (timeline) {
       // Add keyframe
       // const currentModel = timeline.getModel();
 
-      if (!model) {
-        return;
-      }
+      // if (!model) {
+      //   return;
+      // }
 
-      setModel((prev) => {
-        const prevRows = prev.rows;
-        const newRow = createRow({ start: timeline.getTime() });
-        return {
-          ...prev,
-          rows: [...prevRows, newRow],
-        };
-      });
+      // setModel((prev) => {
+      //   const prevRows = prev.rows;
+      //   const newRow = createRow({ start: timeline.getTime() });
+      //   return {
+      //     ...prev,
+      //     rows: [newRow, ...prevRows],
+      //   };
+      // });
+
+      addRow(timeline);
     }
-  }, [model, setModel, timeline]);
+  }, [addRow, timeline]);
 
   // TODO JTE rewind interaction
   // TODO JTE reset zoom interaction

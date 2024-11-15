@@ -41,10 +41,12 @@
     "use-image": "^1.1.1",
     "usehooks-ts": "^3.1.0",
     "uuid": "^11.0.3",
-    "zod": "^3.23.8"
+    "zod": "^3.23.8",
+    "zustand": "^5.0.1"
   },
   "devDependencies": {
     "@react-three/eslint-plugin": "^0.1.1",
+    "@redux-devtools/extension": "^3.3.0",
     "@remix-run/dev": "^2.11.2",
     "@types/react": "^18.2.20",
     "@types/react-dom": "^18.2.7",

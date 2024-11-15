@@ -1,5 +1,6 @@
 import { Timeline } from "animation-timeline-js";
 import { TimelineGroupExtra } from "../functions/createRow";
+import useEditorStore from "~/features/tree-editor/hooks/useEditorStore";
 
 const logMessage = (...args: Array<unknown>) => {
   console.log("TIMELINE LOG", ...args);
@@ -13,15 +14,19 @@ type UseInitTimelineListenersType = {
   timeline: Timeline | undefined;
   outlineContainerRef: React.RefObject<HTMLDivElement>;
   outlineScrollContainerRef: React.RefObject<HTMLDivElement>;
-  setSelectedGroupId: React.Dispatch<React.SetStateAction<string | null>>;
+  // setSelectedGroupId: React.Dispatch<React.SetStateAction<string | null>>;
 };
 
 const useInitTimelineListeners = ({
   timeline,
   outlineContainerRef,
   outlineScrollContainerRef,
-  setSelectedGroupId,
+  // setSelectedGroupId,
 }: UseInitTimelineListenersType) => {
+  const setSelectedGroupId = useEditorStore(
+    (state) => state.setSelectedGroupId,
+  );
+
   if (timeline) {
     timeline.onSelected(function (obj) {
       logMessage(
@@ -46,6 +51,7 @@ const useInitTimelineListeners = ({
     });
 
     timeline.onDragFinished(function (obj) {
+      // obj.elements;
       logDraggingMessage(obj, "dragfinished");
     });
 

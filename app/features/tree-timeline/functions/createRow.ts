@@ -7,6 +7,9 @@ import {
 import { TimelineGroup } from "animation-timeline-js/lib/models/timelineGroup";
 import { v7 } from "uuid";
 
+export type TimelineModelExtra = {
+  rows: TimelineRowExtra[];
+};
 export interface TimelineGroupExtra extends TimelineGroup {
   id?: string;
   selected?: boolean;
