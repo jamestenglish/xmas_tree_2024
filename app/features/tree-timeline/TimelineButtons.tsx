@@ -5,7 +5,7 @@ import {
 } from "animation-timeline-js";
 import clsx from "clsx";
 import { useCallback, useEffect, useState } from "react";
-import useTimelineInteractions from "../hooks/useTimelineInteractions";
+import useTimelineInteractions from "../../tree-timeline/hooks/useTimelineInteractions";
 import createRow from "../functions/createRow";
 
 type TimelineButtonsProps = {

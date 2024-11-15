@@ -6,16 +6,17 @@ import React, {
   useState,
 } from "react";
 import { Timeline, TimelineInteractionMode } from "animation-timeline-js";
-import useInitTimelineListeners from "../hooks/useInitTimelineListeners";
-import useInitTimeline from "../hooks/useInitTimeline";
+import useInitTimelineListeners from "./hooks/useInitTimelineListeners";
+import useInitTimeline from "./hooks/useInitTimeline";
 import TimelineButtons from "./TimelineButtons";
 import createRow, {
   createSelectedGroup,
   createUnselectedGroup,
   TimelineGroupExtra,
   TimelineRowExtra,
-} from "../functions/createRow";
+} from "./functions/createRow";
 import { produce, setAutoFreeze } from "immer";
+import "./assets/demo.css";
 
 setAutoFreeze(false);
 

@@ -5,10 +5,9 @@ import { useRef, useEffect, useMemo, useState } from "react";
 import pos2 from "./pos2";
 // import Button from "~/features/ui/components/Button";
 import { useForm } from "react-hook-form";
-import CanvasEditor from "./CanvasEditor.client";
-import { canvasHeight, canvasWidth } from "./constants";
-import TimelineComponent from "./TimelineComponent.client";
-import "../assets/demo.css";
+import CanvasEditor from "../tree-canvas/CanvasEditor.client";
+import { canvasHeight, canvasWidth } from "../tree-editor/constants";
+import TimelineComponent from "../tree-timeline/TimelineComponent.client";
 
 THREE.ColorManagement.enabled = true;
 
@@ -191,7 +190,8 @@ const CylinderScene = ({
   );
 };
 
-const ThreeClient = () => {
+// TODO JTE move most of this to tree-editor
+const TreeViewer = () => {
   const initial: CylinderFormDataProps = {
     cylinderOpacity: 0.3,
   };
@@ -331,4 +331,4 @@ const ThreeClient = () => {
   );
 };
 
-export default ThreeClient;
+export default TreeViewer;

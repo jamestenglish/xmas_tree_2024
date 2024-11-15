@@ -9,7 +9,7 @@ import {
 } from "react-konva";
 import useImage from "use-image";
 import Button from "~/features/ui/components/Button";
-import { canvasHeight, canvasWidth } from "./constants";
+import { canvasHeight, canvasWidth } from "../tree-editor/constants";
 
 const imgUrl =
   "https://images.chesscomfiles.com/uploads/v1/images_users/tiny_mce/petrikeckman/phpE4U0RQ.png";
