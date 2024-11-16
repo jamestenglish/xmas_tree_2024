@@ -2,8 +2,9 @@ import { useForm } from "react-hook-form";
 import TreeViewer, { CylinderFormDataProps } from "../tree-viewer/TreeViewer";
 import { useRef, useState } from "react";
 import CanvasEditor from "../tree-canvas/CanvasEditor.client";
-import { canvasHeight, canvasWidth } from "../tree-editor/constants";
+import { canvasHeight, canvasWidth } from "./constants";
 import TimelineComponent from "../tree-timeline/TimelineComponent.client";
+import useEditorStore from "./hooks/useEditorStore";
 
 export default function TreeEditor() {
   const initial: CylinderFormDataProps = {
@@ -20,6 +21,8 @@ export default function TreeEditor() {
   const [imgUrl, setImgUrl] = useState<string>(
     "https://images.chesscomfiles.com/uploads/v1/images_users/tiny_mce/petrikeckman/phpE4U0RQ.png",
   );
+
+  const selectedLightIds = useEditorStore((state) => state.selectedLightIds);
   return (
     <>
       {" "}
@@ -43,6 +46,7 @@ export default function TreeEditor() {
                     {...register("cylinderOpacity")}
                   />
                 </div>
+                <div> {JSON.stringify(selectedLightIds, null, 2)}</div>
               </div>
               <div className="flex flex-row gap-2">
                 <TreeViewer imgUrl={imgUrl} cylinderOpacity={cylinderOpacity} />

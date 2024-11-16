@@ -5,10 +5,6 @@ import useEditorStore from "~/features/tree-editor/hooks/useEditorStore";
 
 type UseTimelineInteractionsType = {
   timeline: Timeline | undefined;
-  // interactionMode: TimelineInteractionMode;
-  // setInteractionMode: React.Dispatch<
-  //   React.SetStateAction<TimelineInteractionMode>
-  // >;
 };
 
 export type OnSelectModelType = () => void;
@@ -16,11 +12,7 @@ export type OnPaneModeType = (interactive: boolean) => void;
 export type OnZoomModeType = OnSelectModelType;
 export type OnNoneModeType = OnSelectModelType;
 
-const useTimelineInteractions = ({
-  timeline,
-  // interactionMode,
-  // setInteractionMode,
-}: UseTimelineInteractionsType) => {
+const useTimelineInteractions = ({ timeline }: UseTimelineInteractionsType) => {
   const { interactionMode, setInteractionMode } = useEditorStore(
     useShallow((state) => ({
       interactionMode: state.interactionMode,

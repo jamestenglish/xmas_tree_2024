@@ -1,36 +1,18 @@
-import {
-  // React,
-  useCallback,
-} from "react";
+import { useCallback } from "react";
 import { Timeline } from "animation-timeline-js";
 
-import {} from // createUnselectedGroup,
-// TimelineModelExtra,
-// TimelineRowExtra,
-"./functions/createRow";
-import {
-  // produce,
-  setAutoFreeze,
-} from "immer";
+import { setAutoFreeze } from "immer";
 import useEditorStore from "../tree-editor/hooks/useEditorStore";
 import { useShallow } from "zustand/react/shallow";
 
 setAutoFreeze(false);
 
 type OutlineNodeProps = {
-  // rows: TimelineRowExtra[];
   timeline: Timeline | undefined;
-  // setModel: (value: React.SetStateAction<TimelineModelExtra>) => void;
   index: number;
 };
 
-function OutlineNode({
-  // rows,
-  timeline,
-  // setModel,
-  index,
-}: OutlineNodeProps) {
-  // const addGroupToRow = useEditorStore((state) => state.addGroupToRow);
+function OutlineNode({ timeline, index }: OutlineNodeProps) {
   const { addGroupToRow, deleteRow, rows } = useEditorStore(
     useShallow((state) => ({
       addGroupToRow: state.addGroupToRow,
@@ -45,29 +27,7 @@ function OutlineNode({
     if (!timeline) {
       return;
     }
-    // setModel((prev) => {
-    //   if (!prev) {
-    //     return prev;
-    //   }
-    //   if (!row.id) {
-    //     return prev;
-    //   }
 
-    //   const next = produce(prev, (draft) => {
-    //     draft.rows.forEach((prevRow) => {
-    //       if (prevRow?.id === row?.id) {
-    //         const newGroup = createUnselectedGroup();
-    //         const currentTime = timeline.getTime();
-    //         prevRow?.keyframes?.push(
-    //           { val: currentTime, group: newGroup },
-    //           { val: currentTime + 1000, group: newGroup },
-    //         );
-    //       }
-    //     });
-    //   });
-
-    //   return next;
-    // });
     if (row.id) {
       addGroupToRow(timeline, row.id);
     }
@@ -79,20 +39,6 @@ function OutlineNode({
         return;
       }
       deleteRow(indexToDelete);
-      // setModel((prev) => {
-      //   if (!prev) {
-      //     return prev;
-      //   }
-      //   if (!row.id) {
-      //     return prev;
-      //   }
-
-      //   const next = produce(prev, (draft) => {
-      //     draft.rows.splice(indexToDelete, 1);
-      //   });
-
-      //   return next;
-      // });
     },
     [deleteRow, timeline],
   );
@@ -142,15 +88,9 @@ function OutlineNode({
 }
 
 type OutlineProps = {
-  // rows: TimelineRowExtra[];
   timeline: Timeline | undefined;
-  // setModel: React.Dispatch<React.SetStateAction<TimelineModelExtra>>;
 };
-export default function Outline({
-  // rows,
-  timeline,
-  // setModel
-}: OutlineProps) {
+export default function Outline({ timeline }: OutlineProps) {
   const rows = useEditorStore((state) => state.model.rows);
   return (
     <>
@@ -159,9 +99,7 @@ export default function Outline({
           <OutlineNode
             /*TODO JTE*/
             key={row?.id ?? index}
-            // rows={rows}
             timeline={timeline}
-            // setModel={setModel}
             index={index}
           />
         );

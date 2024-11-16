@@ -3,6 +3,13 @@ import { OrbitControls, useTexture } from "@react-three/drei";
 import * as THREE from "three";
 import { useRef, useEffect, useMemo } from "react";
 import pos2 from "./pos2";
+import useEditorStore from "../tree-editor/hooks/useEditorStore";
+import { useShallow } from "zustand/react/shallow";
+import {
+  EffectComposer,
+  Bloom,
+  ToneMapping,
+} from "@react-three/postprocessing";
 
 THREE.ColorManagement.enabled = true;
 
@@ -54,6 +61,7 @@ interface SphereProps {
   position: [number, number, number];
   color: THREE.Color;
   samplePoint: [number, number, number];
+  id: number;
 }
 
 const points = [new THREE.Vector3(0, -10, 0), new THREE.Vector3(0, 10, 0)];
@@ -71,6 +79,15 @@ const CylinderScene = ({
   const cylinderHeight = 20;
   const cylinderRef = useRef<THREE.Mesh>(null);
   const lineRef = useRef<THREE.BufferGeometry>(null);
+
+  const { setSelectedLightId, toggleLightId, selectedLightIds } =
+    useEditorStore(
+      useShallow((state) => ({
+        setSelectedLightId: state.setSelectedLightId,
+        toggleLightId: state.toggleLightId,
+        selectedLightIds: state.selectedLightIds,
+      })),
+    );
 
   const spheres = useMemo(() => {
     // console.log({ version });
@@ -98,7 +115,7 @@ const CylinderScene = ({
       sampleContext2.drawImage(texture.image, 0, 0);
     }
 
-    pos2.forEach(({ x, y, z, angle }) => {
+    pos2.forEach(({ x, y, z, angle }, index) => {
       const u =
         (360 - (((Math.atan2(z, x) * 180) / Math.PI + 270) % 360)) / 360;
       const v = (y + cylinderHeight / 2) / cylinderHeight;
@@ -111,7 +128,12 @@ const CylinderScene = ({
       const sampleX = 6 * Math.cos(angle);
       const sampleZ = 6 * Math.sin(angle);
       const samplePoint: [number, number, number] = [sampleX, y, sampleZ];
-      generatedSpheres.push({ position: [x, y, z], color, samplePoint });
+      generatedSpheres.push({
+        position: [x, y, z],
+        color,
+        samplePoint,
+        id: index,
+      });
     });
 
     return generatedSpheres;
@@ -165,22 +187,38 @@ const CylinderScene = ({
         <lineBasicMaterial color={0x00ff00} />
       </line>
 
-      {spheres.map((sphere, index) => (
-        <group key={index}>
-          {/* Sphere */}
-          <mesh
-            position={sphere.position}
-            onClick={() => {
-              console.log(`${index}foo`);
-            }}
-          >
-            <sphereGeometry args={[0.3, 16, 16]} />
-            <meshBasicMaterial color={sphere.color} />
-          </mesh>
-          {/* Line from sphere to sample point on the cylinder */}
-          <LineBetweenPoints start={sphere.position} end={sphere.samplePoint} />
-        </group>
-      ))}
+      {spheres.map((sphere, index) => {
+        const isOn = selectedLightIds.includes(sphere.id);
+        return (
+          <group key={index}>
+            {/* Sphere */}
+            <mesh
+              position={sphere.position}
+              onClick={() => {
+                console.log(`${index}foo`);
+                setSelectedLightId(sphere.id);
+                toggleLightId(sphere.id);
+              }}
+            >
+              <sphereGeometry args={[0.3, 16, 16]} />
+              {isOn ? (
+                <meshStandardMaterial
+                  color={sphere.color}
+                  emissive={sphere.color}
+                  emissiveIntensity={8}
+                />
+              ) : (
+                <meshBasicMaterial color={sphere.color} />
+              )}
+            </mesh>
+            {/* Line from sphere to sample point on the cylinder */}
+            <LineBetweenPoints
+              start={sphere.position}
+              end={sphere.samplePoint}
+            />
+          </group>
+        );
+      })}
     </>
   );
 };
@@ -191,54 +229,6 @@ export type TreeViewerProps = {
   imgUrl: string;
 };
 const TreeViewer = ({ cylinderOpacity, imgUrl }: TreeViewerProps) => {
-  // const [version] = useState<number>(0);
-
-  // const strokeWidth = 20;
-
-  // const handleSave = () => {
-  //   const save = async () => {
-  //     if (canvasRef.current && width && height) {
-  //       const paths = await canvasRef.current.exportPaths();
-
-  //       const canvas = document.getElementById(
-  //         `testCanvas`,
-  //       ) as HTMLCanvasElement;
-  //       canvas.width = width;
-  //       canvas.height = height;
-  //       const context = canvas.getContext("2d");
-  //       const maskImg = await canvasRef.current.exportImage("png");
-
-  //       await new Promise((resolve) => {
-  //         const img = new Image();
-  //         img.onload = function () {
-  //           context?.drawImage(img, 0, 0, width, height); // Or at whatever offset you like
-  //           resolve(null);
-  //         };
-  //         img.src = maskImg;
-  //       });
-
-  //       const imageData = context?.getImageData(0, 0, width, height);
-  //       const maskArray = new Array<boolean>(width * height);
-  //       maskArray.fill(false);
-  //       if (imageData) {
-  //         for (let y = 0; y < height; y++) {
-  //           for (let x = 0; x < width; x++) {
-  //             const r = imageData.data[(y * width + x) * 4];
-  //             const g = imageData.data[(y * width + x) * 4 + 1];
-  //             const b = imageData.data[(y * width + x) * 4 + 2];
-
-  //             if (r === 255 && g === 0 && b === 0) {
-  //               maskArray[y * width + x] = true;
-  //             }
-  //           }
-  //         }
-  //       }
-  //       setVersion((prev) => prev + 1);
-  //     }
-  //   };
-  //   save();
-  // };
-
   return (
     <>
       <Canvas
@@ -246,6 +236,15 @@ const TreeViewer = ({ cylinderOpacity, imgUrl }: TreeViewerProps) => {
         camera={{ position: [0, 0, 15], fov: 75 }}
       >
         <color attach="background" args={["#112233"]} />
+        <EffectComposer>
+          <Bloom
+            mipmapBlur
+            luminanceThreshold={1}
+            levels={8}
+            intensity={0.4 * 4}
+          />
+          <ToneMapping />
+        </EffectComposer>
         <CylinderScene cylinderOpacity={cylinderOpacity} imgUrl={imgUrl} />
         <OrbitControls />
       </Canvas>

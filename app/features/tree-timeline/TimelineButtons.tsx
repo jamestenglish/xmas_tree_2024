@@ -1,41 +1,24 @@
-import {
-  Timeline,
-  TimelineInteractionMode,
-  // TimelineModel,
-} from "animation-timeline-js";
+import { Timeline, TimelineInteractionMode } from "animation-timeline-js";
 import clsx from "clsx";
 import { useCallback, useEffect, useState } from "react";
 import useTimelineInteractions from "./hooks/useTimelineInteractions";
-// import createRow from "./functions/createRow";
 import useEditorStore from "../tree-editor/hooks/useEditorStore";
 import { useShallow } from "zustand/react/shallow";
 
 type TimelineButtonsProps = {
-  // interactionMode: TimelineInteractionMode;
   timeline: Timeline | undefined;
-  // model: TimelineModel;
   timelineElRef: React.RefObject<HTMLDivElement>;
-  // setModel: React.Dispatch<React.SetStateAction<TimelineModel>>;
-  // setInteractionMode: React.Dispatch<
-  //   React.SetStateAction<TimelineInteractionMode>
-  // >;
 };
 
 const playStep = 50;
 
 export default function TimelineButtons({
   timeline,
-  // model,
   timelineElRef,
-  // setModel,
-  // interactionMode,
-  // setInteractionMode,
 }: TimelineButtonsProps) {
   const { onSelectModel, onPaneMode, onZoomMode, onNoneMode } =
     useTimelineInteractions({
       timeline,
-      // interactionMode,
-      // setInteractionMode
     });
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
 
@@ -117,7 +100,6 @@ export default function TimelineButtons({
   //   }
   // }, [timeline]);
 
-  // const addRow = useEditorStore((state) => state.addRow);
   const { addRow, interactionMode } = useEditorStore(
     useShallow((state) => ({
       addRow: state.addRow,
@@ -126,22 +108,6 @@ export default function TimelineButtons({
   );
   const onAddTrack = useCallback(() => {
     if (timeline) {
-      // Add keyframe
-      // const currentModel = timeline.getModel();
-
-      // if (!model) {
-      //   return;
-      // }
-
-      // setModel((prev) => {
-      //   const prevRows = prev.rows;
-      //   const newRow = createRow({ start: timeline.getTime() });
-      //   return {
-      //     ...prev,
-      //     rows: [newRow, ...prevRows],
-      //   };
-      // });
-
       addRow(timeline);
     }
   }, [addRow, timeline]);
