@@ -55,8 +55,6 @@ const replaceGroupWithId = ({
   return model;
 };
 
-type ValueOf<T> = T[keyof T];
-
 export const defaultByGroup: GroupTypes = {
   color: "#D0021B",
   canvasLines: [],
@@ -118,22 +116,7 @@ const createSetSelectedGroupId = (selectedGroupId: string | null) => {
       const valuesToUse = state.attributesByGroup[selectedGroupId]
         ? state.attributesByGroup[selectedGroupId]
         : defaultByGroup;
-      // if (state.attributesByGroup[selectedGroupId]) {
-      //   state.color = state.attributesByGroup[selectedGroupId].color;
-      //   state.canvasLines =
-      //     state.attributesByGroup[selectedGroupId].canvasLines;
-      //   state.canvasImages =
-      //     state.attributesByGroup[selectedGroupId].canvasImages;
-      //   state.selectedLightIds =
-      //     state.attributesByGroup[selectedGroupId].selectedLightIds;
-      // } else {
-      //   state.attributesByGroup[selectedGroupId] = defaultByGroup;
-      //   console.log(
-      //     `createSetSelectedGroupId`,
-      //     state.attributesByGroup[selectedGroupId],
-      //     defaultByGroup,
-      //   );
-      // }
+
       const keys = Object.keys(valuesToUse);
       for (let i = 0; i < keys.length; i++) {
         const key = keys[i] as keyof GroupTypes & keyof EditorState;
@@ -145,7 +128,6 @@ const createSetSelectedGroupId = (selectedGroupId: string | null) => {
         }
       }
     }
-    // }
   });
 };
 

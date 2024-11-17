@@ -2,7 +2,6 @@ import memoize from "memoize";
 import { TimelineRowExtra } from "~/features/tree-timeline/functions/createRow";
 
 export function selectedIdsSelector(rows: TimelineRowExtra[]) {
-  // const rows = state.model.rows;
   for (let i = 0; i < rows.length; i++) {
     const row = rows[i];
     const selectedRowId = row?.id;

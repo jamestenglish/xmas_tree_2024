@@ -2,11 +2,9 @@ import Konva from "konva";
 import { Stage } from "konva/lib/Stage";
 import { useCallback } from "react";
 import { useShallow } from "zustand/react/shallow";
-// import memoizedColorSelector from "~/features/tree-editor/state/memoizedColorSelector";
 import useEditorStore, {
   LineType,
 } from "~/features/tree-editor/state/useEditorStore";
-// import memoizedAttributeByGroupSelector from "../../tree-editor/state/memoizedattributeByGroupSelector";
 
 type UseOnMouseDownArgs = {
   stageRef: React.RefObject<Stage>;
@@ -22,19 +20,12 @@ export default function useOnMouseDown({ stageRef }: UseOnMouseDownArgs) {
     setCanvasInteractionMode,
   } = useEditorStore(
     useShallow((state) => ({
-      // canvasLines:
-      //   memoizedAttributeByGroupSelector<Array<LineType>>(
-      //     state.model.rows,
-      //     state.canvasLinesByGroup,
-      //   ) ?? [],
       canvasLines: state.canvasLines,
       setCanvasLines: state.setCanvasLines,
       canvasSelectedId: state.canvasSelectedId,
       setCanvasSelectedId: state.setCanvasSelectedId,
       setCanvasInteractionMode: state.setCanvasInteractionMode,
-      // color:
-      //   memoizedColorSelector(state.colorByGroup, state.model.rows) ??
-      //   undefined,
+
       color: state.color,
       canvasBrushSize: state.canvasBrushSize,
     })),

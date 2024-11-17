@@ -2,7 +2,6 @@ import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import useEditorStore from "../tree-editor/state/useEditorStore";
 import { useShallow } from "zustand/react/shallow";
-// import memoizedIsLightSelectedSelector from "../tree-editor/state/memoizedIsLightSelectedSelector";
 
 export interface SphereProps {
   position: [number, number, number];
@@ -49,12 +48,6 @@ export default function LightSphere({ sphere, index }: LightSphereProps) {
       toggleLightId: state.toggleLightId,
       isSelected:
         state.selectedLightIds.includes(sphere.id) && state.blinkState,
-      // memoizedIsLightSelectedSelector(
-      //   state.model.rows,
-      //   state.selectedLightIdsByGroup,
-      //   sphere.id,
-      //   state.blinkState,
-      // ),
     })),
   );
 

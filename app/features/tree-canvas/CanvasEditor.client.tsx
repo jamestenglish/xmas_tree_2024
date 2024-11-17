@@ -4,7 +4,6 @@ import { Stage, Layer, Line, Circle } from "react-konva";
 import Button from "~/features/ui/components/Button";
 import { canvasHeight, canvasWidth } from "../tree-editor/constants";
 import useEditorStore from "../tree-editor/state/useEditorStore";
-// import memoizedColorSelector from "../tree-editor/state/memoizedColorSelector";
 import { useShallow } from "zustand/shallow";
 import "./assets/canvas.css";
 import EditableImage from "./EditableImage";
@@ -15,7 +14,6 @@ import useOnMouseUp from "./hooks/useOnMouseUp";
 import useOnTransformEnd from "./hooks/useOnTransformEnd";
 import useHandleExport from "./hooks/useHandleExport";
 import ColorPickerDialog from "./ColorPickerDialog";
-// import memoizedAttributeByGroupSelector from "../tree-editor/state/memoizedattributeByGroupSelector";
 const imgUrl =
   "https://images.chesscomfiles.com/uploads/v1/images_users/tiny_mce/petrikeckman/phpE4U0RQ.png";
 
@@ -24,11 +22,6 @@ type CanvasEditorProps = {
 };
 
 export default function CanvasEditor({ setImgUrl }: CanvasEditorProps) {
-  // const [isDrawing, setIsDrawing] = useState<boolean>(false);
-  // const [selectedId, setSelectedId] = useState<string | null>(null);
-  // const [isOpen, setIsOpen] = useState<boolean>(false);
-  // const [pos, setPos] = useState<{ x: number; y: number } | null>(null);
-
   const stageRef = useRef<Konva.Stage>(null);
 
   const {

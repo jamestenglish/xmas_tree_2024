@@ -20,9 +20,7 @@ import createAddRow from "./functions/createAddRow";
 import createAddGroupToRow from "./functions/createAddGroupToRow";
 import createOnDrag from "./functions/createOnDrag";
 import createToggeLightId from "./functions/createToggleLightId";
-// import createSetColor from "./functions/createSetColor";
 import { ImageType } from "~/features/tree-canvas/EditableImage";
-// import createSetAttibuteByGroupId from "./functions/createSetAttributeByGroupId";
 
 export type LineType = {
   points: Array<number>;
@@ -115,11 +113,8 @@ export interface CanvasState {
   canvasSelectedId: string | null;
   setCanvasSelectedId: (canvasSelectedId: string | null) => void;
 
-  // canvasLinesByGroup: AttributeByGroupType<Array<LineType>>;
   canvasLines: Array<LineType>;
   setCanvasLines: (canvasLines: Array<LineType>) => void;
-  // canvasImages: Array<ImageType>;
-  // canvasImagesByGroup: AttributeByGroupType<Array<ImageType>>;
   setCanvasImages: (canvasImages: Array<ImageType>) => void;
   canvasImages: Array<ImageType>;
 }
@@ -127,10 +122,8 @@ export interface CanvasState {
 export interface EditorState extends TimelineState, CanvasState, GroupTypes {
   attributesByGroup: ByGroupType;
   toggleLightId: (selectedLightId: number | null) => void;
-  // selectedLightIdsByGroup: AttributeByGroupType<number[]>;
   selectedLightIds: number[];
 
-  // colorByGroup: AttributeByGroupType<string | undefined>;
   setColor: (color: string) => void;
   color: string | undefined;
 
@@ -152,29 +145,9 @@ const useEditorStore = create<EditorState>()(
       canvasSelectedId: null,
       setCanvasSelectedId: (canvasSelectedId) => set({ canvasSelectedId }),
 
-      // canvasLinesByGroup: initialSelectedGroup
-      //   ? { [initialSelectedGroup]: [] }
-      //   : {},
-      // setCanvasLines: (canvasLines) =>
-      //   set(
-      //     createSetAttibuteByGroupId<Array<LineType>>(
-      //       canvasLines,
-      //       "canvasLinesByGroup",
-      //     ),
-      //   ),
       canvasLines: defaultByGroup.canvasLines,
       setCanvasLines: (canvasLines) => set({ canvasLines }),
 
-      // canvasImagesByGroup: initialSelectedGroup
-      //   ? { [initialSelectedGroup]: [] }
-      //   : {},
-      // setCanvasImages: (canvasImages) =>
-      //   set(
-      //     createSetAttibuteByGroupId<Array<ImageType>>(
-      //       canvasImages,
-      //       "canvasImagesByGroup",
-      //     ),
-      //   ),
       setCanvasImages: (canvasImages) => set({ canvasImages }),
       canvasImages: defaultByGroup.canvasImages,
       // --------
@@ -222,12 +195,9 @@ const useEditorStore = create<EditorState>()(
         "#9B9B9B",
         "#FFFFFF",
       ],
-      // setColor: (color) => set(createSetColor(color)),
       setColor: (color) => set({ color }),
       color: defaultByGroup.color,
-      // colorByGroup: initialSelectedGroup
-      //   ? { [initialSelectedGroup]: "#D0021B" }
-      //   : {},
+
       setSelectedGroupId: (selectedGroupId) =>
         set(createSetSelectedGroupId(selectedGroupId)),
       selectedGroupId: initialSelectedGroup ?? "",
@@ -253,13 +223,6 @@ const useEditorStore = create<EditorState>()(
       blinkState: false,
       toggleBlinkState: () =>
         set((state) => {
-          // if (state.selectedLightIds?.length === 0) {
-          //   if (state.blinkState) {
-          // return { blankState: false };
-          // } else {
-          //   return {};
-          // }
-          // }
           return { blinkState: !state.blinkState };
         }),
     }),

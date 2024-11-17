@@ -32,7 +32,6 @@ export default function ColorPickerDialog({
           rect.left <= event.clientX &&
           event.clientX <= rect.left + rect.width;
         if (!isInDialog) {
-          // setIsOpen(false);
           onClickColorClose();
         }
       }
