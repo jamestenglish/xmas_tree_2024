@@ -1,0 +1,21 @@
+// import memoize from "memoize";
+// import { TimelineRowExtra } from "~/features/tree-timeline/functions/createRow";
+// import { AttributeByGroupType } from "./useEditorStore";
+// import memoizedSelectedIdsSelector from "./memoizedSelectedIdsSelector";
+
+// export function isLightSelectedSelector(
+//   rows: TimelineRowExtra[],
+//   selectedLightIdsByGroup: AttributeByGroupType<number[]>,
+//   sphereId: number,
+//   blinkState: boolean,
+// ) {
+//   const { selectedGroupId = "" } = memoizedSelectedIdsSelector(rows);
+//   const selectedLightIds = selectedLightIdsByGroup[selectedGroupId] ?? [];
+//   return selectedLightIds.includes(sphereId) && blinkState;
+// }
+
+// const memoizedIsLightSelectedSelector = memoize(isLightSelectedSelector, {
+//   cacheKey: JSON.stringify,
+// });
+
+// export default memoizedIsLightSelectedSelector;

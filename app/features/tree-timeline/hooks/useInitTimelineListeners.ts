@@ -1,6 +1,6 @@
 import { Timeline } from "animation-timeline-js";
 import { TimelineGroupExtra } from "../functions/createRow";
-import useEditorStore from "~/features/tree-editor/hooks/useEditorStore";
+import useEditorStore from "~/features/tree-editor/state/useEditorStore";
 import { useShallow } from "zustand/react/shallow";
 import { useEffect } from "react";
 
@@ -23,10 +23,10 @@ const useInitTimelineListeners = ({
   outlineContainerRef,
   outlineScrollContainerRef,
 }: UseInitTimelineListenersType) => {
-  const { setSelectedGroupId, onDrag } = useEditorStore(
+  const { setSelectedGroupId, onDragTimeline } = useEditorStore(
     useShallow((state) => ({
       setSelectedGroupId: state.setSelectedGroupId,
-      onDrag: state.onDrag,
+      onDragTimeline: state.onDragTimeline,
     })),
   );
 
@@ -50,7 +50,7 @@ const useInitTimelineListeners = ({
 
       timeline.onDrag(function (obj) {
         if (obj.elements) {
-          onDrag(obj.elements, "continue");
+          onDragTimeline(obj.elements, "continue");
         }
         // logDraggingMessage(obj, "drag");
       });
@@ -61,7 +61,7 @@ const useInitTimelineListeners = ({
 
       timeline.onDragFinished(function (obj) {
         if (obj.elements) {
-          onDrag(obj.elements, "finished");
+          onDragTimeline(obj.elements, "finished");
         }
         logDraggingMessage(obj, "dragfinished");
       });
@@ -108,7 +108,7 @@ const useInitTimelineListeners = ({
             }
           }
           if (groupId) {
-            console.log("groupId", groupId, from);
+            console.log("useInitTimelineListeners groupId", groupId, from);
             setSelectedGroupId(groupId);
           }
           logMessage(
@@ -164,7 +164,7 @@ const useInitTimelineListeners = ({
       });
     }
   }, [
-    onDrag,
+    onDragTimeline,
     outlineContainerRef,
     outlineScrollContainerRef,
     setSelectedGroupId,

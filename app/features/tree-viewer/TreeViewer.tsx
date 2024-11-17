@@ -3,13 +3,15 @@ import { OrbitControls, useTexture } from "@react-three/drei";
 import * as THREE from "three";
 import { useRef, useEffect, useMemo } from "react";
 import pos2 from "./pos2";
-import useEditorStore from "../tree-editor/hooks/useEditorStore";
-import { useShallow } from "zustand/react/shallow";
+// import useEditorStore from "../tree-editor/hooks/useEditorStore";
 import {
   EffectComposer,
   Bloom,
   ToneMapping,
+  // Outline,
 } from "@react-three/postprocessing";
+import LightSphere, { SphereProps } from "./LightSphere";
+// import useEditorStore from "../tree-editor/hooks/useEditorStore";
 
 THREE.ColorManagement.enabled = true;
 
@@ -29,41 +31,6 @@ export interface CylinderFormDataProps {
   cylinderOpacity?: number;
 }
 
-interface LineBetweenPointsProps {
-  start: [number, number, number];
-  end: [number, number, number];
-}
-
-const LineBetweenPoints: React.FC<LineBetweenPointsProps> = ({
-  start,
-  end,
-}: LineBetweenPointsProps) => {
-  const lineRef = useRef<THREE.BufferGeometry>(null);
-
-  useEffect(() => {
-    if (lineRef.current) {
-      lineRef.current.setFromPoints([
-        new THREE.Vector3(...start),
-        new THREE.Vector3(...end),
-      ]);
-    }
-  }, [start, end]);
-
-  return (
-    <line>
-      <bufferGeometry ref={lineRef} />
-      <lineBasicMaterial color={0xff0000} />
-    </line>
-  );
-};
-
-interface SphereProps {
-  position: [number, number, number];
-  color: THREE.Color;
-  samplePoint: [number, number, number];
-  id: number;
-}
-
 const points = [new THREE.Vector3(0, -10, 0), new THREE.Vector3(0, 10, 0)];
 
 export type CylinderSceneProps = {
@@ -79,15 +46,6 @@ const CylinderScene = ({
   const cylinderHeight = 20;
   const cylinderRef = useRef<THREE.Mesh>(null);
   const lineRef = useRef<THREE.BufferGeometry>(null);
-
-  const { setSelectedLightId, toggleLightId, selectedLightIds } =
-    useEditorStore(
-      useShallow((state) => ({
-        setSelectedLightId: state.setSelectedLightId,
-        toggleLightId: state.toggleLightId,
-        selectedLightIds: state.selectedLightIds,
-      })),
-    );
 
   const spheres = useMemo(() => {
     // console.log({ version });
@@ -188,36 +146,7 @@ const CylinderScene = ({
       </line>
 
       {spheres.map((sphere, index) => {
-        const isOn = selectedLightIds.includes(sphere.id);
-        return (
-          <group key={index}>
-            {/* Sphere */}
-            <mesh
-              position={sphere.position}
-              onClick={() => {
-                console.log(`${index}foo`);
-                setSelectedLightId(sphere.id);
-                toggleLightId(sphere.id);
-              }}
-            >
-              <sphereGeometry args={[0.3, 16, 16]} />
-              {isOn ? (
-                <meshStandardMaterial
-                  color={sphere.color}
-                  emissive={sphere.color}
-                  emissiveIntensity={8}
-                />
-              ) : (
-                <meshBasicMaterial color={sphere.color} />
-              )}
-            </mesh>
-            {/* Line from sphere to sample point on the cylinder */}
-            <LineBetweenPoints
-              start={sphere.position}
-              end={sphere.samplePoint}
-            />
-          </group>
-        );
+        return <LightSphere key={index} index={index} sphere={sphere} />;
       })}
     </>
   );
@@ -229,6 +158,7 @@ export type TreeViewerProps = {
   imgUrl: string;
 };
 const TreeViewer = ({ cylinderOpacity, imgUrl }: TreeViewerProps) => {
+  // const sphereRef = useEditorStore((state) => state.sphereRefs[0]);
   return (
     <>
       <Canvas
@@ -243,6 +173,7 @@ const TreeViewer = ({ cylinderOpacity, imgUrl }: TreeViewerProps) => {
             levels={8}
             intensity={0.4 * 4}
           />
+          {/* <Outline selection={sphereRef ? [sphereRef] : []} /> */}
           <ToneMapping />
         </EffectComposer>
         <CylinderScene cylinderOpacity={cylinderOpacity} imgUrl={imgUrl} />

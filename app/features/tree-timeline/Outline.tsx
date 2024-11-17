@@ -2,7 +2,7 @@ import { useCallback } from "react";
 import { Timeline } from "animation-timeline-js";
 
 import { setAutoFreeze } from "immer";
-import useEditorStore from "../tree-editor/hooks/useEditorStore";
+import useEditorStore from "../tree-editor/state/useEditorStore";
 import { useShallow } from "zustand/react/shallow";
 
 setAutoFreeze(false);
@@ -13,10 +13,10 @@ type OutlineNodeProps = {
 };
 
 function OutlineNode({ timeline, index }: OutlineNodeProps) {
-  const { addGroupToRow, deleteRow, rows } = useEditorStore(
+  const { addTimelineGroupToRow, deleteTimelineRow, rows } = useEditorStore(
     useShallow((state) => ({
-      addGroupToRow: state.addGroupToRow,
-      deleteRow: state.deleteRow,
+      addTimelineGroupToRow: state.addTimelineGroupToRow,
+      deleteTimelineRow: state.deleteTimelineRow,
       rows: state.model.rows,
     })),
   );
@@ -29,18 +29,18 @@ function OutlineNode({ timeline, index }: OutlineNodeProps) {
     }
 
     if (row.id) {
-      addGroupToRow(timeline, row.id);
+      addTimelineGroupToRow(timeline, row.id);
     }
-  }, [addGroupToRow, row.id, timeline]);
+  }, [addTimelineGroupToRow, row.id, timeline]);
 
   const onDeleteRow = useCallback(
     (indexToDelete: number) => {
       if (!timeline) {
         return;
       }
-      deleteRow(indexToDelete);
+      deleteTimelineRow(indexToDelete);
     },
-    [deleteRow, timeline],
+    [deleteTimelineRow, timeline],
   );
 
   if (!timeline) {

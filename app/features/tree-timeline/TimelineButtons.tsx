@@ -2,7 +2,7 @@ import { Timeline, TimelineInteractionMode } from "animation-timeline-js";
 import clsx from "clsx";
 import { useCallback, useEffect, useState } from "react";
 import useTimelineInteractions from "./hooks/useTimelineInteractions";
-import useEditorStore from "../tree-editor/hooks/useEditorStore";
+import useEditorStore from "../tree-editor/state/useEditorStore";
 import { useShallow } from "zustand/react/shallow";
 
 type TimelineButtonsProps = {
@@ -100,17 +100,17 @@ export default function TimelineButtons({
   //   }
   // }, [timeline]);
 
-  const { addRow, interactionMode } = useEditorStore(
+  const { addTimelineRow, timelineInteractionMode } = useEditorStore(
     useShallow((state) => ({
-      addRow: state.addRow,
-      interactionMode: state.interactionMode,
+      addTimelineRow: state.addTimelineRow,
+      timelineInteractionMode: state.timelineInteractionMode,
     })),
   );
   const onAddTrack = useCallback(() => {
     if (timeline) {
-      addRow(timeline);
+      addTimelineRow(timeline);
     }
-  }, [addRow, timeline]);
+  }, [addTimelineRow, timeline]);
 
   // TODO JTE rewind interaction
   // TODO JTE reset zoom interaction
@@ -120,7 +120,8 @@ export default function TimelineButtons({
     <>
       <button
         className={clsx("button mat-icon material-icons mat-icon-no-color", {
-          "button-hover": interactionMode === TimelineInteractionMode.Selection,
+          "button-hover":
+            timelineInteractionMode === TimelineInteractionMode.Selection,
         })}
         title="Timeline selection mode"
         onClick={onSelectModel}
@@ -129,7 +130,8 @@ export default function TimelineButtons({
       </button>
       <button
         className={clsx("button mat-icon material-icons mat-icon-no-color", {
-          "button-hover": interactionMode === TimelineInteractionMode.Pan,
+          "button-hover":
+            timelineInteractionMode === TimelineInteractionMode.Pan,
         })}
         title="Timeline pan mode with the keyframe selection."
         onClick={() => onPaneMode(true)}
@@ -139,7 +141,8 @@ export default function TimelineButtons({
       <button
         className={clsx("button mat-icon material-icons mat-icon-no-color", {
           "button-hover":
-            interactionMode === TimelineInteractionMode.NonInteractivePan,
+            timelineInteractionMode ===
+            TimelineInteractionMode.NonInteractivePan,
         })}
         title="Timeline pan mode non interactive"
         onClick={() => onPaneMode(false)}
@@ -148,7 +151,8 @@ export default function TimelineButtons({
       </button>
       <button
         className={clsx("button mat-icon material-icons mat-icon-no-color", {
-          "button-hover": interactionMode === TimelineInteractionMode.Zoom,
+          "button-hover":
+            timelineInteractionMode === TimelineInteractionMode.Zoom,
         })}
         title="Timeline zoom mode. Also ctrl + scroll can be used."
         onClick={onZoomMode}
@@ -157,7 +161,8 @@ export default function TimelineButtons({
       </button>
       <button
         className={clsx("button mat-icon material-icons mat-icon-no-color", {
-          "button-hover": interactionMode === TimelineInteractionMode.None,
+          "button-hover":
+            timelineInteractionMode === TimelineInteractionMode.None,
         })}
         title="Only view mode."
         onClick={onNoneMode}

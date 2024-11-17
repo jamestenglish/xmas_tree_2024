@@ -66,7 +66,17 @@ module.exports = {
           typescript: {},
         },
       },
-      rules: { "jsx-a11y/media-has-caption": "off" },
+      rules: {
+        "jsx-a11y/media-has-caption": "off",
+        "@typescript-eslint/no-unused-vars": [
+          "warn", // or "error"
+          {
+            argsIgnorePattern: "^_",
+            varsIgnorePattern: "^_",
+            caughtErrorsIgnorePattern: "^_",
+          },
+        ],
+      },
     },
 
     // Typescript
@@ -94,6 +104,14 @@ module.exports = {
       rules: {
         "jsx-a11y/media-has-caption": "off",
         "react/no-unknown-property": ["off", { ignore: ["JSX"] }],
+        "@typescript-eslint/no-unused-vars": [
+          "warn", // or "error"
+          {
+            argsIgnorePattern: "^_",
+            varsIgnorePattern: "^_",
+            caughtErrorsIgnorePattern: "^_",
+          },
+        ],
       },
     },
 

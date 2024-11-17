@@ -7,7 +7,7 @@ import TimelineButtons from "./TimelineButtons";
 import { setAutoFreeze } from "immer";
 import "./assets/demo.css";
 import Outline from "./Outline";
-import useEditorStore from "../tree-editor/hooks/useEditorStore";
+import useEditorStore from "../tree-editor/state/useEditorStore";
 
 setAutoFreeze(false);
 

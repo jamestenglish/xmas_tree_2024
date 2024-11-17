@@ -1,7 +1,7 @@
 import { Timeline, TimelineInteractionMode } from "animation-timeline-js";
 import { useCallback, useEffect } from "react";
 import { useShallow } from "zustand/react/shallow";
-import useEditorStore from "~/features/tree-editor/hooks/useEditorStore";
+import useEditorStore from "~/features/tree-editor/state/useEditorStore";
 
 type UseTimelineInteractionsType = {
   timeline: Timeline | undefined;
@@ -13,51 +13,58 @@ export type OnZoomModeType = OnSelectModelType;
 export type OnNoneModeType = OnSelectModelType;
 
 const useTimelineInteractions = ({ timeline }: UseTimelineInteractionsType) => {
-  const { interactionMode, setInteractionMode } = useEditorStore(
-    useShallow((state) => ({
-      interactionMode: state.interactionMode,
-      setInteractionMode: state.setInteractionMode,
-    })),
-  );
+  const { timelineInteractionMode, setTimelineInteractionMode } =
+    useEditorStore(
+      useShallow((state) => ({
+        timelineInteractionMode: state.timelineInteractionMode,
+        setTimelineInteractionMode: state.setTimelineInteractionMode,
+      })),
+    );
   // sync to timeline
   useEffect(() => {
     if (timeline) {
-      timeline.setInteractionMode(interactionMode);
+      timeline.setInteractionMode(timelineInteractionMode);
     }
-  }, [interactionMode, timeline]);
+  }, [timelineInteractionMode, timeline]);
 
   const onSelectModel = useCallback(() => {
     if (timeline) {
-      setInteractionMode(TimelineInteractionMode.Selection);
+      setTimelineInteractionMode(TimelineInteractionMode.Selection);
     }
-  }, [setInteractionMode, timeline]);
+  }, [setTimelineInteractionMode, timeline]);
 
   const onPaneMode = useCallback(
     (interactive: boolean) => {
       if (timeline) {
-        setInteractionMode(
+        setTimelineInteractionMode(
           interactive
             ? TimelineInteractionMode.Pan
             : TimelineInteractionMode.NonInteractivePan,
         );
       }
     },
-    [setInteractionMode, timeline],
+    [setTimelineInteractionMode, timeline],
   );
 
   const onZoomMode = useCallback(() => {
     if (timeline) {
-      setInteractionMode(TimelineInteractionMode.Zoom);
+      setTimelineInteractionMode(TimelineInteractionMode.Zoom);
     }
-  }, [setInteractionMode, timeline]);
+  }, [setTimelineInteractionMode, timeline]);
 
   const onNoneMode = useCallback(() => {
     if (timeline) {
-      setInteractionMode(TimelineInteractionMode.None);
+      setTimelineInteractionMode(TimelineInteractionMode.None);
     }
-  }, [setInteractionMode, timeline]);
+  }, [setTimelineInteractionMode, timeline]);
 
-  return { interactionMode, onSelectModel, onPaneMode, onZoomMode, onNoneMode };
+  return {
+    timelineInteractionMode,
+    onSelectModel,
+    onPaneMode,
+    onZoomMode,
+    onNoneMode,
+  };
 };
 
 export default useTimelineInteractions;

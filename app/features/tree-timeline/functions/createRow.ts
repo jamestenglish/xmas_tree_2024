@@ -28,13 +28,8 @@ export interface TimelineGroupExtra extends TimelineGroup {
   selected?: boolean;
 }
 
-type CreateRowArgs = {
-  start?: number;
-  end?: number;
-};
-
 export function createUnselectedGroup(existingGroupId?: string) {
-  const groupId = existingGroupId ?? v7();
+  const groupId = existingGroupId ?? `group_${v7()}`;
 
   const group: TimelineGroupExtra = {
     id: groupId,
@@ -49,7 +44,7 @@ export function createUnselectedGroup(existingGroupId?: string) {
 }
 
 export function createSelectedGroup(existingGroupId?: string) {
-  const groupId = existingGroupId ?? v7();
+  const groupId = existingGroupId ?? `group_${v7()}`;
 
   const group: TimelineGroupExtra = {
     id: groupId,
@@ -57,17 +52,27 @@ export function createSelectedGroup(existingGroupId?: string) {
       // TODO JTE
       fillColor: "rgba(0,170,0,0.3)",
     },
-    selected: false,
+    selected: true,
   };
 
   return group;
 }
 
-const createRow = ({ start = 0, end = undefined }: CreateRowArgs = {}) => {
-  const group = createUnselectedGroup();
+type CreateRowArgs = {
+  start?: number;
+  end?: number;
+  isSelected?: boolean;
+};
+
+const createRow = ({
+  start = 0,
+  end = undefined,
+  isSelected = false,
+}: CreateRowArgs = {}) => {
+  const group = isSelected ? createSelectedGroup() : createUnselectedGroup();
   const groupId = group?.id;
   const row: TimelineRowExtra = {
-    id: v7(),
+    id: `row_${v7()}`,
     style: {
       groupsStyle: {
         // fillColor: "rgba(10, 71, 112, 1)",
@@ -76,12 +81,12 @@ const createRow = ({ start = 0, end = undefined }: CreateRowArgs = {}) => {
     },
     keyframes: [
       {
-        id: `A_${groupId}`,
+        id: `A_keyframe_${groupId}`,
         val: start,
         group: group,
       },
       {
-        id: `B_${groupId}`,
+        id: `B_keyframe_${groupId}`,
         val: end ?? start + 1000,
         group: group,
       },

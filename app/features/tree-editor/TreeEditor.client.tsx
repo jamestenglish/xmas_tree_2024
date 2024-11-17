@@ -1,12 +1,52 @@
 import { useForm } from "react-hook-form";
 import TreeViewer, { CylinderFormDataProps } from "../tree-viewer/TreeViewer";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import CanvasEditor from "../tree-canvas/CanvasEditor.client";
 import { canvasHeight, canvasWidth } from "./constants";
 import TimelineComponent from "../tree-timeline/TimelineComponent.client";
-import useEditorStore from "./hooks/useEditorStore";
+import useEditorStore from "./state/useEditorStore";
+import { useShallow } from "zustand/react/shallow";
+import ColorPicker from "../tree-canvas/ColorPicker.client";
+import memoizedCanvasStateSelector from "./state/memoizedCanvasInteractionModeSelector";
+// import memoizedSelectedLightIdsSelector from "./state/memoizedSelectedLightIdsSelector";
+// import memoizedColorSelector from "./state/memoizedColorSelector";
+
+const BLINK_SPEED = 300;
 
 export default function TreeEditor() {
+  const { color, toggleBlinkState, selectedLightIds, selectedGroupType } =
+    useEditorStore(
+      useShallow((state) => ({
+        toggleBlinkState: state.toggleBlinkState,
+        // selectedLightIds: memoizedSelectedLightIdsSelector(
+        //   state.selectedLightIdsByGroup,
+        //   state.model.rows,
+        // ),
+        selectedLightIds: state.selectedLightIds,
+        selectedGroupType: memoizedCanvasStateSelector(state.model.rows),
+        // color:
+        //   memoizedColorSelector(state.colorByGroup, state.model.rows) ??
+        //   undefined,
+        color: state.color,
+      })),
+    );
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+    timeoutRef.current = setInterval(() => {
+      // toggleBlinkState();
+    }, BLINK_SPEED);
+
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, [toggleBlinkState]);
+
   const initial: CylinderFormDataProps = {
     cylinderOpacity: 0.3,
   };
@@ -22,7 +62,6 @@ export default function TreeEditor() {
     "https://images.chesscomfiles.com/uploads/v1/images_users/tiny_mce/petrikeckman/phpE4U0RQ.png",
   );
 
-  const selectedLightIds = useEditorStore((state) => state.selectedLightIds);
   return (
     <>
       {" "}
@@ -39,17 +78,29 @@ export default function TreeEditor() {
                     Opacity
                   </label>
                   <input
-                    type="number"
-                    className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
-                    placeholder="100"
-                    required
+                    type="range"
+                    min="0"
+                    max="1"
+                    step="0.1"
                     {...register("cylinderOpacity")}
                   />
+                  {/* <input
+                    type="number"
+                    className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
+                 
+                    {...register("cylinderOpacity")}
+                  /> */}
                 </div>
-                <div> {JSON.stringify(selectedLightIds, null, 2)}</div>
+                <div>
+                  {" "}
+                  {JSON.stringify(selectedLightIds, null, 2)}{" "}
+                  {JSON.stringify(color, null, 2)}
+                </div>
               </div>
-              <div className="flex flex-row gap-2">
+              {/* <div className="flex flex-row gap-2"> */}
+              <div className="grid grid-cols-2 gap-2">
                 <TreeViewer imgUrl={imgUrl} cylinderOpacity={cylinderOpacity} />
+
                 <div
                   style={{
                     // width: "640px",
@@ -57,13 +108,21 @@ export default function TreeEditor() {
                     border: "1px solid black",
                   }}
                 >
-                  <CanvasEditor setImgUrl={setImgUrl} />
+                  {selectedGroupType === "canvas" && (
+                    <CanvasEditor setImgUrl={setImgUrl} />
+                  )}
+                  {selectedGroupType === "light" && <ColorPicker />}
+                  {selectedGroupType === "none" && (
+                    <div>No timeline selection</div>
+                  )}
                 </div>
               </div>
             </div>
           </div>
         </div>
-        <TimelineComponent></TimelineComponent>
+        <div className="p-6">
+          <TimelineComponent></TimelineComponent>
+        </div>
       </div>
       <div className="flex flex-row gap-2">
         <canvas

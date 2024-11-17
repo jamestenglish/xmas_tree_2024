@@ -1,0 +1,36 @@
+// // import memoize from "memoize";
+// import { TimelineRowExtra } from "~/features/tree-timeline/functions/createRow";
+// import { AttributeByGroupType } from "./useEditorStore";
+// import memoizedSelectedIdsSelector from "./memoizedSelectedIdsSelector";
+// import memoize from "memoize";
+
+// export function attributeByGroupSelector<T>(
+//   rows: TimelineRowExtra[],
+//   byGroupAttribute: AttributeByGroupType<T>,
+//   // selectedLightIdsByGroup: AttributeByGroupType<number[]>,
+//   // sphereId: number,
+//   // blinkState: boolean,
+// ) {
+//   const { selectedGroupId = "" } = memoizedSelectedIdsSelector(rows);
+//   const attributeById = byGroupAttribute[selectedGroupId] ?? null;
+//   return attributeById;
+// }
+
+// export default memoize(attributeByGroupSelector, { cacheKey: JSON.stringify });
+// // function memoize<T extends (...args: any[]) => any>(fn: T): T {
+// //   const cache = new Map<string, ReturnType<T>>();
+
+// //   return function (this: ThisParameterType<T>, ...args: Parameters<T>) {
+// //     const key = JSON.stringify(args);
+// //     if (cache.has(key)) {
+// //       return cache.get(key);
+// //     }
+
+// //     const result = fn.apply(this, args);
+// //     cache.set(key, result);
+// //     return result;
+// //   } as T;
+// // }
+
+// // type
+// // export default memoize<attributeByGroupSelector
