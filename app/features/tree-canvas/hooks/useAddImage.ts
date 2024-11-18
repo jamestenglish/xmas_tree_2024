@@ -1,6 +1,8 @@
 import { useCallback } from "react";
 import useEditorStore from "~/features/tree-editor/state/useEditorStore";
 import { useShallow } from "zustand/react/shallow";
+import { v7 } from "uuid";
+import { ImageType } from "../EditableImage";
 
 export default function useAddImage() {
   const { canvasImages, setCanvasImages } = useEditorStore(
@@ -12,8 +14,10 @@ export default function useAddImage() {
 
   const addImage = useCallback(
     (src: string) => {
-      const newImage = {
-        id: `img-${Date.now()}`,
+      const newImage: ImageType = {
+        // id: `${new Date().getTime()}`,
+        id: v7(),
+        type: "image",
         src,
         x: 50,
         y: 50,

@@ -49,6 +49,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
           href="https://fonts.googleapis.com/icon?family=Material+Icons&amp;display=block"
           rel="stylesheet"
         />
+        {/* <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&amp;display=block"
+        /> */}
       </head>
       <body>
         {children}

@@ -24,7 +24,6 @@ export default function ColorPickerDialog({
         "modal",
       ) as HTMLDialogElement | null;
       if (dialog !== null) {
-        console.log({ dialog });
         const rect = dialog.getBoundingClientRect();
         const isInDialog =
           rect.top <= event.clientY &&

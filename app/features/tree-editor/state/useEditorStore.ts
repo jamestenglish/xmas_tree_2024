@@ -22,10 +22,17 @@ import createOnDrag from "./functions/createOnDrag";
 import createToggeLightId from "./functions/createToggleLightId";
 import { ImageType } from "~/features/tree-canvas/EditableImage";
 
+export type CanvasGlobalCompositeOperationType =
+  | "destination-out"
+  | "source-over";
+
 export type LineType = {
   points: Array<number>;
   stroke: string;
   strokeWidth: number;
+  id: string;
+  type: string;
+  globalCompositeOperation: CanvasGlobalCompositeOperationType;
 };
 
 export function is(input: unknown, type: string) {
@@ -59,11 +66,9 @@ export type AttributeByGroupType<T> = {
 type CanvasCusorA = { x: number; y: number };
 type CanvasCursorPos = CanvasCusorA | null;
 
-export type CanvasInteractionMode =
-  | "drawing"
-  | "erasing"
-  | "selecting"
-  | "idle";
+export type CanvasInteractionMode = "drawing" | "selecting" | "idle";
+
+export type CanvasInteractionType = "drawing" | "selecting";
 
 export interface GroupTypes {
   color: string | undefined;
@@ -109,6 +114,17 @@ export interface CanvasState {
 
   canvasBrushSize: number;
   setCanvasBrushSize: (canvasBrushSize: number) => void;
+
+  canvasGlobalCompositeOperation: CanvasGlobalCompositeOperationType;
+  setCanvasGlobalCompositeOperation: (
+    canvasGlobalCompositeOperation: CanvasGlobalCompositeOperationType,
+  ) => void;
+
+  canvasInteractionType: CanvasInteractionType;
+  setCanvasInteractionType: (
+    canvasInteractionType: CanvasInteractionType,
+  ) => void;
+
   // ----
   canvasSelectedId: string | null;
   setCanvasSelectedId: (canvasSelectedId: string | null) => void;
@@ -135,6 +151,16 @@ const useEditorStore = create<EditorState>()(
   devtools(
     // persist(
     (set) => ({
+      canvasInteractionType: "drawing",
+      setCanvasInteractionType: (
+        canvasInteractionType: CanvasInteractionType,
+      ) => set({ canvasInteractionType }),
+
+      canvasGlobalCompositeOperation: "source-over",
+      setCanvasGlobalCompositeOperation: (
+        canvasGlobalCompositeOperation: CanvasGlobalCompositeOperationType,
+      ) => set({ canvasGlobalCompositeOperation }),
+
       attributesByGroup: initialSelectedGroup
         ? {
             [initialSelectedGroup]: defaultByGroup,

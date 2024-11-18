@@ -5,6 +5,7 @@ import { useShallow } from "zustand/react/shallow";
 import useEditorStore, {
   LineType,
 } from "~/features/tree-editor/state/useEditorStore";
+import { v7 } from "uuid";
 
 type UseOnMouseDownArgs = {
   stageRef: React.RefObject<Stage>;
@@ -18,6 +19,8 @@ export default function useOnMouseDown({ stageRef }: UseOnMouseDownArgs) {
     setCanvasLines,
     setCanvasSelectedId,
     setCanvasInteractionMode,
+    canvasGlobalCompositeOperation,
+    canvasInteractionType,
   } = useEditorStore(
     useShallow((state) => ({
       canvasLines: state.canvasLines,
@@ -25,38 +28,47 @@ export default function useOnMouseDown({ stageRef }: UseOnMouseDownArgs) {
       canvasSelectedId: state.canvasSelectedId,
       setCanvasSelectedId: state.setCanvasSelectedId,
       setCanvasInteractionMode: state.setCanvasInteractionMode,
-
+      canvasGlobalCompositeOperation: state.canvasGlobalCompositeOperation,
       color: state.color,
       canvasBrushSize: state.canvasBrushSize,
+      canvasInteractionType: state.canvasInteractionType,
     })),
   );
   return useCallback(
     (e: Konva.KonvaEventObject<MouseEvent>) => {
       console.log("useOnMouseDown");
-      if (e.target === stageRef.current) {
-        setCanvasSelectedId(null); // Deselect any selected images
-      }
-      const pos = e.target?.getStage()?.getPointerPosition();
-      console.log({ pos });
-      if (pos && color) {
-        setCanvasInteractionMode("drawing");
-        console.log("drawing");
-        const newLine: LineType = {
-          points: [pos.x, pos.y],
-          stroke: color,
-          strokeWidth: canvasBrushSize,
-        };
-        setCanvasLines([...canvasLines, newLine]);
+      if (canvasInteractionType === "drawing") {
+        if (e.target === stageRef.current) {
+          setCanvasSelectedId(null); // Deselect any selected images
+        }
+        const pos = e.target?.getStage()?.getPointerPosition();
+        console.log({ pos });
+        if (pos && color) {
+          setCanvasInteractionMode("drawing");
+          console.log("drawing");
+          const newLine: LineType = {
+            // id: `${new Date().getTime()}`,
+            id: v7(),
+            type: "line",
+            points: [pos.x, pos.y],
+            stroke: color,
+            strokeWidth: canvasBrushSize,
+            globalCompositeOperation: canvasGlobalCompositeOperation,
+          };
+          setCanvasLines([...canvasLines, newLine]);
+        }
       }
     },
     [
-      canvasBrushSize,
-      canvasLines,
+      canvasInteractionType,
+      stageRef,
       color,
-      setCanvasLines,
       setCanvasSelectedId,
       setCanvasInteractionMode,
-      stageRef,
+      canvasBrushSize,
+      canvasGlobalCompositeOperation,
+      setCanvasLines,
+      canvasLines,
     ],
   );
 }

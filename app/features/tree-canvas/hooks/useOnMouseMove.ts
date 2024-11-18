@@ -2,7 +2,6 @@ import Konva from "konva";
 import { useCallback } from "react";
 import { useShallow } from "zustand/react/shallow";
 import useEditorStore from "~/features/tree-editor/state/useEditorStore";
-// import memoizedAttributeByGroupSelector from "../../tree-editor/state/memoizedattributeByGroupSelector";
 
 export default function useOnMouseMove() {
   const {
@@ -13,11 +12,6 @@ export default function useOnMouseMove() {
   } = useEditorStore(
     useShallow((state) => ({
       setCanvasCursorPos: state.setCanvasCursorPos,
-      // canvasLines:
-      //   memoizedAttributeByGroupSelector<Array<LineType>>(
-      //     state.model.rows,
-      //     state.canvasLinesByGroup,
-      //   ) ?? [],
       canvasLines: state.canvasLines,
       setCanvasLines: state.setCanvasLines,
       canvasSelectedId: state.canvasSelectedId,
@@ -44,7 +38,8 @@ export default function useOnMouseMove() {
           lastLine.points = lastLine.points.concat([point.x, point.y]);
           canvasLines.splice(canvasLines.length - 1, 1, lastLine);
           console.log("adding lines");
-          setCanvasLines(canvasLines.concat());
+          // setCanvasLines(canvasLines.concat());
+          setCanvasLines(canvasLines);
         }
       }
     },

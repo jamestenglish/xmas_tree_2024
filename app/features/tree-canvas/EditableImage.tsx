@@ -11,6 +11,7 @@ export type ImageType = {
   width: number;
   height: number;
   rotation: number;
+  type: string;
 };
 
 type EditableImageProps = {
@@ -48,7 +49,10 @@ export default function EditableImage({
         height={img.height}
         rotation={img.rotation}
         draggable
-        onClick={onSelect}
+        onClick={(e) => {
+          console.log("----uhhh");
+          onSelect(e);
+        }}
         onTap={onSelect}
         ref={shapeRef}
         onTransformEnd={onTransformEnd}

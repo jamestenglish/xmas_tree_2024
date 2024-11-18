@@ -58,7 +58,10 @@
   width: 44px;
   min-width: 44px;
 }
-
+.mat-tw {
+  font-size: inherit !important;
+  line-height: inherit !important;
+}
 .outline .mat-icon.button {
   padding: 0px;
   width: 38px;

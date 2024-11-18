@@ -2,11 +2,23 @@ import { ButtonHTMLAttributes } from "react";
 
 type ButtonProps = {
   variant?: "small";
+  selected?: boolean;
 } & ButtonHTMLAttributes<HTMLButtonElement>;
 export default function Button(props: ButtonProps) {
-  const { children, variant, ...otherProps } = props;
+  const { children, variant, selected, ...otherProps } = props;
 
   if (variant === "small") {
+    if (selected) {
+      return (
+        <button
+          type="button"
+          className="mb-1 me-1 rounded-lg bg-blue-700 px-2.5 py-0.5 text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+          {...otherProps}
+        >
+          {children}
+        </button>
+      );
+    }
     return (
       <button
         type="button"
