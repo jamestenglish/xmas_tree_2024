@@ -16,8 +16,7 @@ import useOnTransformEnd from "./hooks/useOnTransformEnd";
 import memoize from "memoize";
 import useOnMouseLeave from "./hooks/useOnMouseLeave";
 import CanvasEditorControls from "./CanvasEditorControls";
-import { SubmitHandler, useForm } from "react-hook-form";
-import Button from "../ui/components/Button";
+import CanvasImageForm from "./CanvasImageForm";
 
 const createCanvasElements = (
   canvasImages: ImageType[],
@@ -38,118 +37,7 @@ const memoizedCreateCanvasElements = memoize(createCanvasElements, {
   cacheKey: JSON.stringify,
 });
 
-function CanvasForm({
-  selectedImage,
-  setSelectedImage,
-}: {
-  selectedImage: ImageType | null;
-  setSelectedImage: React.Dispatch<React.SetStateAction<ImageType | null>>;
-}) {
-  //
-  const { register, handleSubmit } = useForm<ImageType>({
-    values: selectedImage ?? undefined,
-    defaultValues: selectedImage ?? undefined,
-  });
-
-  const { canvasImages, setCanvasImages } = useEditorStore(
-    useShallow((state) => ({
-      canvasImages: state.canvasImages,
-      setCanvasImages: state.setCanvasImages,
-    })),
-  );
-
-  const onSubmit: SubmitHandler<ImageType> = (data) => {
-    console.log(data);
-    const { id } = data;
-    const index = canvasImages.findIndex(({ id: idIn }) => idIn === id);
-    if (index >= 0) {
-      const newCanvasImages = [
-        ...canvasImages.slice(0, index),
-        data,
-        ...canvasImages.slice(index + 1),
-      ];
-      setCanvasImages(newCanvasImages);
-    }
-    setSelectedImage(null);
-    // setIsOpen(false);
-    // addImage(data.imgUrl);
-  };
-
-  if (!selectedImage) {
-    return <></>;
-  }
-
-  // TODO JTE animate: https://motion.dev/docs/animate
-  return (
-    <>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <div className="flex w-screen flex-row p-1">
-          <div className="flex flex-row gap-2">
-            <label
-              htmlFor="width"
-              className="font-small text-sm text-gray-900 dark:text-white"
-            >
-              Width:
-              <input
-                className="blockrounded-sm ml-1 w-12 border border-gray-300 bg-gray-50 p-0.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
-                {...register("width", { required: true })}
-              />
-            </label>
-            <label
-              htmlFor="height"
-              className="font-small text-sm text-gray-900 dark:text-white"
-            >
-              Height:
-              <input
-                className="blockrounded-sm ml-1 w-12 border border-gray-300 bg-gray-50 p-0.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
-                {...register("height", { required: true })}
-              />
-            </label>
-
-            <label
-              htmlFor="height"
-              className="font-small text-sm text-gray-900 dark:text-white"
-            >
-              x:
-              <input
-                className="blockrounded-sm ml-1 w-12 border border-gray-300 bg-gray-50 p-0.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
-                {...register("x", { required: true })}
-              />
-            </label>
-
-            <label
-              htmlFor="height"
-              className="font-small text-sm text-gray-900 dark:text-white"
-            >
-              y:
-              <input
-                className="blockrounded-sm ml-1 w-12 border border-gray-300 bg-gray-50 p-0.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
-                {...register("y", { required: true })}
-              />
-            </label>
-
-            <label
-              htmlFor="height"
-              className="font-small text-sm text-gray-900 dark:text-white"
-            >
-              rotation:
-              <input
-                className="blockrounded-sm ml-1 w-12 border border-gray-300 bg-gray-50 p-0.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
-                {...register("rotation", { required: true })}
-              />
-            </label>
-
-            <Button variant="small" type="submit">
-              Submit
-            </Button>
-          </div>
-        </div>
-      </form>
-    </>
-  );
-}
-
-function CanvasImgs() {
+function CanvasImgs({ shapeRefsMeta }: { shapeRefsMeta: ShapeRefMeta[] }) {
   //
   const { canvasImages, setCanvasImages } = useEditorStore(
     useShallow((state) => ({
@@ -162,12 +50,14 @@ function CanvasImgs() {
 
   return (
     <>
-      <div className="mt-2 flex max-h-16 flex-row gap-2">
-        <CanvasForm
+      {selectedImage && (
+        <CanvasImageForm
           selectedImage={selectedImage}
           setSelectedImage={setSelectedImage}
+          shapeRefsMeta={shapeRefsMeta}
         />
-      </div>
+      )}
+
       <div className="mt-2 flex max-h-16 flex-row gap-2">
         {canvasImages.map((img) => {
           return (
@@ -184,11 +74,11 @@ function CanvasImgs() {
                 onClick={() => setSelectedImage(img)}
               />
               <svg
-                className="row-0 col-0 bg-white"
+                className="col-start-1 col-end-1 row-start-1 row-end-1 bg-white"
                 xmlns="http://www.w3.org/2000/svg"
-                height="24px"
+                height="16px"
                 viewBox="0 -960 960 960"
-                width="24px"
+                width="16px"
                 fill="#5f6368"
                 onClick={() => {
                   const index = canvasImages.findIndex((i) => i.id === img.id);
@@ -210,6 +100,12 @@ function CanvasImgs() {
     </>
   );
 }
+
+export type ShapeRefMeta = {
+  ref: React.RefObject<Konva.Image>;
+  id: string;
+  animate?: unknown;
+};
 
 export default function CanvasEditor({
   stageRef,
@@ -249,6 +145,28 @@ export default function CanvasEditor({
       setCanvasInteractionType: state.setCanvasInteractionType,
     })),
   );
+
+  const [shapeRefsMeta, setShapeRef] = useState<Array<ShapeRefMeta>>([]);
+
+  const addShapeRef = useCallback((meta: ShapeRefMeta) => {
+    setShapeRef((prev) => {
+      const index = prev.findIndex((sr) => sr.id === meta.id);
+      if (index < 0) {
+        return [...prev, meta];
+      }
+      return [...prev.slice(0, index), meta, ...prev.slice(index)];
+    });
+  }, []);
+
+  const removeShapeRef = useCallback((meta: ShapeRefMeta) => {
+    setShapeRef((prev) => {
+      const index = prev.findIndex((sr) => sr.id === meta.id);
+      if (index < 0) {
+        return prev;
+      }
+      return [...prev.slice(0, index), ...prev.slice(index)];
+    });
+  }, []);
 
   // Start drawing freehand
   const onMouseDown = useOnMouseDown({
@@ -319,7 +237,10 @@ export default function CanvasEditor({
                     return (
                       <EditableImage
                         key={element.id}
+                        id={element.id}
                         img={element}
+                        addShapeRef={addShapeRef}
+                        removeShapeRef={removeShapeRef}
                         isSelected={element.id === canvasSelectedId}
                         onSelect={() => onSelect(element.id)}
                         onTransformEnd={(e: Konva.KonvaEventObject<Event>) =>
@@ -355,7 +276,7 @@ export default function CanvasEditor({
             )}
           </Stage>
         </div>
-        <CanvasImgs />
+        <CanvasImgs shapeRefsMeta={shapeRefsMeta} />
       </div>
     </>
   );

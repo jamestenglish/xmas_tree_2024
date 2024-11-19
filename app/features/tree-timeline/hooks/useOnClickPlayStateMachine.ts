@@ -63,7 +63,7 @@ export default function useOnClickPlayStateMachine() {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const hateMyself = (func: any) => {
       if (doHateMyself) {
-        setTimeout(() => func(), 1000);
+        setTimeout(() => func(), 250);
         setTimelineExportState({
           ...timelineExportState,
           status: "PAUSE",

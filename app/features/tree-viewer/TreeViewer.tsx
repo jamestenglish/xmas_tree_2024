@@ -56,9 +56,15 @@ const getTextureIndex = (
 ) => {
   if (timelineExportState.status === "PLAY") {
     const data = timelineExportState?.canvasCylinderImgUrlsData ?? [];
+    const max = data.reduce((acc, datum) => {
+      return Math.max(acc, datum.end);
+    }, 0);
     for (let i = 0; i < data.length; i++) {
       const { start, end } = data[i];
-      if (timelineCoarseTime >= start && timelineCoarseTime < end) {
+      if (
+        timelineCoarseTime >= start &&
+        (timelineCoarseTime < end || timelineCoarseTime == max)
+      ) {
         return i + 1;
       }
     }

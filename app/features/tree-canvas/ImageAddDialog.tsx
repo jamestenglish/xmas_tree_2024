@@ -54,14 +54,44 @@ export default function ImageAddDialog() {
     [canvasImages, setCanvasImages],
   );
 
-  const { register, handleSubmit } = useForm<AddImageFormDataProps>({
+  const {
+    register,
+    handleSubmit,
+    formState: { isSubmitting },
+  } = useForm<AddImageFormDataProps>({
     defaultValues: initial,
   });
 
-  const onSubmit: SubmitHandler<AddImageFormDataProps> = (data) => {
+  const onSubmit: SubmitHandler<AddImageFormDataProps> = async (data) => {
     console.log(data);
+    const canvas = document.getElementById(
+      "AddImageDialogCanvas",
+    ) as HTMLCanvasElement;
+
+    if (canvas) {
+      const imgLoader = new Image();
+      imgLoader.crossOrigin = "anonymous";
+      imgLoader.src = data.imgUrl;
+      const dimension = await new Promise<{ h: number; w: number }>(
+        (resolve) => {
+          imgLoader.onload = function () {
+            resolve({ h: imgLoader.height, w: imgLoader.width });
+          };
+        },
+      );
+      canvas.height = dimension.h;
+      canvas.width = dimension.w;
+      const context = canvas.getContext("2d");
+      if (context) {
+        context.clearRect(0, 0, canvas.width, canvas.height);
+
+        context.drawImage(imgLoader, 0, 0, canvas.width, canvas.height);
+        const dataUrl = canvas.toDataURL("image/png");
+
+        addImage(dataUrl);
+      }
+    }
     setIsOpen(false);
-    addImage(data.imgUrl);
   };
 
   const onClickClose = useCallback(() => {
@@ -71,6 +101,7 @@ export default function ImageAddDialog() {
   const onClickOpen = useCallback(() => {
     setIsOpen(true);
   }, []);
+  console.log({ isSubmitting });
 
   return (
     <>
@@ -90,7 +121,9 @@ export default function ImageAddDialog() {
                 className="blockrounded-lg grow border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
                 {...register("imgUrl", { required: true })}
               />
-              <Button type="submit">Submit</Button>
+              <Button disabled={isSubmitting} type="submit">
+                Submit
+              </Button>
             </form>
           </div>
           <div className="w-1/4"></div>
@@ -99,6 +132,9 @@ export default function ImageAddDialog() {
       <Button variant="small" onClick={onClickOpen}>
         Add Img
       </Button>
+      <div className="hidden">
+        <canvas id="AddImageDialogCanvas"></canvas>
+      </div>
     </>
   );
 }
