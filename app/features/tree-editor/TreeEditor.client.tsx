@@ -1,6 +1,5 @@
-import { useForm } from "react-hook-form";
-import TreeViewer, { CylinderFormDataProps } from "../tree-viewer/TreeViewer";
-import { useEffect, useRef, useState } from "react";
+import TreeViewer from "../tree-viewer/TreeViewer";
+import { useRef } from "react";
 import CanvasEditor from "../tree-canvas/CanvasEditor.client";
 import { canvasHeight, canvasWidth } from "./constants";
 import TimelineComponent from "../tree-timeline/TimelineComponent.client";
@@ -8,52 +7,72 @@ import useEditorStore from "./state/useEditorStore";
 import { useShallow } from "zustand/react/shallow";
 import ColorPicker from "../tree-canvas/ColorPicker.client";
 import memoizedCanvasStateSelector from "./state/memoizedCanvasInteractionModeSelector";
+import Konva from "konva";
 
-const BLINK_SPEED = 300;
+// const BLINK_SPEED = 300;
+
+function TimelineExportStateDebugger() {
+  //
+  const { timelineExportState, canvasCylinderImgUrl } = useEditorStore(
+    useShallow((state) => ({
+      timelineExportState: state.timelineExportState,
+      canvasCylinderImgUrl: state.canvasCylinderImgUrl,
+    })),
+  );
+
+  const imgUrls =
+    timelineExportState?.canvasCylinderImgUrlsData?.map(
+      (img) => img.canvasCylinderImgUrl,
+    ) ?? [];
+
+  return (
+    <>
+      <div className="flex flex-row gap-2">
+        {canvasCylinderImgUrl && <img src={canvasCylinderImgUrl} alt="foo" />}
+        {imgUrls.map((src, index) => {
+          return <img key={index} alt="foo" src={src} />;
+        })}
+      </div>
+    </>
+  );
+}
 
 export default function TreeEditor() {
-  const { color, toggleBlinkState, selectedLightIds, selectedGroupType } =
-    useEditorStore(
-      useShallow((state) => ({
-        toggleBlinkState: state.toggleBlinkState,
+  const { selectedGroupType, timelineSelectedGroupId } = useEditorStore(
+    useShallow((state) => ({
+      selectedGroupType: memoizedCanvasStateSelector(state.timelineModel.rows),
+      timelineSelectedGroupId: state.timelineSelectedGroupId,
+    })),
+  );
+  // const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-        selectedLightIds: state.selectedLightIds,
-        selectedGroupType: memoizedCanvasStateSelector(state.model.rows),
+  // useEffect(() => {
+  //   if (timeoutRef.current) {
+  //     clearTimeout(timeoutRef.current);
+  //   }
+  //   timeoutRef.current = setInterval(() => {
+  //     // toggleTreeViewerBlinkState();
+  //   }, BLINK_SPEED);
 
-        color: state.color,
-      })),
-    );
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  //   return () => {
+  //     if (timeoutRef.current) {
+  //       clearTimeout(timeoutRef.current);
+  //     }
+  //   };
+  // }, [toggleTreeViewerBlinkState]);
 
-  useEffect(() => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
-    timeoutRef.current = setInterval(() => {
-      // toggleBlinkState();
-    }, BLINK_SPEED);
+  // const initial: CylinderFormDataProps = {
+  //   cylinderOpacity: 0.3,
+  // };
 
-    return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-    };
-  }, [toggleBlinkState]);
+  // const { register, watch } = useForm<CylinderFormDataProps>({
+  //   defaultValues: initial,
+  // });
 
-  const initial: CylinderFormDataProps = {
-    cylinderOpacity: 0.3,
-  };
-
-  const { register, watch } = useForm<CylinderFormDataProps>({
-    defaultValues: initial,
-  });
-
-  const cylinderOpacity = watch("cylinderOpacity") ?? 0.3;
+  // const cylinderOpacity = watch("cylinderOpacity") ?? 0.3;
 
   const testCanvasRef = useRef<HTMLCanvasElement>(null);
-  const [imgUrl, setImgUrl] = useState<string>(
-    "https://images.chesscomfiles.com/uploads/v1/images_users/tiny_mce/petrikeckman/phpE4U0RQ.png",
-  );
+  const stageRef = useRef<Konva.Stage>(null);
 
   return (
     <>
@@ -62,7 +81,7 @@ export default function TreeEditor() {
         <div className="tmp-main">
           <div className="content">
             <div className="p-6">
-              <div className="mb-6 grid gap-6 md:grid-cols-6">
+              {/* <div className="mb-6 grid gap-6 md:grid-cols-6">
                 <div>
                   <label
                     htmlFor="first_name"
@@ -80,13 +99,13 @@ export default function TreeEditor() {
                 </div>
                 <div>
                   {" "}
-                  {JSON.stringify(selectedLightIds, null, 2)}{" "}
+                  {JSON.stringify(treeViewerSelectedLightIds, null, 2)}{" "}
                   {JSON.stringify(color, null, 2)}
                 </div>
-              </div>
+              </div> */}
               {/* <div className="flex flex-row gap-2"> */}
               <div className="grid grid-cols-2 gap-2">
-                <TreeViewer imgUrl={imgUrl} cylinderOpacity={cylinderOpacity} />
+                <TreeViewer />
 
                 <div
                   style={{
@@ -95,12 +114,20 @@ export default function TreeEditor() {
                     border: "1px solid black",
                   }}
                 >
-                  {selectedGroupType === "canvas" && (
-                    <CanvasEditor setImgUrl={setImgUrl} />
-                  )}
-                  {selectedGroupType === "light" && <ColorPicker />}
-                  {selectedGroupType === "none" && (
-                    <div>No timeline selection</div>
+                  {timelineSelectedGroupId ? (
+                    <>
+                      {selectedGroupType === "canvas" && (
+                        <CanvasEditor stageRef={stageRef} />
+                      )}
+                      {selectedGroupType === "light" && <ColorPicker />}
+                      {selectedGroupType === "none" && (
+                        <div>No timeline selection</div>
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      <div>Select a group in the timeline</div>
+                    </>
                   )}
                 </div>
               </div>
@@ -131,6 +158,7 @@ export default function TreeEditor() {
         />
       </div>
       <img id="testImg" alt="foo" />
+      <TimelineExportStateDebugger />
     </>
   );
 }

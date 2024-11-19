@@ -17,7 +17,7 @@
 
   // Use 'forwardPorts' to make a list of ports inside the container available locally.
   // "forwardPorts": [5173],
-  "runArgs": ["-p=5173:5173"],
+  "runArgs": ["-p=5175:5173"],
 
   // Use 'postCreateCommand' to run commands after the container is created.
   // "postCreateCommand": "yarn install",
@@ -28,7 +28,8 @@
       "extensions": [
         "esbenp.prettier-vscode",
         "bradlc.vscode-tailwindcss",
-        "dbaeumer.vscode-eslint"
+        "dbaeumer.vscode-eslint",
+        "YoavBls.pretty-ts-errors"
       ],
       "settings": {
         "editor.formatOnSave": true,

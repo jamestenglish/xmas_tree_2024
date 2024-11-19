@@ -23,9 +23,9 @@ const useInitTimelineListeners = ({
   outlineContainerRef,
   outlineScrollContainerRef,
 }: UseInitTimelineListenersType) => {
-  const { setSelectedGroupId, onDragTimeline } = useEditorStore(
+  const { setTimelineSelectedGroupId, onDragTimeline } = useEditorStore(
     useShallow((state) => ({
-      setSelectedGroupId: state.setSelectedGroupId,
+      setTimelineSelectedGroupId: state.setTimelineSelectedGroupId,
       onDragTimeline: state.onDragTimeline,
     })),
   );
@@ -109,7 +109,7 @@ const useInitTimelineListeners = ({
           }
           if (groupId) {
             console.log("useInitTimelineListeners groupId", groupId, from);
-            setSelectedGroupId(groupId);
+            setTimelineSelectedGroupId(groupId);
           }
           logMessage(
             "mousedown:" +
@@ -167,7 +167,7 @@ const useInitTimelineListeners = ({
     onDragTimeline,
     outlineContainerRef,
     outlineScrollContainerRef,
-    setSelectedGroupId,
+    setTimelineSelectedGroupId,
     timeline,
   ]);
 };

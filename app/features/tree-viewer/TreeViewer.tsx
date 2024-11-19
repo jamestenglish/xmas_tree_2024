@@ -11,6 +11,11 @@ import {
   // Outline,
 } from "@react-three/postprocessing";
 import LightSphere, { SphereProps } from "./LightSphere";
+import useEditorStore, {
+  TimelineExportState,
+} from "../tree-editor/state/useEditorStore";
+import { useShallow } from "zustand/react/shallow";
+import TreeViewerControls from "./TreeViewerControls";
 // import useEditorStore from "../tree-editor/hooks/useEditorStore";
 
 THREE.ColorManagement.enabled = true;
@@ -27,22 +32,76 @@ THREE.ColorManagement.enabled = true;
 // const imgUrl =
 //   "https://images.chesscomfiles.com/uploads/v1/images_users/tiny_mce/petrikeckman/phpE4U0RQ.png";
 
+const getTextureUrls = (
+  timelineExportState: TimelineExportState,
+  canvasCylinderImgUrl: string,
+) => {
+  const defaultResult = [canvasCylinderImgUrl];
+  if (timelineExportState.status === "PLAY") {
+    return (
+      timelineExportState?.canvasCylinderImgUrlsData?.map(
+        (obj) => obj.canvasCylinderImgUrl,
+      ) ?? defaultResult
+    );
+  }
+
+  return defaultResult;
+};
+
+const getTextureIndex = (
+  timelineExportState: TimelineExportState,
+  timelineCoarseTime: number,
+) => {
+  if (timelineExportState.status === "PLAY") {
+    const data = timelineExportState?.canvasCylinderImgUrlsData ?? [];
+    for (let i = 0; i < data.length; i++) {
+      const { start, end } = data[i];
+      if (timelineCoarseTime >= start && timelineCoarseTime < end) {
+        return i;
+      }
+    }
+  }
+
+  return 0;
+};
+
 export interface CylinderFormDataProps {
   cylinderOpacity?: number;
 }
 
 const points = [new THREE.Vector3(0, -10, 0), new THREE.Vector3(0, 10, 0)];
 
-export type CylinderSceneProps = {
-  cylinderOpacity?: number;
-  imgUrl: string;
-};
+const CylinderScene = () => {
+  const {
+    canvasCylinderImgUrl,
+    treeViewerCylinderOpacity,
+    timelineExportState,
+    timelineCoarseTime,
+  } = useEditorStore(
+    useShallow((state) => ({
+      canvasCylinderImgUrl: state.canvasCylinderImgUrl,
+      treeViewerCylinderOpacity: state.treeViewerCylinderOpacity,
+      timelineExportState: state.timelineExportState,
+      timelineCoarseTime: state.timelineCoarseTime,
+    })),
+  );
 
-const CylinderScene = ({
-  cylinderOpacity = 0.3,
-  imgUrl,
-}: CylinderSceneProps) => {
-  const texture = useTexture(imgUrl);
+  const urlsToUse = useMemo(() => {
+    const result = getTextureUrls(timelineExportState, canvasCylinderImgUrl);
+    console.log({ result });
+    return result;
+  }, [canvasCylinderImgUrl, timelineExportState]);
+
+  const texturesIndex = useMemo(() => {
+    const result = getTextureIndex(timelineExportState, timelineCoarseTime);
+    console.log(result);
+    return result;
+  }, [timelineCoarseTime, timelineExportState]);
+
+  const textures = useTexture(urlsToUse);
+
+  const texture = textures[texturesIndex];
+
   const cylinderHeight = 20;
   const cylinderRef = useRef<THREE.Mesh>(null);
   const lineRef = useRef<THREE.BufferGeometry>(null);
@@ -136,7 +195,7 @@ const CylinderScene = ({
           map={texture}
           side={THREE.DoubleSide}
           transparent
-          opacity={cylinderOpacity}
+          opacity={treeViewerCylinderOpacity}
         />
       </mesh>
       <line>
@@ -152,33 +211,36 @@ const CylinderScene = ({
   );
 };
 
-// TODO JTE move most of this to tree-editor
-export type TreeViewerProps = {
-  cylinderOpacity: number;
-  imgUrl: string;
-};
-const TreeViewer = ({ cylinderOpacity, imgUrl }: TreeViewerProps) => {
+const TreeViewer = () => {
   // const sphereRef = useEditorStore((state) => state.sphereRefs[0]);
   return (
     <>
-      <Canvas
-        style={{ height: "100vh" }}
-        camera={{ position: [0, 0, 15], fov: 75 }}
-      >
-        <color attach="background" args={["#112233"]} />
-        <EffectComposer>
-          <Bloom
-            mipmapBlur
-            luminanceThreshold={1}
-            levels={8}
-            intensity={0.4 * 4}
-          />
-          {/* <Outline selection={sphereRef ? [sphereRef] : []} /> */}
-          <ToneMapping />
-        </EffectComposer>
-        <CylinderScene cylinderOpacity={cylinderOpacity} imgUrl={imgUrl} />
-        <OrbitControls />
-      </Canvas>
+      <div className="flex flex-col">
+        <div>
+          <TreeViewerControls />
+        </div>
+        <div>
+          <Canvas
+            style={{ height: "100vh" }}
+            camera={{ position: [0, 0, 15], fov: 75 }}
+          >
+            <color attach="background" args={["#112233"]} />
+            <EffectComposer>
+              <Bloom
+                mipmapBlur
+                // luminanceThreshold={1}
+                luminanceThreshold={0.1}
+                levels={8}
+                intensity={0.4 * 4}
+              />
+              {/* <Outline selection={sphereRef ? [sphereRef] : []} /> */}
+              <ToneMapping />
+            </EffectComposer>
+            <CylinderScene />
+            <OrbitControls />
+          </Canvas>
+        </div>
+      </div>
     </>
   );
 };

@@ -11,8 +11,7 @@ export function selectedIdsSelector(rows: TimelineRowExtra[]) {
       const group = keyframe?.group;
       if (!(typeof group === "string")) {
         if (group?.selected) {
-          console.log("result");
-          return { selectedGroupId: group?.id, selectedRowId };
+          return { timelineSelectedGroupId: group?.id, selectedRowId };
         }
       }
     }

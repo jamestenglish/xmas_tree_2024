@@ -14,11 +14,13 @@ export default function createSetAttibuteByGroupId<T>(
 ) {
   return produce((state: EditorState) => {
     if (value !== null) {
-      const { selectedGroupId } = memoizedSelectedIdsSelector(state.model.rows);
-      if (selectedGroupId && state) {
+      const { timelineSelectedGroupId } = memoizedSelectedIdsSelector(
+        state.timelineModel.rows,
+      );
+      if (timelineSelectedGroupId && state) {
         const attribute = state[attributeName] as AttributeByGroupType<T>;
         if (attribute !== null) {
-          attribute[selectedGroupId] = value;
+          attribute[timelineSelectedGroupId] = value;
         }
       }
     }

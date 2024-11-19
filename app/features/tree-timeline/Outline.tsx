@@ -17,7 +17,7 @@ function OutlineNode({ timeline, index }: OutlineNodeProps) {
     useShallow((state) => ({
       addTimelineGroupToRow: state.addTimelineGroupToRow,
       deleteTimelineRow: state.deleteTimelineRow,
-      rows: state.model.rows,
+      rows: state.timelineModel.rows,
     })),
   );
 
@@ -91,7 +91,7 @@ type OutlineProps = {
   timeline: Timeline | undefined;
 };
 export default function Outline({ timeline }: OutlineProps) {
-  const rows = useEditorStore((state) => state.model.rows);
+  const rows = useEditorStore((state) => state.timelineModel.rows);
   return (
     <>
       {rows.map((row, index) => {

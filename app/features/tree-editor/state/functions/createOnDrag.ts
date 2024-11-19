@@ -18,9 +18,9 @@ export default function createOnDrag(
 ) {
   return produce((state: EditorState) => {
     if (elements !== null) {
-      const { model } = state;
+      const { timelineModel } = state;
 
-      if (state.model) {
+      if (state.timelineModel) {
         const dragCollections: Array<DragCollectionType | null> = elements.map(
           (element) => {
             if (!(element?.keyframe && element?.row)) {
@@ -42,7 +42,7 @@ export default function createOnDrag(
 
         dragCollections.forEach((dragCollection) => {
           if (dragCollection !== null) {
-            model?.rows?.forEach((row) => {
+            timelineModel?.rows?.forEach((row) => {
               if (row?.id !== dragCollection?.rowId) {
                 return;
               }
@@ -56,7 +56,7 @@ export default function createOnDrag(
           }
         });
 
-        state?.model?.rows?.forEach((row) => {
+        state?.timelineModel?.rows?.forEach((row) => {
           if (row?.keyframes && dragType === "finished") {
             console.log("dragType", dragType);
             deconflictKeyframes(row.keyframes);

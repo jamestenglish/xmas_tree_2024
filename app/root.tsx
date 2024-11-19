@@ -30,6 +30,27 @@ console.group = function () {
   }
 };
 
+const ERRORS_TO_SILENCE = [
+  "Warning: %s: Support for defaultProps will be removed from function components in a future major release. Use JavaScript default parameters instead.%s",
+  "Warning: Extra attributes from the server: %s%s",
+];
+
+const error = console.error;
+
+console.error = function () {
+  // eslint-disable-next-line prefer-rest-params
+  const args = Array.from(arguments);
+
+  if (args.length >= 1) {
+    // console.log(args[0]);
+    if (!ERRORS_TO_SILENCE.includes(args[0])) {
+      error.apply(console, args);
+    }
+  } else {
+    error.apply(console, args);
+  }
+};
+
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">

@@ -48,6 +48,7 @@
     "@react-three/eslint-plugin": "^0.1.1",
     "@redux-devtools/extension": "^3.3.0",
     "@remix-run/dev": "^2.11.2",
+    "@types/lodash": "^4.17.13",
     "@types/react": "^18.2.20",
     "@types/react-color": "^3.0.12",
     "@types/react-dom": "^18.2.7",

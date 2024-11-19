@@ -4,17 +4,17 @@ import { EditorState } from "../useEditorStore";
 export default function createToggeLightId(selectedLightId: number | null) {
   return produce((state: EditorState) => {
     if (selectedLightId !== null) {
-      let selectedLightIds = state.selectedLightIds ?? [];
+      let treeViewerSelectedLightIds = state.treeViewerSelectedLightIds ?? [];
 
-      // const { selectedLightIds } = state;
-      if (selectedLightIds.includes(selectedLightId)) {
-        selectedLightIds = selectedLightIds.filter(
+      // const { treeViewerSelectedLightIds } = state;
+      if (treeViewerSelectedLightIds.includes(selectedLightId)) {
+        treeViewerSelectedLightIds = treeViewerSelectedLightIds.filter(
           (id) => id !== selectedLightId,
         );
       } else {
-        selectedLightIds.push(selectedLightId);
+        treeViewerSelectedLightIds.push(selectedLightId);
       }
-      state.selectedLightIds = selectedLightIds;
+      state.treeViewerSelectedLightIds = treeViewerSelectedLightIds;
     }
   });
 }

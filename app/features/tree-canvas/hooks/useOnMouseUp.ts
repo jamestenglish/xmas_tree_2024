@@ -10,7 +10,6 @@ export default function useOnMouseUp() {
     })),
   );
   return useCallback(() => {
-    console.log("done draw");
     setCanvasInteractionMode("idle");
   }, [setCanvasInteractionMode]);
 }

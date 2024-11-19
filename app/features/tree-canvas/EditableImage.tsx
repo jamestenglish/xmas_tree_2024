@@ -27,7 +27,7 @@ export default function EditableImage({
   onSelect,
   onTransformEnd,
 }: EditableImageProps) {
-  const [image] = useImage(img.src);
+  const [image] = useImage(img.src, "anonymous");
   const shapeRef = useRef<Konva.Image>(null);
   const trRef = useRef<Konva.Transformer>(null);
 

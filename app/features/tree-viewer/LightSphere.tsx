@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import useEditorStore from "../tree-editor/state/useEditorStore";
 import { useShallow } from "zustand/react/shallow";
+import cloneDeep from "lodash/cloneDeep";
 
 export interface SphereProps {
   position: [number, number, number];
@@ -43,13 +44,29 @@ type LightSphereProps = {
   index: number;
 };
 export default function LightSphere({ sphere, index }: LightSphereProps) {
-  const { toggleLightId, isSelected } = useEditorStore(
+  const { toggleTreeViewerLightId, isSelected } = useEditorStore(
     useShallow((state) => ({
-      toggleLightId: state.toggleLightId,
+      toggleTreeViewerLightId: state.toggleTreeViewerLightId,
       isSelected:
-        state.selectedLightIds.includes(sphere.id) && state.blinkState,
+        state.treeViewerSelectedLightIds.includes(sphere.id) &&
+        state.treeViewerBlinkState,
     })),
   );
+
+  const { color } = sphere;
+
+  const newColor = cloneDeep(color);
+
+  const isBlack =
+    (color.r === 0 || color.r === 1) &&
+    (color.g === 0 || color.g === 1) &&
+    (color.b === 0 || color.b === 1);
+  if (isBlack) {
+    // opacity works better with very light gray
+    newColor.r = 1;
+    newColor.g = 1;
+    newColor.b = 1;
+  }
 
   return (
     <group>
@@ -58,17 +75,19 @@ export default function LightSphere({ sphere, index }: LightSphereProps) {
         position={sphere.position}
         onClick={() => {
           console.log(`sphere onClick: ${index}`);
-          toggleLightId(sphere.id);
+          toggleTreeViewerLightId(sphere.id);
         }}
         // ref={sphereRef}
       >
         <sphereGeometry args={[isSelected ? 0.4 : 0.3, 16, 16]} />
 
         <meshStandardMaterial
-          color={sphere.color}
-          emissive={sphere.color}
-          emissiveIntensity={1}
+          color={newColor}
+          emissive={newColor}
           // TODO JTE Íchange to 8 to make glow
+
+          emissiveIntensity={isBlack ? 0.1 : 8}
+          opacity={isBlack ? 0.01 : undefined}
         />
       </mesh>
       {/* Line from sphere to sample point on the cylinder */}

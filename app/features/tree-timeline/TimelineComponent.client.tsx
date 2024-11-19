@@ -12,11 +12,11 @@ import useEditorStore from "../tree-editor/state/useEditorStore";
 setAutoFreeze(false);
 
 function useSyncModel(timeline: Timeline | undefined) {
-  const model = useEditorStore((state) => state.model);
+  const timelineModel = useEditorStore((state) => state.timelineModel);
   useEffect(() => {
-    // console.log("setting model", { model });
-    timeline?.setModel(model);
-  }, [model, timeline]);
+    // console.log("setting timelineModel", { timelineModel });
+    timeline?.setModel(timelineModel);
+  }, [timelineModel, timeline]);
 }
 
 function TimelineComponent() {

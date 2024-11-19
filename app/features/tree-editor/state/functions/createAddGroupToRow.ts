@@ -6,7 +6,7 @@ import { EditorState } from "../useEditorStore";
 
 export default function createAddGroupToRow(timeline: Timeline, rowId: string) {
   return produce((state: EditorState) => {
-    const rows = state.model.rows;
+    const rows = state.timelineModel.rows;
     rows.forEach((prevRow) => {
       if (prevRow?.id === rowId) {
         const newGroup = createUnselectedGroup();
