@@ -58,6 +58,21 @@ export default function useOnClickPlayStateMachine() {
       });
     };
 
+    const doHateMyself = true;
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const hateMyself = (func: any) => {
+      if (doHateMyself) {
+        setTimeout(() => func(), 1000);
+        setTimelineExportState({
+          ...timelineExportState,
+          status: "PAUSE",
+        });
+      } else {
+        func();
+      }
+    };
+
     switch (status) {
       case "IDLE":
         return;
@@ -97,18 +112,22 @@ export default function useOnClickPlayStateMachine() {
         console.log("initGroupIds?.length: ", initGroupIds?.length);
         if (prevGroupId && prevGroupId === timelineSelectedGroupId) {
           if (initGroupIds?.length === 0) {
-            setTimelineExportState({
-              ...timelineExportState,
-              status: "GROUP_EXPORT_INIT",
+            hateMyself(() => {
+              setTimelineExportState({
+                ...timelineExportState,
+                status: "GROUP_EXPORT_INIT",
+              });
             });
           } else {
             const [prevGroupId, ...restGroupIds] = initGroupIds ?? [];
             setTimelineSelectedGroupId(prevGroupId);
-            setTimelineExportState({
-              ...timelineExportState,
-              status: "INIT_STATE_A",
-              initGroupIds: restGroupIds,
-              prevGroupId: prevGroupId,
+            hateMyself(() => {
+              setTimelineExportState({
+                ...timelineExportState,
+                status: "INIT_STATE_A",
+                initGroupIds: restGroupIds,
+                prevGroupId: prevGroupId,
+              });
             });
           }
         }
@@ -116,10 +135,11 @@ export default function useOnClickPlayStateMachine() {
       }
       case "GROUP_EXPORT_INIT": {
         setTimelineSelectedGroupId(null);
-
-        setTimelineExportState({
-          ...timelineExportState,
-          status: "GROUP_EXPORT_START",
+        hateMyself(() => {
+          setTimelineExportState({
+            ...timelineExportState,
+            status: "GROUP_EXPORT_START",
+          });
         });
 
         return;
@@ -128,10 +148,12 @@ export default function useOnClickPlayStateMachine() {
       case "GROUP_EXPORT_START": {
         if (timelineSelectedGroupId === null) {
           if (groupIds?.length === 0) {
-            setTimelineExportState({
-              ...timelineExportState,
-              status: "PLAY",
-              groupIds: [] as string[],
+            hateMyself(() => {
+              setTimelineExportState({
+                ...timelineExportState,
+                status: "PLAY",
+                groupIds: [] as string[],
+              });
             });
             return;
           }
@@ -139,12 +161,13 @@ export default function useOnClickPlayStateMachine() {
           const [groupId, ...newGroupIds] = groupIds;
 
           setTimelineSelectedGroupId(groupId);
-
-          setTimelineExportState({
-            ...timelineExportState,
-            status: "GROUP_EXPORT_LOAD_CANVAS_START",
-            groupIds: newGroupIds,
-            groupId,
+          hateMyself(() => {
+            setTimelineExportState({
+              ...timelineExportState,
+              status: "GROUP_EXPORT_LOAD_CANVAS_START",
+              groupIds: newGroupIds,
+              groupId,
+            });
           });
         }
         return;
@@ -156,13 +179,14 @@ export default function useOnClickPlayStateMachine() {
             error("Error not groupId in GROUP_EXPORT_LOAD_CANVAS_START");
             return;
           }
-
-          setTimelineExportState({
-            ...timelineExportState,
-            status: "GROUP_EXPORT_LOAD_CANVAS_EXPORT",
-            groupIds,
-            groupId,
-            prevAttributes: newPrevAttributes,
+          hateMyself(() => {
+            setTimelineExportState({
+              ...timelineExportState,
+              status: "GROUP_EXPORT_LOAD_CANVAS_EXPORT",
+              groupIds,
+              groupId,
+              prevAttributes: newPrevAttributes,
+            });
           });
         }
         return;
@@ -170,19 +194,22 @@ export default function useOnClickPlayStateMachine() {
       case "GROUP_EXPORT_LOAD_CANVAS_EXPORT": {
         if (timelineSelectedGroupId !== null) {
           setTimelineActionId(v7());
-
-          setTimelineExportState({
-            ...timelineExportState,
-            status: "GROUP_EXPORT_LOAD_CANVAS_WAIT",
+          hateMyself(() => {
+            setTimelineExportState({
+              ...timelineExportState,
+              status: "GROUP_EXPORT_LOAD_CANVAS_WAIT",
+            });
           });
         }
 
         return;
       }
       case "GROUP_EXPORT_LOAD_CANVAS_WAIT": {
-        setTimelineExportState({
-          ...timelineExportState,
-          status: "GROUP_EXPORT_LOAD_CANVAS_FINISH",
+        hateMyself(() => {
+          setTimelineExportState({
+            ...timelineExportState,
+            status: "GROUP_EXPORT_LOAD_CANVAS_FINISH",
+          });
         });
         return;
       }
@@ -222,16 +249,17 @@ export default function useOnClickPlayStateMachine() {
             ...prevUrls,
             { groupId, canvasCylinderImgUrl, start, end },
           ];
-
-          setTimelineExportState({
-            ...timelineExportState,
-            status: "GROUP_EXPORT_INIT",
-            groupIds,
-            groupId: null,
-            prevAttributes: newPrevAttributes,
-            canvasCylinderImgUrlsData: newUrls,
-            prevGroupId: null,
-            initGroupIds: null,
+          hateMyself(() => {
+            setTimelineExportState({
+              ...timelineExportState,
+              status: "GROUP_EXPORT_INIT",
+              groupIds,
+              groupId: null,
+              prevAttributes: newPrevAttributes,
+              canvasCylinderImgUrlsData: newUrls,
+              prevGroupId: null,
+              initGroupIds: null,
+            });
           });
         }
 

@@ -1,18 +1,10 @@
 import { Timeline } from "animation-timeline-js";
 import { useCallback, useEffect } from "react";
-import { v7 } from "uuid";
 import { useShallow } from "zustand/shallow";
-import findAllTimelineObjectsByGroupId from "~/features/tree-editor/state/functions/findAllTimelineObjectsByGroupId";
 import useEditorStore from "~/features/tree-editor/state/useEditorStore";
 import useOnClickPlayStateMachine from "./useOnClickPlayStateMachine";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const hateMyself = (func: any, _pause: any) => {
-  // setTimeout(() => {
-  func();
-  // }, 1000);
-  // _pause();
-};
+
 const playStep = 50;
 
 type UseOnPlayClickArgs = {
