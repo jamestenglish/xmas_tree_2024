@@ -5,15 +5,14 @@ import { CylinderFormDataProps } from "./TreeViewer";
 import { useEffect } from "react";
 
 export default function TreeViewerControls() {
-  const { canvasBrushSize, setCanvasBrushSize, setTreeViewerCylinderOpacity } =
-    useEditorStore(
-      useShallow((state) => ({
-        canvasBrushSize: state.canvasBrushSize,
-        setCanvasBrushSize: state.setCanvasBrushSize,
-        treeViewerCylinderOpacity: state.treeViewerCylinderOpacity,
-        setTreeViewerCylinderOpacity: state.setTreeViewerCylinderOpacity,
-      })),
-    );
+  const { setTreeViewerCylinderOpacity } = useEditorStore(
+    useShallow((state) => ({
+      canvasBrushSize: state.canvasBrushSize,
+      setCanvasBrushSize: state.setCanvasBrushSize,
+      treeViewerCylinderOpacity: state.treeViewerCylinderOpacity,
+      setTreeViewerCylinderOpacity: state.setTreeViewerCylinderOpacity,
+    })),
+  );
 
   const initial: CylinderFormDataProps = {
     cylinderOpacity: 0.3,

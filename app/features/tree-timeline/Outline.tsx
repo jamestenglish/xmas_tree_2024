@@ -97,7 +97,6 @@ export default function Outline({ timeline }: OutlineProps) {
       {rows.map((row, index) => {
         return (
           <OutlineNode
-            /*TODO JTE*/
             key={row?.id ?? index}
             timeline={timeline}
             index={index}

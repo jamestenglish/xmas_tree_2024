@@ -100,11 +100,14 @@ export interface AttributeByGroupState {
 type TimelineExportStatus =
   | "IDLE"
   | "START"
+  | "INIT_STATE"
+  | "INIT_STATE_A"
   | "GROUP_EXPORT_INIT"
   | "GROUP_EXPORT_START"
   | "GROUP_EXPORT_LOAD_CANVAS_START"
   | "GROUP_EXPORT_LOAD_CANVAS_EXPORT"
   | "GROUP_EXPORT_LOAD_CANVAS_WAIT"
+  | "GROUP_EXPORT_LOAD_CANVAS_FINISH"
   | "PLAY"
   | "PAUSE"
   | "ERROR";
@@ -122,6 +125,8 @@ export type TimelineExportState = {
     end: number;
   }> | null;
   allTimelineObjectsByGroupId?: { [key: string]: GroupMetaType } | null;
+  initGroupIds?: string[] | null;
+  prevGroupId?: string | null;
 };
 
 export type TimelineExportMeta = {

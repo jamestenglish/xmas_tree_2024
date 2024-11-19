@@ -76,83 +76,95 @@ export const defaultByGroup: GroupTypes = {
   canvasLines: [],
   canvasImages: [],
   treeViewerSelectedLightIds: [],
-  canvasCylinderImgUrl:
-    "https://images.chesscomfiles.com/uploads/v1/images_users/tiny_mce/petrikeckman/phpE4U0RQ.png",
+  // canvasCylinderImgUrl:
+  //   "https://images.chesscomfiles.com/uploads/v1/images_users/tiny_mce/petrikeckman/phpE4U0RQ.png",
+  canvasCylinderImgUrl: "/imgs/test_pattern.png",
 };
 
-// TODO JTE there is a bug when created a new group
+export function setTimelineSelectedGroupIdRaw(
+  state: TimelineState,
+  timelineSelectedGroupId: string | null,
+) {
+  // console.group("setTimelineSelectedGroupIdRaw");
+  const { timelineModel } = state;
+  const prevGroupId = state.timelineSelectedGroupId;
+  const allGroupsIds = findAllGroupIds({ timelineModel });
+  let modelUpdates = timelineModel;
+  allGroupsIds.forEach((groupId) => {
+    const unselectedGroup = createUnselectedGroup(groupId);
+    modelUpdates = replaceGroupWithId({
+      timelineSelectedGroupId: groupId,
+      timelineModel: modelUpdates,
+      newGroup: unselectedGroup,
+    });
+  });
+  // console.log(
+  //   `createSetTimelineSelectedGroupId prev: ${prevGroupId} | cur: ${timelineSelectedGroupId}`,
+  // );
+
+  if (prevGroupId && state.attributesByGroup[prevGroupId]) {
+    // console.log(`createSetTimelineSelectedGroupId has prevId`);
+    copyAttributes<TimelineState, GroupTypes>({
+      source: state,
+      destination: state.attributesByGroup[prevGroupId],
+    });
+  } else {
+    if (prevGroupId !== null) {
+      state.attributesByGroup[prevGroupId] = defaultByGroup;
+    }
+  }
+  if (timelineSelectedGroupId) {
+    // console.log(
+    //   "createSetTimelineSelectedGroupId has timelineSelectedGroupId",
+    // );
+    const selectedGroup = createSelectedGroup(timelineSelectedGroupId);
+    modelUpdates = replaceGroupWithId({
+      timelineSelectedGroupId: timelineSelectedGroupId,
+      timelineModel: modelUpdates,
+      newGroup: selectedGroup,
+      state,
+    });
+    const existingAttributes = state.attributesByGroup[timelineSelectedGroupId];
+
+    // console.log(
+    //   `createSetTimelineSelectedGroupId existingAttributes`,
+    //   existingAttributes,
+    // );
+
+    // if (!existingAttributes) {
+    //   state.attributesByGroup[timelineSelectedGroupId] = defaultByGroup;
+    // }
+
+    const valuesToUse = existingAttributes
+      ? existingAttributes
+      : defaultByGroup;
+
+    copyAttributes<GroupTypes, TimelineState>({
+      source: valuesToUse,
+      destination: state,
+    });
+    state.attributesByGroup[timelineSelectedGroupId] = valuesToUse;
+
+    // const keys = Object.keys(valuesToUse);
+    // for (let i = 0; i < keys.length; i++) {
+    //   const key = keys[i] as keyof GroupTypes & keyof EditorState;
+    //   if (key) {
+    //     const value = valuesToUse[key];
+    //     // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    //     const tempState = state as any;
+    //     tempState[key] = value;
+    //   }
+    // }
+  }
+  state.timelineSelectedGroupId = timelineSelectedGroupId;
+  console.groupEnd();
+}
+
 const createSetTimelineSelectedGroupId = (
   timelineSelectedGroupId: string | null,
 ) => {
   return produce((state: TimelineState) => {
-    const { timelineModel } = state;
-    const prevGroupId = state.timelineSelectedGroupId;
-    const allGroupsIds = findAllGroupIds({ timelineModel });
-    let modelUpdates = timelineModel;
-    allGroupsIds.forEach((groupId) => {
-      const unselectedGroup = createUnselectedGroup(groupId);
-      modelUpdates = replaceGroupWithId({
-        timelineSelectedGroupId: groupId,
-        timelineModel: modelUpdates,
-        newGroup: unselectedGroup,
-      });
-    });
-    // console.log(
-    //   `createSetTimelineSelectedGroupId prev: ${prevGroupId} | cur: ${timelineSelectedGroupId}`,
-    // );
-    if (timelineSelectedGroupId) {
-      // console.log(
-      //   "createSetTimelineSelectedGroupId has timelineSelectedGroupId",
-      // );
-      const selectedGroup = createSelectedGroup(timelineSelectedGroupId);
-      modelUpdates = replaceGroupWithId({
-        timelineSelectedGroupId: timelineSelectedGroupId,
-        timelineModel: modelUpdates,
-        newGroup: selectedGroup,
-        state,
-      });
-      state.timelineSelectedGroupId = timelineSelectedGroupId;
-      if (prevGroupId && state.attributesByGroup[prevGroupId]) {
-        // console.log(`createSetTimelineSelectedGroupId has prevId`);
-        copyAttributes<TimelineState, GroupTypes>({
-          source: state,
-          destination: state.attributesByGroup[prevGroupId],
-        });
-        // state.attributesByGroup[prevGroupId] = {
-        //   color: state.color,
-        //   canvasLines: state.canvasLines,
-        //   canvasImages: state.canvasImages,
-        //   treeViewerSelectedLightIds: state.treeViewerSelectedLightIds,
-        // };
-      } else {
-        if (prevGroupId !== null) {
-          state.attributesByGroup[prevGroupId] = defaultByGroup;
-        }
-      }
-      console.log(
-        `createSetTimelineSelectedGroupId`,
-        state.attributesByGroup[timelineSelectedGroupId],
-      );
-      const valuesToUse = state.attributesByGroup[timelineSelectedGroupId]
-        ? state.attributesByGroup[timelineSelectedGroupId]
-        : defaultByGroup;
-      copyAttributes<GroupTypes, TimelineState>({
-        source: valuesToUse,
-        destination: state,
-      });
-
-      // const keys = Object.keys(valuesToUse);
-      // for (let i = 0; i < keys.length; i++) {
-      //   const key = keys[i] as keyof GroupTypes & keyof EditorState;
-      //   if (key) {
-      //     const value = valuesToUse[key];
-      //     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      //     const tempState = state as any;
-      //     tempState[key] = value;
-      //   }
-      // }
-    }
-    state.timelineSelectedGroupId = timelineSelectedGroupId;
+    setTimelineSelectedGroupIdRaw(state, timelineSelectedGroupId);
   });
 };
 

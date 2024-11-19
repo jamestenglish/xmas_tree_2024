@@ -2,14 +2,14 @@ import { useCallback, useEffect } from "react";
 import Button from "~/features/ui/components/Button";
 import useEditorStore from "../tree-editor/state/useEditorStore";
 import { useShallow } from "zustand/shallow";
-import useAddImage from "./hooks/useAddImage";
 
 import useHandleExport from "./hooks/useHandleExport";
 import ColorPickerDialog from "./ColorPickerDialog";
 import { Stage } from "konva/lib/Stage";
+import ImageAddDialog from "./ImageAddDialog";
 
-const imgUrl =
-  "https://images.chesscomfiles.com/uploads/v1/images_users/tiny_mce/petrikeckman/phpE4U0RQ.png";
+// const imgUrl =
+//   "https://images.chesscomfiles.com/uploads/v1/images_users/tiny_mce/petrikeckman/phpE4U0RQ.png";
 
 export default function CanvasEditorControls({
   stageRef,
@@ -44,9 +44,6 @@ export default function CanvasEditorControls({
       timelineActionId: state.timelineActionId,
     })),
   );
-
-  // Function to add an image
-  const addImage = useAddImage();
 
   const handleExport = useHandleExport({
     stageRef,
@@ -127,9 +124,7 @@ export default function CanvasEditorControls({
           </div>
         </Button>
 
-        <Button variant="small" onClick={() => addImage(imgUrl)}>
-          Add Image
-        </Button>
+        <ImageAddDialog />
 
         <label
           htmlFor="canvasBrushSize"

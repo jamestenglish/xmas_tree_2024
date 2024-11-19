@@ -84,8 +84,6 @@ export default function LightSphere({ sphere, index }: LightSphereProps) {
         <meshStandardMaterial
           color={newColor}
           emissive={newColor}
-          // TODO JTE Íchange to 8 to make glow
-
           emissiveIntensity={isBlack ? 0.1 : 8}
           opacity={isBlack ? 0.01 : undefined}
         />

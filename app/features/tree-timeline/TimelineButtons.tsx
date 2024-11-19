@@ -82,8 +82,6 @@ export default function TimelineButtons({
   //       clearInterval(intervalId);
   //     }
   //   };
-  //   // TODO JTE do I need this disable?
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
   // }, [timelineElRef.current, timelineIsPlaying]);
 
   // const onPlayClick = useCallback(
@@ -139,7 +137,6 @@ export default function TimelineButtons({
   // const onRemoveKeyFrame = useCallback(() => {
   //   if (timeline) {
   //     // Add keyframe
-  //     // TODO JTE
   //     const currentModel = timeline.getModel();
   //     if (currentModel && currentModel.rows) {
   //       currentModel.rows.forEach((row) => {
@@ -166,7 +163,6 @@ export default function TimelineButtons({
 
   // TODO JTE rewind interaction
   // TODO JTE reset zoom interaction
-  // TODO JTE add group, remove group
 
   return (
     <>

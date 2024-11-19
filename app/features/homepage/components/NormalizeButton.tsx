@@ -11,7 +11,7 @@ import mapData from "~/features/calibration/functions/mapData";
 import useGenericDataLocalStorage from "../hooks/useGenericDataLocalStorage";
 
 const NormalizeButton = () => {
-  // TODO JTE
+  // TODO JTE use state
   const [captureDataStorage] = useLocalStorageInternal<CaptureDataType>(
     "calibrationData",
     {},

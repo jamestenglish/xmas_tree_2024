@@ -27,30 +27,6 @@ export default function ColorPickerDialog({
       >
         <ColorPicker />
       </GenericDialog>
-      {/* <dialog
-        id="ColorDialog"
-        className="modal"
-        open={canvasIsColorPickerOpen}
-        onCancel={() => console.log("cancl")}
-        // onClick={(event) => {
-        //   console.log("aaaclick");
-        //   const dialog = document.getElementById("ColorDialog") as HTMLDialogElement;
-        //   if (dialog !== null) {
-        //     const rect = dialog.getBoundingClientRect();
-        //     const isInDialog =
-        //       rect.top <= event.clientY &&
-        //       event.clientY <= rect.top + rect.height &&
-        //       rect.left <= event.clientX &&
-        //       event.clientX <= rect.left + rect.width;
-        //     console.log({ isInDialog });
-        //     if (!isInDialog) {
-        //       onClickColorClose();
-        //     }
-        //   }
-        // }}
-      >
-        <ColorPicker />
-      </dialog> */}
     </>
   );
 }

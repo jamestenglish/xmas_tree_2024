@@ -34,7 +34,6 @@ export function createUnselectedGroup(existingGroupId?: string) {
   const group: TimelineGroupExtra = {
     id: groupId,
     style: {
-      // TODO JTE
       fillColor: "rgba(0,0,170,0.3)",
     },
     selected: false,
@@ -49,7 +48,6 @@ export function createSelectedGroup(existingGroupId?: string) {
   const group: TimelineGroupExtra = {
     id: groupId,
     style: {
-      // TODO JTE
       fillColor: "rgba(0,170,0,0.3)",
     },
     selected: true,
