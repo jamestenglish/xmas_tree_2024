@@ -7,9 +7,9 @@ import {
 import { TimelineGroup } from "animation-timeline-js/lib/models/timelineGroup";
 import { v7 } from "uuid";
 
-export type TimelineModelExtra = {
+export interface TimelineModelExtra {
   rows: TimelineRowExtra[];
-};
+}
 
 export interface TimelineRowExtra extends TimelineRow, TimelineRanged {
   keyframes?: TimelineKeyframeExtra[] | null;
@@ -28,39 +28,41 @@ export interface TimelineGroupExtra extends TimelineGroup {
   selected?: boolean;
 }
 
-export function createUnselectedGroup(existingGroupId?: string) {
+function createGroup(
+  fillColor: string,
+  selected: boolean,
+  existingGroupId?: string,
+) {
   const groupId = existingGroupId ?? `group_${v7()}`;
 
   const group: TimelineGroupExtra = {
     id: groupId,
     style: {
-      fillColor: "rgba(0,0,170,0.3)",
+      fillColor,
     },
-    selected: false,
+    selected,
   };
 
   return group;
+}
+
+export function createUnselectedGroup(existingGroupId?: string) {
+  return createGroup("rgba(0,0,170,0.3)", false, existingGroupId);
 }
 
 export function createSelectedGroup(existingGroupId?: string) {
-  const groupId = existingGroupId ?? `group_${v7()}`;
-
-  const group: TimelineGroupExtra = {
-    id: groupId,
-    style: {
-      fillColor: "rgba(0,170,0,0.3)",
-    },
-    selected: true,
-  };
-
-  return group;
+  return createGroup("rgba(0,170,0,0.3)", true, existingGroupId);
 }
 
-type CreateRowArgs = {
+export function createUnexportedGroup(existingGroupId?: string) {
+  return createGroup("rgba(170,0,0.3)", false, existingGroupId);
+}
+
+interface CreateRowArgs {
   start?: number;
   end?: number;
   isSelected?: boolean;
-};
+}
 
 const createRow = ({
   start = 0,
@@ -71,12 +73,12 @@ const createRow = ({
   const groupId = group?.id;
   const row: TimelineRowExtra = {
     id: `row_${v7()}`,
-    style: {
-      groupsStyle: {
-        // fillColor: "rgba(10, 71, 112, 1)",
-        fillColor: "rgba(10, 71, 255, 0.3)",
-      },
-    },
+    // style: {
+    //   groupsStyle: {
+    //     // fillColor: "rgba(10, 71, 112, 1)",
+    //     fillColor: "rgba(10, 71, 255, 0.3)",
+    //   },
+    // },
     keyframes: [
       {
         id: `A_keyframe_${groupId}`,

@@ -1,9 +1,9 @@
 import { Timeline } from "animation-timeline-js";
 import { useEffect, useState } from "react";
 
-type UseInitTimelineArgs = {
+interface UseInitTimelineArgs {
   timelineElRef: React.RefObject<HTMLDivElement>;
-};
+}
 
 const useInitTimeline = ({ timelineElRef }: UseInitTimelineArgs) => {
   const [timeline, setTimeline] = useState<Timeline>();

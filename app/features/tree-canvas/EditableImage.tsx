@@ -19,13 +19,13 @@ export interface ImageTypeParent extends ImageTypeAnimationValues {
   type: string;
 }
 
-type ImageAnimationValue = {
+interface ImageAnimationValue {
   value: unknown;
-};
+}
 
-type ImageAnimationOptions = {
+interface ImageAnimationOptions {
   [key: string]: ImageAnimationValue;
-};
+}
 
 export interface ImageTypeAnimation {
   options: ImageAnimationOptions;
@@ -37,7 +37,7 @@ export interface ImageType extends ImageTypeParent, ImageTypeAnimationValues {
   currentAnimationFrame?: ImageTypeParent;
 }
 
-type EditableImageProps = {
+interface EditableImageProps {
   img: ImageType;
   isSelected: boolean;
   onSelect: (e: Konva.KonvaEventObject<MouseEvent>) => void;
@@ -45,7 +45,7 @@ type EditableImageProps = {
   addShapeRef: (meta: ShapeRefMeta) => void;
   removeShapeRef: (meta: ShapeRefMeta) => void;
   id: string;
-};
+}
 
 // Separate component for each editable image with transformer support
 export default function EditableImage({

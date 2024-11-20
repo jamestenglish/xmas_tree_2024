@@ -3,9 +3,9 @@ import { useCallback, useEffect } from "react";
 import { useShallow } from "zustand/react/shallow";
 import useEditorStore from "~/features/tree-editor/state/useEditorStore";
 
-type UseTimelineInteractionsType = {
+interface UseTimelineInteractionsType {
   timeline: Timeline | undefined;
-};
+}
 
 export type OnSelectModelType = () => void;
 export type OnPaneModeType = (interactive: boolean) => void;
@@ -13,13 +13,15 @@ export type OnZoomModeType = OnSelectModelType;
 export type OnNoneModeType = OnSelectModelType;
 
 const useTimelineInteractions = ({ timeline }: UseTimelineInteractionsType) => {
-  const { timelineInteractionMode, setTimelineInteractionMode } =
+  //
+  const { setTimelineInteractionMode, timelineInteractionMode } =
     useEditorStore(
       useShallow((state) => ({
         timelineInteractionMode: state.timelineInteractionMode,
         setTimelineInteractionMode: state.setTimelineInteractionMode,
       })),
     );
+
   // sync to timeline
   useEffect(() => {
     if (timeline) {

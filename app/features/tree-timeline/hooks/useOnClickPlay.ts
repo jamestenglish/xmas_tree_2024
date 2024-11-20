@@ -1,27 +1,27 @@
 import { Timeline } from "animation-timeline-js";
 import { useCallback, useEffect } from "react";
 import { useShallow } from "zustand/shallow";
+// import useOnClickPlayStateMachine from "./useOnClickPlayStateMachine";
 import useEditorStore from "~/features/tree-editor/state/useEditorStore";
-import useOnClickPlayStateMachine from "./useOnClickPlayStateMachine";
-
 
 const playStep = 50;
 
-type UseOnPlayClickArgs = {
+interface UseOnPlayClickArgs {
   timeline: Timeline | undefined;
   timelineElRef: React.RefObject<HTMLDivElement>;
-};
+}
 
 export default function useOnClickPlay({
   timeline,
   timelineElRef,
 }: UseOnPlayClickArgs) {
-  const { timelineExportState, setTimelineExportState, setTimelineCoarseTime } =
+  //
+  const { setTimelineExportState, timelineExportState, setTimelineCoarseTime } =
     useEditorStore(
       useShallow((state) => ({
+        setTimelineCoarseTime: state.setTimelineCoarseTime,
         timelineExportState: state.timelineExportState,
         setTimelineExportState: state.setTimelineExportState,
-        setTimelineCoarseTime: state.setTimelineCoarseTime,
       })),
     );
 
@@ -108,7 +108,7 @@ export default function useOnClickPlay({
     [moveTimelineIntoTheBounds, setTimelineExportState, timeline],
   );
 
-  useOnClickPlayStateMachine();
+  // useOnClickPlayStateMachine();
 
   return { onClickPlay };
 }

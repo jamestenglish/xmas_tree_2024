@@ -3,9 +3,10 @@ import {
   createUnselectedGroup,
   TimelineGroupExtra,
   TimelineModelExtra,
+  createUnexportedGroup,
 } from "~/features/tree-timeline/functions/createRow";
 import { produce } from "immer";
-import { TimelineState, GroupTypes } from "../useEditorStore";
+import { EditorState, GroupTypes } from "../useEditorStore";
 import findAllTimelineObjectsByGroupId, {
   FindAllGroupIdsType,
 } from "./findAllTimelineObjectsByGroupId";
@@ -16,14 +17,12 @@ const findAllGroupIds = ({ timelineModel }: FindAllGroupIdsType) => {
   return allGroupIds;
 };
 
-type ReplaceGroupWithIdType = {
+interface ReplaceGroupWithIdType {
   timelineSelectedGroupId: string | null;
   timelineModel: TimelineModelExtra;
   newGroup: TimelineGroupExtra;
-  state?: TimelineState;
-};
-
-// TODO JTE reduce state interface scope like this ^^^
+  state?: EditorState;
+}
 
 const replaceGroupWithId = ({
   timelineSelectedGroupId,
@@ -76,19 +75,18 @@ export const defaultByGroup: GroupTypes = {
   canvasLines: [],
   canvasImages: [],
   treeViewerSelectedLightIds: [],
-  // canvasCylinderImgUrl:
-  //   "https://images.chesscomfiles.com/uploads/v1/images_users/tiny_mce/petrikeckman/phpE4U0RQ.png",
-  canvasCylinderImgUrl: "/imgs/test_pattern.png",
+  canvasCylinderImgUrls: ["/imgs/test_pattern.png"],
+  canvasLastEditTimestamp: null,
+  canvasLastExportTimestamp: null,
 };
 
-export function setTimelineSelectedGroupIdRaw(
-  state: TimelineState,
-  timelineSelectedGroupId: string | null,
-) {
-  // console.group("setTimelineSelectedGroupIdRaw");
-  const { timelineModel } = state;
-  const prevGroupId = state.timelineSelectedGroupId;
+const setAllGroupsToUnselected = ({
+  timelineModel,
+}: {
+  timelineModel: TimelineModelExtra;
+}) => {
   const allGroupsIds = findAllGroupIds({ timelineModel });
+
   let modelUpdates = timelineModel;
   allGroupsIds.forEach((groupId) => {
     const unselectedGroup = createUnselectedGroup(groupId);
@@ -98,13 +96,60 @@ export function setTimelineSelectedGroupIdRaw(
       newGroup: unselectedGroup,
     });
   });
-  // console.log(
-  //   `createSetTimelineSelectedGroupId prev: ${prevGroupId} | cur: ${timelineSelectedGroupId}`,
-  // );
 
+  return modelUpdates;
+};
+
+function setUnexportedGroups({
+  state,
+  timelineSelectedGroupId,
+  timelineModel,
+}: {
+  state: EditorState;
+  timelineSelectedGroupId: string | null;
+  timelineModel: TimelineModelExtra;
+}) {
+  const allGroupsIds = findAllGroupIds({ timelineModel });
+
+  let modelUpdates = timelineModel;
+  allGroupsIds.forEach((groupId) => {
+    if (groupId === timelineSelectedGroupId) {
+      return;
+    }
+
+    const attributes = state.attributesByGroup[groupId];
+    if (attributes) {
+      const { canvasLastEditTimestamp, canvasLastExportTimestamp } = attributes;
+
+      if (
+        canvasLastEditTimestamp &&
+        (canvasLastExportTimestamp === null ||
+          canvasLastEditTimestamp > canvasLastExportTimestamp)
+      ) {
+        const unexportedGroup = createUnexportedGroup(groupId);
+        modelUpdates = replaceGroupWithId({
+          timelineSelectedGroupId: groupId,
+          timelineModel: modelUpdates,
+          newGroup: unexportedGroup,
+        });
+      }
+    }
+  });
+
+  return modelUpdates;
+}
+
+export function setTimelineSelectedGroupIdRaw(
+  state: EditorState,
+  timelineSelectedGroupId: string | null,
+) {
+  const { timelineModel } = state;
+  const prevGroupId = state.timelineSelectedGroupId;
+  let modelUpdates = timelineModel;
+
+  modelUpdates = setAllGroupsToUnselected({ timelineModel: modelUpdates });
   if (prevGroupId && state.attributesByGroup[prevGroupId]) {
-    // console.log(`createSetTimelineSelectedGroupId has prevId`);
-    copyAttributes<TimelineState, GroupTypes>({
+    copyAttributes<EditorState, GroupTypes>({
       source: state,
       destination: state.attributesByGroup[prevGroupId],
     });
@@ -114,9 +159,6 @@ export function setTimelineSelectedGroupIdRaw(
     }
   }
   if (timelineSelectedGroupId) {
-    // console.log(
-    //   "createSetTimelineSelectedGroupId has timelineSelectedGroupId",
-    // );
     const selectedGroup = createSelectedGroup(timelineSelectedGroupId);
     modelUpdates = replaceGroupWithId({
       timelineSelectedGroupId: timelineSelectedGroupId,
@@ -126,44 +168,31 @@ export function setTimelineSelectedGroupIdRaw(
     });
     const existingAttributes = state.attributesByGroup[timelineSelectedGroupId];
 
-    // console.log(
-    //   `createSetTimelineSelectedGroupId existingAttributes`,
-    //   existingAttributes,
-    // );
-
-    // if (!existingAttributes) {
-    //   state.attributesByGroup[timelineSelectedGroupId] = defaultByGroup;
-    // }
-
     const valuesToUse = existingAttributes
       ? existingAttributes
       : defaultByGroup;
 
-    copyAttributes<GroupTypes, TimelineState>({
+    copyAttributes<GroupTypes, EditorState>({
       source: valuesToUse,
       destination: state,
     });
     state.attributesByGroup[timelineSelectedGroupId] = valuesToUse;
-
-    // const keys = Object.keys(valuesToUse);
-    // for (let i = 0; i < keys.length; i++) {
-    //   const key = keys[i] as keyof GroupTypes & keyof EditorState;
-    //   if (key) {
-    //     const value = valuesToUse[key];
-    //     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    //     const tempState = state as any;
-    //     tempState[key] = value;
-    //   }
-    // }
   }
+
+  modelUpdates = setUnexportedGroups({
+    timelineModel: modelUpdates,
+    state,
+    timelineSelectedGroupId,
+  });
+
+  state.timelineModel = modelUpdates;
   state.timelineSelectedGroupId = timelineSelectedGroupId;
-  console.groupEnd();
 }
 
 const createSetTimelineSelectedGroupId = (
   timelineSelectedGroupId: string | null,
 ) => {
-  return produce((state: TimelineState) => {
+  return produce((state: EditorState) => {
     setTimelineSelectedGroupIdRaw(state, timelineSelectedGroupId);
   });
 };

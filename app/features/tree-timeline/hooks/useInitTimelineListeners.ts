@@ -12,11 +12,11 @@ const logDraggingMessage = (...args: Array<unknown>) => {
   console.log("TIMELINE DRAG", ...args);
 };
 
-type UseInitTimelineListenersType = {
+interface UseInitTimelineListenersType {
   timeline: Timeline | undefined;
   outlineContainerRef: React.RefObject<HTMLDivElement>;
   outlineScrollContainerRef: React.RefObject<HTMLDivElement>;
-};
+}
 
 const useInitTimelineListeners = ({
   timeline,

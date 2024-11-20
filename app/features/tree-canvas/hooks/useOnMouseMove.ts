@@ -4,20 +4,21 @@ import { useShallow } from "zustand/react/shallow";
 import useEditorStore from "~/features/tree-editor/state/useEditorStore";
 
 export default function useOnMouseMove() {
+  //
+
   const {
-    canvasInteractionMode,
-    setCanvasCursorPos,
     canvasLines,
     setCanvasLines,
+
+    setCanvasCursorPos,
+    canvasInteractionMode,
   } = useEditorStore(
     useShallow((state) => ({
-      setCanvasCursorPos: state.setCanvasCursorPos,
       canvasLines: state.canvasLines,
       setCanvasLines: state.setCanvasLines,
-      canvasSelectedId: state.canvasSelectedId,
-      setCanvasSelectedId: state.setCanvasSelectedId,
-      setCanvasInteractionMode: state.setCanvasInteractionMode,
+
       canvasInteractionMode: state.canvasInteractionMode,
+      setCanvasCursorPos: state.setCanvasCursorPos,
     })),
   );
 

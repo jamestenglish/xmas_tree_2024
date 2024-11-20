@@ -6,32 +6,28 @@ import TimelineComponent from "../tree-timeline/TimelineComponent.client";
 import useEditorStore from "./state/useEditorStore";
 import { useShallow } from "zustand/react/shallow";
 import ColorPicker from "../tree-canvas/ColorPicker.client";
-import memoizedCanvasStateSelector from "./state/memoizedCanvasInteractionModeSelector";
+// import memoizedCanvasStateSelector from "./state/memoizedCanvasInteractionModeSelector";
 import Konva from "konva";
 
 // const BLINK_SPEED = 300;
 
 function TimelineExportStateDebugger() {
   //
-  const { timelineExportState, canvasCylinderImgUrl } = useEditorStore(
+
+  const { canvasCylinderImgUrls } = useEditorStore(
     useShallow((state) => ({
-      timelineExportState: state.timelineExportState,
-      canvasCylinderImgUrl: state.canvasCylinderImgUrl,
+      canvasCylinderImgUrls: state.canvasCylinderImgUrls,
     })),
   );
 
-  const imgUrls =
-    timelineExportState?.canvasCylinderImgUrlsData?.map(
-      (img) => img.canvasCylinderImgUrl,
-    ) ?? [];
-
+  // TODO JTE here use memo
   return (
     <>
       <div className="flex flex-row gap-2">
-        {canvasCylinderImgUrl && <img src={canvasCylinderImgUrl} alt="foo" />}
-        {imgUrls.map((src, index) => {
-          return <img key={index} alt="foo" src={src} />;
-        })}
+        {canvasCylinderImgUrls &&
+          canvasCylinderImgUrls.map((canvasCylinderImgUrl, index) => (
+            <img key={index} src={canvasCylinderImgUrl} alt="foo" />
+          ))}
       </div>
     </>
   );
@@ -40,7 +36,9 @@ function TimelineExportStateDebugger() {
 export default function TreeEditor() {
   const { selectedGroupType, timelineSelectedGroupId } = useEditorStore(
     useShallow((state) => ({
-      selectedGroupType: memoizedCanvasStateSelector(state.timelineModel.rows),
+      selectedGroupType: state.timelineSelectedGroupId ? "canvas" : "none",
+      // there isn't a light type anymore
+      // selectedGroupType: memoizedCanvasStateSelector(state.timelineModel.rows),
       timelineSelectedGroupId: state.timelineSelectedGroupId,
     })),
   );

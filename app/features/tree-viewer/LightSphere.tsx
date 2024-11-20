@@ -39,11 +39,12 @@ const LineBetweenPoints: React.FC<LineBetweenPointsProps> = ({
   );
 };
 
-type LightSphereProps = {
+interface LightSphereProps {
   sphere: SphereProps;
   index: number;
-};
+}
 export default function LightSphere({ sphere, index }: LightSphereProps) {
+  //
   const { toggleTreeViewerLightId, isSelected } = useEditorStore(
     useShallow((state) => ({
       toggleTreeViewerLightId: state.toggleTreeViewerLightId,

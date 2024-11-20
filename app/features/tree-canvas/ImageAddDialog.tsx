@@ -62,37 +62,40 @@ export default function ImageAddDialog() {
     defaultValues: initial,
   });
 
-  const onSubmit: SubmitHandler<AddImageFormDataProps> = async (data) => {
-    console.log(data);
-    const canvas = document.getElementById(
-      "AddImageDialogCanvas",
-    ) as HTMLCanvasElement;
+  const onSubmit: SubmitHandler<AddImageFormDataProps> = useCallback(
+    async (data) => {
+      console.log(data);
+      const canvas = document.getElementById(
+        "AddImageDialogCanvas",
+      ) as HTMLCanvasElement;
 
-    if (canvas) {
-      const imgLoader = new Image();
-      imgLoader.crossOrigin = "anonymous";
-      imgLoader.src = data.imgUrl;
-      const dimension = await new Promise<{ h: number; w: number }>(
-        (resolve) => {
-          imgLoader.onload = function () {
-            resolve({ h: imgLoader.height, w: imgLoader.width });
-          };
-        },
-      );
-      canvas.height = dimension.h;
-      canvas.width = dimension.w;
-      const context = canvas.getContext("2d");
-      if (context) {
-        context.clearRect(0, 0, canvas.width, canvas.height);
+      if (canvas) {
+        const imgLoader = new Image();
+        imgLoader.crossOrigin = "anonymous";
+        imgLoader.src = data.imgUrl;
+        const dimension = await new Promise<{ h: number; w: number }>(
+          (resolve) => {
+            imgLoader.onload = function () {
+              resolve({ h: imgLoader.height, w: imgLoader.width });
+            };
+          },
+        );
+        canvas.height = dimension.h;
+        canvas.width = dimension.w;
+        const context = canvas.getContext("2d");
+        if (context) {
+          context.clearRect(0, 0, canvas.width, canvas.height);
 
-        context.drawImage(imgLoader, 0, 0, canvas.width, canvas.height);
-        const dataUrl = canvas.toDataURL("image/png");
+          context.drawImage(imgLoader, 0, 0, canvas.width, canvas.height);
+          const dataUrl = canvas.toDataURL("image/png");
 
-        addImage(dataUrl);
+          addImage(dataUrl);
+        }
       }
-    }
-    setIsOpen(false);
-  };
+      setIsOpen(false);
+    },
+    [addImage],
+  );
 
   const onClickClose = useCallback(() => {
     setIsOpen(false);
@@ -101,7 +104,6 @@ export default function ImageAddDialog() {
   const onClickOpen = useCallback(() => {
     setIsOpen(true);
   }, []);
-  console.log({ isSubmitting });
 
   return (
     <>

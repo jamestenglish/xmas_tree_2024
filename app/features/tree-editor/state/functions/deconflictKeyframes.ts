@@ -1,10 +1,10 @@
 import { TimelineKeyframeExtra } from "~/features/tree-timeline/functions/createRow";
 
-type IsBetweenArgs = {
+interface IsBetweenArgs {
   keyframeA: TimelineKeyframeExtra;
   keyframeB: TimelineKeyframeExtra;
   keyframeTest: TimelineKeyframeExtra;
-};
+}
 
 const isBetween = ({ keyframeA, keyframeB, keyframeTest }: IsBetweenArgs) => {
   const { val: valA } = keyframeA;

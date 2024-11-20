@@ -16,24 +16,28 @@ export default function CanvasEditorControls({
 }: {
   stageRef: React.RefObject<Stage>;
 }) {
+  //
+
   const {
     color,
-    addSelectedColor,
-    setCanvasIsColorPickerOpen,
-    setCanvasSelectedId,
-    canvasBrushSize,
+
     setCanvasBrushSize,
+    canvasBrushSize,
+    setCanvasIsColorPickerOpen,
+    addSelectedColor,
     canvasGlobalCompositeOperation,
     setCanvasGlobalCompositeOperation,
     canvasInteractionType,
     setCanvasInteractionType,
+    setCanvasSelectedId,
+
     timelineActionId,
   } = useEditorStore(
     useShallow((state) => ({
-      addSelectedColor: state.addSelectedColor,
       color: state.color,
+
+      addSelectedColor: state.addSelectedColor,
       setCanvasIsColorPickerOpen: state.setCanvasIsColorPickerOpen,
-      setCanvasSelectedId: state.setCanvasSelectedId,
       canvasBrushSize: state.canvasBrushSize,
       setCanvasBrushSize: state.setCanvasBrushSize,
       canvasGlobalCompositeOperation: state.canvasGlobalCompositeOperation,
@@ -41,6 +45,8 @@ export default function CanvasEditorControls({
         state.setCanvasGlobalCompositeOperation,
       canvasInteractionType: state.canvasInteractionType,
       setCanvasInteractionType: state.setCanvasInteractionType,
+      setCanvasSelectedId: state.setCanvasSelectedId,
+
       timelineActionId: state.timelineActionId,
     })),
   );

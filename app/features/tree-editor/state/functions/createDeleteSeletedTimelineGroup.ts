@@ -5,10 +5,11 @@ import findAllTimelineObjectsByGroupId, {
   GroupMetaType,
 } from "./findAllTimelineObjectsByGroupId";
 
-type DeleteGroupObjectsArgs = {
+interface DeleteGroupObjectsArgs {
   groupObjects: GroupMetaType;
   timelineModel: TimelineModelExtra;
-};
+}
+
 const deleteGroupObjects = ({
   groupObjects,
   timelineModel,

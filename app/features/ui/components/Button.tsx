@@ -4,6 +4,7 @@ type ButtonProps = {
   variant?: "small";
   selected?: boolean;
 } & ButtonHTMLAttributes<HTMLButtonElement>;
+
 export default function Button(props: ButtonProps) {
   const { children, variant, selected, ...otherProps } = props;
 

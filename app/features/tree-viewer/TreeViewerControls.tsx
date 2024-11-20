@@ -1,15 +1,12 @@
 import { useForm } from "react-hook-form";
-import useEditorStore from "../tree-editor/state/useEditorStore";
 import { useShallow } from "zustand/shallow";
 import { CylinderFormDataProps } from "./TreeViewer";
 import { useEffect } from "react";
+import useEditorStore from "../tree-editor/state/useEditorStore";
 
 export default function TreeViewerControls() {
   const { setTreeViewerCylinderOpacity } = useEditorStore(
     useShallow((state) => ({
-      canvasBrushSize: state.canvasBrushSize,
-      setCanvasBrushSize: state.setCanvasBrushSize,
-      treeViewerCylinderOpacity: state.treeViewerCylinderOpacity,
       setTreeViewerCylinderOpacity: state.setTreeViewerCylinderOpacity,
     })),
   );

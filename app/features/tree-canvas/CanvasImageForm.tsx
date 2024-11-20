@@ -29,7 +29,7 @@ type ImageKeyframeType<T> = {
   [K in keyof T]: T[K][];
 };
 
-type FormDataToKeyFramesArgs = {
+interface FormDataToKeyFramesArgs {
   initialState: {
     animationOptionsString?: string;
     currentAnimationFrame?: ImageTypeParent;
@@ -43,7 +43,8 @@ type FormDataToKeyFramesArgs = {
     rotation: number;
   };
   animationKeyFrames: ImageTypeParent[];
-};
+}
+
 const formDataToKeyframes = ({
   initialState,
   animationKeyFrames,

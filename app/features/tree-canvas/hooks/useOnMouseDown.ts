@@ -2,36 +2,38 @@ import Konva from "konva";
 import { Stage } from "konva/lib/Stage";
 import { useCallback } from "react";
 import { useShallow } from "zustand/react/shallow";
-import useEditorStore, {
-  LineType,
-} from "~/features/tree-editor/state/useEditorStore";
+import useEditorStore from "~/features/tree-editor/state/useEditorStore";
 import { v7 } from "uuid";
+import { LineType } from "~/features/tree-editor/state/createCanvasSlice";
 
-type UseOnMouseDownArgs = {
+interface UseOnMouseDownArgs {
   stageRef: React.RefObject<Stage>;
-};
+}
 
 export default function useOnMouseDown({ stageRef }: UseOnMouseDownArgs) {
+  //
+
   const {
-    canvasBrushSize,
     color,
     canvasLines,
     setCanvasLines,
-    setCanvasSelectedId,
-    setCanvasInteractionMode,
+
     canvasGlobalCompositeOperation,
+    canvasBrushSize,
+    setCanvasInteractionMode,
     canvasInteractionType,
+    setCanvasSelectedId,
   } = useEditorStore(
     useShallow((state) => ({
       canvasLines: state.canvasLines,
       setCanvasLines: state.setCanvasLines,
-      canvasSelectedId: state.canvasSelectedId,
-      setCanvasSelectedId: state.setCanvasSelectedId,
-      setCanvasInteractionMode: state.setCanvasInteractionMode,
-      canvasGlobalCompositeOperation: state.canvasGlobalCompositeOperation,
       color: state.color,
+
+      setCanvasInteractionMode: state.setCanvasInteractionMode,
       canvasBrushSize: state.canvasBrushSize,
+      canvasGlobalCompositeOperation: state.canvasGlobalCompositeOperation,
       canvasInteractionType: state.canvasInteractionType,
+      setCanvasSelectedId: state.setCanvasSelectedId,
     })),
   );
   return useCallback(

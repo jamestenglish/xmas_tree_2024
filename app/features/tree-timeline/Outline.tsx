@@ -7,10 +7,10 @@ import { useShallow } from "zustand/react/shallow";
 
 setAutoFreeze(false);
 
-type OutlineNodeProps = {
+interface OutlineNodeProps {
   timeline: Timeline | undefined;
   index: number;
-};
+}
 
 function OutlineNode({ timeline, index }: OutlineNodeProps) {
   const { addTimelineGroupToRow, deleteTimelineRow, rows } = useEditorStore(
@@ -87,9 +87,10 @@ function OutlineNode({ timeline, index }: OutlineNodeProps) {
   );
 }
 
-type OutlineProps = {
+interface OutlineProps {
   timeline: Timeline | undefined;
-};
+}
+
 export default function Outline({ timeline }: OutlineProps) {
   const rows = useEditorStore((state) => state.timelineModel.rows);
   return (

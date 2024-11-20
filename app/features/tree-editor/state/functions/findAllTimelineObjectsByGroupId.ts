@@ -4,15 +4,15 @@ import {
   TimelineModelExtra,
 } from "~/features/tree-timeline/functions/createRow";
 
-export type FindAllGroupIdsType = {
+export interface FindAllGroupIdsType {
   timelineModel: TimelineModelExtra;
-};
+}
 
-export type GroupMetaType = {
+export interface GroupMetaType {
   groups: Array<TimelineGroupExtra>;
   keyframes: TimelineKeyframeExtra[];
   rowId: string | undefined;
-};
+}
 
 // TODO JTE use this for serialize/deserial
 const findAllTimelineObjectsByGroupId = ({

@@ -9,6 +9,7 @@ export function selectedIdsSelector(rows: TimelineRowExtra[]) {
     for (let j = 0; j < keyframes.length; j++) {
       const keyframe = keyframes[j];
       const group = keyframe?.group;
+      console.log({ group });
       if (!(typeof group === "string")) {
         if (group?.selected) {
           return { timelineSelectedGroupId: group?.id, selectedRowId };

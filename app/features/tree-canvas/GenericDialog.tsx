@@ -1,5 +1,3 @@
-/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
-/* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable react/jsx-no-comment-textnodes */
 import { PropsWithChildren, useEffect } from "react";
 
@@ -7,11 +5,12 @@ import { PropsWithChildren, useEffect } from "react";
 //   children,
 // }: PropsWithChildren<HomePageFormProviderProps>) {
 
-type GenericDialogProps = {
+interface GenericDialogProps {
   onClickClose: () => void;
   id: string;
   isOpen: boolean;
-};
+}
+
 export default function GenericDialog({
   onClickClose,
   children,

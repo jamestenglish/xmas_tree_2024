@@ -6,10 +6,10 @@ import useEditorStore from "../tree-editor/state/useEditorStore";
 import { useShallow } from "zustand/react/shallow";
 import useOnClickPlay from "./hooks/useOnClickPlay";
 
-type TimelineButtonsProps = {
+interface TimelineButtonsProps {
   timeline: Timeline | undefined;
   timelineElRef: React.RefObject<HTMLDivElement>;
-};
+}
 
 // const playStep = 50;
 
@@ -17,6 +17,7 @@ export default function TimelineButtons({
   timeline,
   timelineElRef,
 }: TimelineButtonsProps) {
+  //
   const { onSelectModel, onPaneMode, onZoomMode, onNoneMode } =
     useTimelineInteractions({
       timeline,
@@ -24,8 +25,8 @@ export default function TimelineButtons({
 
   const {
     timelineSelectedGroupId,
-
     deleteSeletedTimelineGroup,
+
     timelineInteractionMode,
     setTimelineExportState,
     timelineExportState,
@@ -33,9 +34,10 @@ export default function TimelineButtons({
     useShallow((state) => ({
       timelineSelectedGroupId: state.timelineSelectedGroupId,
       deleteSeletedTimelineGroup: state.deleteSeletedTimelineGroup,
-      timelineInteractionMode: state.timelineInteractionMode,
-      setTimelineExportState: state.setTimelineExportState,
+
       timelineExportState: state.timelineExportState,
+      setTimelineExportState: state.setTimelineExportState,
+      timelineInteractionMode: state.timelineInteractionMode,
     })),
   );
 

@@ -7,11 +7,12 @@ import { TimelineElementDragState } from "animation-timeline-js";
 import deconflictKeyframes from "./deconflictKeyframes";
 import { DragTypes, EditorState } from "../useEditorStore";
 
-type DragCollectionType = {
+interface DragCollectionType {
   rowId: string;
   keyframeId: string;
   val: number;
-};
+}
+
 export default function createOnDrag(
   elements: TimelineElementDragState[] | null,
   dragType: DragTypes,

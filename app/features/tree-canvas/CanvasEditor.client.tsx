@@ -1,10 +1,8 @@
-/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
-/* eslint-disable jsx-a11y/click-events-have-key-events */
 import Konva from "konva";
 import { useCallback, useState } from "react";
 import { Stage, Layer, Line, Circle } from "react-konva";
 import { canvasHeight, canvasWidth } from "../tree-editor/constants";
-import useEditorStore, { LineType } from "../tree-editor/state/useEditorStore";
+import useEditorStore from "../tree-editor/state/useEditorStore";
 import { useShallow } from "zustand/shallow";
 import "./assets/canvas.css";
 import EditableImage, { ImageType } from "./EditableImage";
@@ -17,6 +15,7 @@ import memoize from "memoize";
 import useOnMouseLeave from "./hooks/useOnMouseLeave";
 import CanvasEditorControls from "./CanvasEditorControls";
 import CanvasImageForm from "./CanvasImageForm";
+import { LineType } from "../tree-editor/state/createCanvasSlice";
 
 const createCanvasElements = (
   canvasImages: ImageType[],
@@ -101,48 +100,41 @@ function CanvasImgs({ shapeRefsMeta }: { shapeRefsMeta: ShapeRefMeta[] }) {
   );
 }
 
-export type ShapeRefMeta = {
+export interface ShapeRefMeta {
   ref: React.RefObject<Konva.Image>;
   id: string;
   animate?: unknown;
-};
+}
 
 export default function CanvasEditor({
   stageRef,
 }: {
   stageRef: React.RefObject<Konva.Stage>;
 }) {
+  //
+
   const {
     color,
-    canvasCursorPos,
-    canvasSelectedId,
-    setCanvasSelectedId,
-    canvasBrushSize,
     canvasElements,
+
+    canvasSelectedId,
     canvasInteractionType,
+    canvasBrushSize,
+    canvasCursorPos,
+    setCanvasSelectedId,
   } = useEditorStore(
     useShallow((state) => ({
-      addSelectedColor: state.addSelectedColor,
-
       color: state.color,
-
-      canvasCursorPos: state.canvasCursorPos,
-      setCanvasCursorPos: state.setCanvasCursorPos,
-      setCanvasIsColorPickerOpen: state.setCanvasIsColorPickerOpen,
-      canvasSelectedId: state.canvasSelectedId,
-      setCanvasSelectedId: state.setCanvasSelectedId,
-      canvasBrushSize: state.canvasBrushSize,
-      setCanvasBrushSize: state.setCanvasBrushSize,
       canvasElements: memoizedCreateCanvasElements(
         state.canvasImages,
         state.canvasLines,
       ),
-      canvasGlobalCompositeOperation: state.canvasGlobalCompositeOperation,
-      setCanvasGlobalCompositeOperation:
-        state.setCanvasGlobalCompositeOperation,
 
+      canvasCursorPos: state.canvasCursorPos,
+      canvasBrushSize: state.canvasBrushSize,
       canvasInteractionType: state.canvasInteractionType,
-      setCanvasInteractionType: state.setCanvasInteractionType,
+      canvasSelectedId: state.canvasSelectedId,
+      setCanvasSelectedId: state.setCanvasSelectedId,
     })),
   );
 
