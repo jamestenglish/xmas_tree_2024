@@ -3,12 +3,10 @@ import { OrbitControls, useTexture } from "@react-three/drei";
 import * as THREE from "three";
 import { useRef, useEffect, useMemo } from "react";
 import pos2 from "./pos2";
-// import useEditorStore from "../tree-editor/hooks/useEditorStore";
 import {
   EffectComposer,
   Bloom,
   ToneMapping,
-  // Outline,
 } from "@react-three/postprocessing";
 import LightSphere, { SphereProps } from "./LightSphere";
 import useEditorStore, {
@@ -16,7 +14,6 @@ import useEditorStore, {
 } from "../tree-editor/state/useEditorStore";
 import { useShallow } from "zustand/react/shallow";
 import TreeViewerControls from "./TreeViewerControls";
-// import useEditorStore from "../tree-editor/hooks/useEditorStore";
 
 THREE.ColorManagement.enabled = true;
 
