@@ -7,8 +7,8 @@ import { ClientOnly } from "remix-utils/client-only";
 
 export const meta: MetaFunction = () => {
   return [
-    { title: "Photobooth" },
-    { name: "description", content: "Cool photobooth!" },
+    { title: "2024 Xmas Tree" },
+    { name: "description", content: "2024 Xmas Tree" },
   ];
 };
 

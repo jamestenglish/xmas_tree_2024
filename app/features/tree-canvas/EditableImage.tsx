@@ -35,6 +35,7 @@ export interface ImageType extends ImageTypeParent, ImageTypeAnimationValues {
   animationOptions?: ImageAnimationOptions;
   animationKeyFrames?: Array<ImageTypeParent>;
   currentAnimationFrame?: ImageTypeParent;
+  updatedTime?: number;
 }
 
 interface EditableImageProps {

@@ -1,6 +1,7 @@
 import { Timeline } from "animation-timeline-js";
 import { useCallback, useEffect } from "react";
 import { useShallow } from "zustand/shallow";
+import { SAMPLE_TIME_IN_MS } from "~/features/tree-canvas/functions/getSequenceArgs";
 // import useOnClickPlayStateMachine from "./useOnClickPlayStateMachine";
 import useEditorStore from "~/features/tree-editor/state/useEditorStore";
 
@@ -76,7 +77,7 @@ export default function useOnClickPlay({
           }
           timeline.setTime(newTime);
           moveTimelineIntoTheBounds();
-          if (newTime % 200 === 0) {
+          if (newTime % SAMPLE_TIME_IN_MS === 0) {
             setTimelineCoarseTime(newTime);
           }
         }

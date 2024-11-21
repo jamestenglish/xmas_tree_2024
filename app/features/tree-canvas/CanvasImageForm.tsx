@@ -6,11 +6,7 @@ import {
   useFormContext,
 } from "react-hook-form";
 import Button from "../ui/components/Button";
-import {
-  ImageType,
-  ImageTypeAnimationValues,
-  ImageTypeParent,
-} from "./EditableImage";
+import { ImageType } from "./EditableImage";
 import { useCallback } from "react";
 import useEditorStore from "../tree-editor/state/useEditorStore";
 import { useShallow } from "zustand/shallow";
@@ -20,7 +16,7 @@ import { animate } from "motion";
 import CodeTextArea, { animationOptionsStringDefault } from "./CodeTextArea";
 import CanvasImageFormInputs from "./CanvasImageFormInputs";
 import findAllTimelineObjectsByGroupId from "../tree-editor/state/functions/findAllTimelineObjectsByGroupId";
-import getAnimation from "./functions/getAnimation";
+import getSequenceArgs, { resetAnimation } from "./functions/getSequenceArgs";
 
 interface ImageTypeForm extends ImageType {
   animationOptionsString?: string;
@@ -36,8 +32,7 @@ function CanvasImageFormInner({
   shapeRefsMeta: ShapeRefMeta[];
 }) {
   //
-  const { register, handleSubmit, control, watch } =
-    useFormContext<ImageTypeForm>();
+  const { handleSubmit, control, watch } = useFormContext<ImageTypeForm>();
 
   const {
     animationOptions: _animationOptions,
@@ -65,7 +60,7 @@ function CanvasImageFormInner({
   );
 
   const form = watch();
-  const onClickAnimationPlay = useCallback(() => {
+  const onClickAnimationPlay = useCallback(async () => {
     const { animationOptionsString } = form;
     console.log({ animationOptionsString });
     if (
@@ -100,15 +95,43 @@ function CanvasImageFormInner({
         const selectedGroup =
           allTimelineObjectsByGroupId[timelineSelectedGroupId];
 
-        const duration =
+        const durationInSeconds =
           Math.abs(
             selectedGroup.keyframes[0].val - selectedGroup.keyframes[1].val,
           ) / 1000;
 
-        const animation = getAnimation({ canvasImage, duration, shapeRefMeta });
+        // const animationArgs = getAnimationArgs({
+        //   canvasImage,
+        //   durationInSeconds,
+        //   shapeRefMeta,
+        // });
 
-        animation?.play();
-        console.log("click");
+        // if (animationArgs) {
+        //   animate(...animationArgs);
+        //   console.log("click");
+        // }
+
+        const sequenceArgs = getSequenceArgs({
+          canvasImage,
+          durationInSeconds,
+          shapeRefMeta,
+        });
+
+        if (sequenceArgs) {
+          console.log({ sequenceArgs });
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const controls = animate(sequenceArgs as any);
+
+          await controls;
+
+          resetAnimation({
+            canvasImage,
+            shapeRefMeta,
+          });
+
+          controls.cancel();
+          console.log("click");
+        }
       }
     }
   }, [
@@ -120,8 +143,17 @@ function CanvasImageFormInner({
   ]);
 
   const onSubmit = useCallback<SubmitHandler<ImageTypeForm>>(
-    (data) => {
-      console.log(data);
+    (dataInitial) => {
+      console.log("ImageTypeForm", dataInitial);
+      const { animationOptionsString } = dataInitial;
+      const animationOptions = animationOptionsString
+        ? JSON5.parse(animationOptionsString)
+        : undefined;
+      const data = {
+        ...dataInitial,
+        animationOptions,
+        updatedTime: new Date().getTime(),
+      };
       const { id } = data;
       const index = canvasImages.findIndex(({ id: idIn }) => idIn === id);
       if (index >= 0) {
@@ -170,13 +202,11 @@ function CanvasImageFormInner({
             />
           );
         })}
-        {isAnimation && (
-          <CodeTextArea {...register("animationOptionsString")} />
-        )}
+        {isAnimation && <CodeTextArea />}
         <div className="flex flex-row gap-2">
           {isAnimation && (
             <Button onClick={onClickAnimationPlay} variant="small">
-              Play/Pause
+              Play
             </Button>
           )}
           <Button variant="small" type="submit">
@@ -193,17 +223,20 @@ export default function CanvasImageForm({
   setSelectedImage,
   shapeRefsMeta,
 }: {
-  selectedImage: ImageType | null;
+  selectedImage: ImageType;
   setSelectedImage: React.Dispatch<React.SetStateAction<ImageTypeForm | null>>;
   shapeRefsMeta: ShapeRefMeta[];
 }) {
-  const values = selectedImage
-    ? {
-        ...selectedImage,
-        animationOptionsString: animationOptionsStringDefault,
-      }
+  const { animationOptions } = selectedImage;
+  const animationOptionsString = animationOptions
+    ? JSON5.stringify(animationOptions, null, 2)
     : undefined;
-  console.log({ values });
+  const values = {
+    ...selectedImage,
+    animationOptionsString:
+      animationOptionsString ?? animationOptionsStringDefault,
+  };
+  // console.log({ values });
   const methods = useForm<ImageTypeForm>({
     values,
     defaultValues: values,

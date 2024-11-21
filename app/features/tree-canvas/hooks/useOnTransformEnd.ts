@@ -23,11 +23,11 @@ export default function useOnTransformEnd() {
           img.id === id
             ? {
                 ...img,
-                x: node.x(),
-                y: node.y(),
-                width: node.width() * scaleX,
-                height: node.height() * scaleY,
-                rotation: rotation,
+                x: Math.round(Number(node.x())),
+                y: Math.round(Number(node.y())),
+                width: Math.round(Number(node.width() * scaleX)),
+                height: Math.round(Number(node.height() * scaleY)),
+                rotation: Math.round(Number(rotation)),
               }
             : img,
         ),

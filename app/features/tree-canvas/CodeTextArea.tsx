@@ -1,30 +1,34 @@
 import CodeEditor from "@uiw/react-textarea-code-editor";
-import { forwardRef, TextareaHTMLAttributes } from "react";
+// import { forwardRef, TextareaHTMLAttributes } from "react";
+import { useFormContext, Controller } from "react-hook-form";
 
 export const animationOptionsStringDefault = `{
   ease: "linear"
 }
 `;
 
-const CodeTextArea = forwardRef<
-  HTMLTextAreaElement,
-  TextareaHTMLAttributes<HTMLTextAreaElement>
->((props: TextareaHTMLAttributes<HTMLTextAreaElement>, ref) => {
+// const CodeTextArea = (props: TextareaHTMLAttributes<HTMLTextAreaElement>) => {
+const CodeTextArea = () => {
+  const { control } = useFormContext();
+
   return (
-    <CodeEditor
-      ref={ref}
-      language="js"
-      padding={15}
-      style={{
-        backgroundColor: "#f5f5f5",
-        fontFamily:
-          "ui-monospace,SFMono-Regular,SF Mono,Consolas,Liberation Mono,Menlo,monospace",
-      }}
-      value={animationOptionsStringDefault}
-      {...props}
+    <Controller
+      name="animationOptionsString"
+      control={control}
+      render={({ field }) => (
+        <CodeEditor
+          language="js"
+          padding={15}
+          style={{
+            backgroundColor: "#f5f5f5",
+            fontFamily:
+              "ui-monospace,SFMono-Regular,SF Mono,Consolas,Liberation Mono,Menlo,monospace",
+          }}
+          {...field}
+        />
+      )}
     />
   );
-});
-CodeTextArea.displayName = "CodeTextArea";
+};
 
 export default CodeTextArea;

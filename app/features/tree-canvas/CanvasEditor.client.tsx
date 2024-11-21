@@ -21,6 +21,7 @@ const createCanvasElements = (
   canvasImages: ImageType[],
   canvasLines: LineType[],
 ) => {
+  console.log("createCanvasElements");
   const combinedArray: Array<ImageType | LineType> = [
     ...canvasImages,
     ...canvasLines,
