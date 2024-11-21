@@ -1,45 +1,9 @@
 import { StateCreator } from "zustand";
-import { GroupMetaType } from "./functions/findAllTimelineObjectsByGroupId";
 
 import { TimelineInteractionMode } from "animation-timeline-js";
 import { StateIntersection } from "./useEditorStore";
 
-type TimelineExportStatus =
-  | "IDLE"
-  | "START"
-  | "INIT_STATE"
-  | "INIT_STATE_A"
-  | "GROUP_EXPORT_INIT"
-  | "GROUP_EXPORT_START"
-  | "GROUP_EXPORT_LOAD_CANVAS_START"
-  | "GROUP_EXPORT_LOAD_CANVAS_EXPORT"
-  | "GROUP_EXPORT_LOAD_CANVAS_WAIT"
-  | "GROUP_EXPORT_LOAD_CANVAS_FINISH"
-  | "PLAY"
-  | "PAUSE"
-  | "ERROR";
-
-// interface TimelineExportMeta {
-//   groupIdsToProcess: string[];
-//   currentGroupId: string;
-// }
-
-export interface TimelineExportState {
-  status: TimelineExportStatus;
-  groupIds: string[];
-  groupId?: string | null;
-  errorMessage?: string | null;
-  prevAttributes?: string | null;
-  canvasCylinderImgUrlsData?: Array<{
-    groupId: string;
-    canvasCylinderImgUrl: string;
-    start: number;
-    end: number;
-  }> | null;
-  allTimelineObjectsByGroupId?: { [key: string]: GroupMetaType } | null;
-  initGroupIds?: string[] | null;
-  prevGroupId?: string | null;
-}
+export type TimelinePlayingState = "idle" | "loading" | "playing";
 
 export interface TimelineState {
   timelineCoarseTime: number;
@@ -55,6 +19,9 @@ export interface TimelineState {
   setTimelineInteractionMode: (
     timelineInteractionMode: TimelineInteractionMode,
   ) => void;
+
+  timelinePlayingState: TimelinePlayingState;
+  setTimelinePlayingState: (timelinePlayingState: TimelinePlayingState) => void;
 }
 
 const createTimelineSlice: StateCreator<
@@ -75,6 +42,10 @@ const createTimelineSlice: StateCreator<
   timelineInteractionMode: TimelineInteractionMode.Pan,
   setTimelineInteractionMode: (timelineInteractionMode) =>
     set({ timelineInteractionMode }),
+
+  timelinePlayingState: "idle",
+  setTimelinePlayingState: (timelinePlayingState) =>
+    set({ timelinePlayingState }),
 });
 
 export default createTimelineSlice;

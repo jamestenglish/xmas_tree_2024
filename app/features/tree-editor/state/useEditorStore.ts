@@ -4,9 +4,7 @@ import {
   // persist
 } from "zustand/middleware";
 import type {} from "@redux-devtools/extension"; // required for devtools typing
-import createRow, {
-  TimelineModelExtra,
-} from "~/features/tree-timeline/functions/createRow";
+import { TimelineModelExtra } from "~/features/tree-timeline/functions/createRow";
 import { Timeline, TimelineElementDragState } from "animation-timeline-js";
 import { produce } from "immer";
 import createSetTimelineSelectedGroupId, {
@@ -23,34 +21,18 @@ import createTreeViewerSlice, {
   TreeViewerState,
 } from "./createTreeViewerSlice";
 import createTimelineSlice, { TimelineState } from "./createTimelineSlice";
-import findAllTimelineObjectsByGroupId from "./functions/findAllTimelineObjectsByGroupId";
+import { initialModel, initialSelectedGroup } from "./storeInitials";
+import getIsExportedByGroupId from "./functions/getIsExportedByGroupId";
 
 export function is(input: unknown, type: string) {
   return typeof input === type;
 }
 
-// TODO JTE if you want more than drawing
-// const initialRowA = createRow();
-const initialRowB = createRow({ isSelected: true });
-
-// TODO JTE if you want more than drawing
-// const initialModel: TimelineModelExtra = {
-//   rows: [initialRowA, initialRowB],
-// };
-
-const initialModel: TimelineModelExtra = {
-  rows: [initialRowB],
-};
-
-const initialGroup = initialRowB?.keyframes?.[0]?.group;
-const initialSelectedGroup =
-  (typeof initialGroup !== "string" ? initialGroup?.id : null) ?? null;
-
 export type AttributeByGroupType<T> = {
   [key: string]: T;
 };
 
-type TimelineSelectedGroupIdType = string | null;
+export type TimelineSelectedGroupIdType = string | null;
 
 type SetTimelineSelectedGroupIdType = (
   timelineSelectedGroupId: TimelineSelectedGroupIdType,
@@ -60,7 +42,7 @@ interface BaseState {
   setColor: (color: string) => void;
   setCanvasLines: (canvasLines: Array<LineType>) => void;
   setCanvasImages: (canvasImages: Array<ImageType>) => void;
-  setCanvasCylinderImgUrls: (canvasCylinderImgUrls: string[]) => void;
+  setCanvasExports: (canvasExports: CanvasExport[]) => void;
   setTimelineSelectedGroupId: SetTimelineSelectedGroupIdType;
 }
 
@@ -69,12 +51,14 @@ export interface GroupTypes {
   canvasLines: Array<LineType>;
   canvasImages: Array<ImageType>;
   treeViewerSelectedLightIds: number[];
-  canvasCylinderImgUrls: string[];
-  canvasLastEditTimestamp: number | null;
-  canvasLastExportTimestamp: number | null;
+  canvasExports: CanvasExport[] | null;
+  canvasLastEditTimestamp: number;
+  canvasLastExportTimestamp: number;
+  timelineKeyframeStart: number;
+  timelineKeyframeEnd: number;
 }
 
-interface ByGroupType {
+export interface ByGroupType {
   [key: string]: GroupTypes;
 }
 interface AttributeByGroupState {
@@ -111,11 +95,13 @@ export interface EditorState
 
   treeViewerBlinkState: boolean;
   toggleTreeViewerBlinkState: () => void;
+
+  isTimelinePlayable: boolean;
 }
 
-interface TimelineTexture {
+export interface CanvasExport {
   groupId: string;
-  canvasCylinderImgUrls: string[];
+  canvasCylinderImgUrl: string;
   start: number;
   end: number;
 }
@@ -126,49 +112,50 @@ const defaultAttributesByGroup = initialSelectedGroup
     }
   : {};
 
-const allCanvasCylinderImgUrls = (state: EditorState) => {
-  const { timelineModel } = state;
-
-  const allTimelineObjectsByGroupId = findAllTimelineObjectsByGroupId({
-    timelineModel,
-  });
-  const groupIds = Object.keys(allTimelineObjectsByGroupId);
-
-  const timelineTextures: Array<TimelineTexture> = groupIds.map((groupId) => {
-    const timelineObjects = allTimelineObjectsByGroupId[groupId];
-    const { canvasCylinderImgUrls } = state.attributesByGroup[groupId];
-
-    const start = Math.min(
-      timelineObjects.keyframes[0].val,
-      timelineObjects.keyframes[1].val,
-    );
-    const end = Math.max(
-      timelineObjects.keyframes[0].val,
-      timelineObjects.keyframes[1].val,
-    );
-
-    const timelineTexture: TimelineTexture = {
-      start,
-      end,
-      groupId,
-      canvasCylinderImgUrls,
-    };
-
-    return timelineTexture;
-  });
-};
-
 const createEditorSlice: StateCreator<
   StateIntersection,
   [["zustand/devtools", never]],
   [],
   EditorState
 > = (set) => ({
-  canvasCylinderImgUrls: defaultByGroup.canvasCylinderImgUrls,
-  setCanvasCylinderImgUrls: (canvasCylinderImgUrls) => {
-    const canvasLastExportTimestamp = new Date().getTime();
-    set({ canvasCylinderImgUrls, canvasLastExportTimestamp });
-  },
+  timelineKeyframeEnd: defaultByGroup.timelineKeyframeEnd,
+  timelineKeyframeStart: defaultByGroup.timelineKeyframeStart,
+
+  canvasExports: defaultByGroup.canvasExports,
+  // setCanvasExports: (canvasExports) => {
+  //   const canvasLastExportTimestamp = new Date().getTime();
+  //   // TODO JTE here? isTimelinePlayable?
+  //   set({ canvasExports, canvasLastExportTimestamp });
+  // },
+
+  setCanvasExports: (canvasExports) =>
+    set(
+      produce((state: EditorState) => {
+        const canvasLastExportTimestamp = new Date().getTime();
+
+        state.canvasExports = canvasExports;
+        state.canvasLastExportTimestamp = canvasLastExportTimestamp;
+
+        const { timelineSelectedGroupId } = state;
+        const exportedByGroupId = getIsExportedByGroupId({
+          attributesByGroup: state.attributesByGroup,
+        });
+        console.log("setCanvasExports", { exportedByGroupId });
+
+        let isTimelinePlayable = true;
+        Object.keys(exportedByGroupId).forEach((groupId) => {
+          if (groupId === timelineSelectedGroupId) {
+            return;
+          }
+          const isExported = exportedByGroupId[groupId];
+          if (!isExported) {
+            isTimelinePlayable = false;
+          }
+        });
+
+        state.isTimelinePlayable = isTimelinePlayable;
+      }),
+    ),
 
   attributesByGroup: defaultAttributesByGroup,
 
@@ -177,12 +164,12 @@ const createEditorSlice: StateCreator<
   canvasLines: defaultByGroup.canvasLines,
   setCanvasLines: (canvasLines) => {
     const canvasLastEditTimestamp = new Date().getTime();
-    set({ canvasLines, canvasLastEditTimestamp });
+    set({ canvasLines, canvasLastEditTimestamp, isTimelinePlayable: false });
   },
 
   setCanvasImages: (canvasImages) => {
     const canvasLastEditTimestamp = new Date().getTime();
-    set({ canvasImages, canvasLastEditTimestamp });
+    set({ canvasImages, canvasLastEditTimestamp, isTimelinePlayable: false });
   },
   canvasImages: defaultByGroup.canvasImages,
 
@@ -198,21 +185,21 @@ const createEditorSlice: StateCreator<
   timelineModel: initialModel,
   setTimelineModel: (timelineModel) => set({ timelineModel }),
 
-  addTimelineRow: (timeline: Timeline) => set(createAddRow(timeline)),
-  deleteTimelineRow: (indexToDelete: number) =>
+  addTimelineRow: (timeline) => set(createAddRow(timeline)),
+  deleteTimelineRow: (indexToDelete) =>
     set(
       produce((state: EditorState) => {
         state.timelineModel.rows.splice(indexToDelete, 1);
       }),
     ),
 
-  addTimelineGroupToRow: (timeline: Timeline, rowId: string) =>
+  addTimelineGroupToRow: (timeline, rowId) =>
     set(createAddGroupToRow(timeline, rowId)),
   deleteSeletedTimelineGroup: () => set(createDeleteSeletedTimelineGroup()),
 
   onDragTimeline: (elements, dragType) => set(createOnDrag(elements, dragType)),
 
-  toggleTreeViewerLightId: (selectedLightId: number | null) =>
+  toggleTreeViewerLightId: (selectedLightId) =>
     set(createToggeLightId(selectedLightId)),
   treeViewerSelectedLightIds: defaultByGroup.treeViewerSelectedLightIds,
   treeViewerBlinkState: false,
@@ -224,6 +211,8 @@ const createEditorSlice: StateCreator<
   // --- global
   setTimelineSelectedGroupId: (timelineSelectedGroupId) =>
     set(createSetTimelineSelectedGroupId(timelineSelectedGroupId)),
+
+  isTimelinePlayable: false,
 });
 
 const useEditorStore = create<StateIntersection>()(

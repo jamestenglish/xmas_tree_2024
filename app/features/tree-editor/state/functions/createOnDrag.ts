@@ -6,6 +6,7 @@ import {
 import { TimelineElementDragState } from "animation-timeline-js";
 import deconflictKeyframes from "./deconflictKeyframes";
 import { DragTypes, EditorState } from "../useEditorStore";
+import updateTimelineKeyframes from "./updateTimelineKeyframes";
 
 interface DragCollectionType {
   rowId: string;
@@ -57,12 +58,17 @@ export default function createOnDrag(
           }
         });
 
-        state?.timelineModel?.rows?.forEach((row) => {
-          if (row?.keyframes && dragType === "finished") {
-            console.log("dragType", dragType);
-            deconflictKeyframes(row.keyframes);
-          }
-        });
+        if (dragType === "finished") {
+          state?.timelineModel?.rows?.forEach((row) => {
+            if (row?.keyframes) {
+              deconflictKeyframes(row.keyframes);
+            }
+          });
+
+          updateTimelineKeyframes({ state });
+
+          state.isTimelinePlayable = false;
+        }
       }
     }
   });

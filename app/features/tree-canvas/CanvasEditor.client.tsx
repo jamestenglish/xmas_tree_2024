@@ -188,7 +188,10 @@ export default function CanvasEditor({
   return (
     <>
       <div>
-        <CanvasEditorControls stageRef={stageRef} />
+        <CanvasEditorControls
+          shapeRefsMeta={shapeRefsMeta}
+          stageRef={stageRef}
+        />
 
         <div
           style={{

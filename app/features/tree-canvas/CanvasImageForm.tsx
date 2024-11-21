@@ -20,60 +20,11 @@ import { animate } from "motion";
 import CodeTextArea, { animationOptionsStringDefault } from "./CodeTextArea";
 import CanvasImageFormInputs from "./CanvasImageFormInputs";
 import findAllTimelineObjectsByGroupId from "../tree-editor/state/functions/findAllTimelineObjectsByGroupId";
+import getAnimation from "./functions/getAnimation";
 
 interface ImageTypeForm extends ImageType {
   animationOptionsString?: string;
 }
-
-type ImageKeyframeType<T> = {
-  [K in keyof T]: T[K][];
-};
-
-interface FormDataToKeyFramesArgs {
-  initialState: {
-    animationOptionsString?: string;
-    currentAnimationFrame?: ImageTypeParent;
-    id: string;
-    src: string;
-    type: string;
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-    rotation: number;
-  };
-  animationKeyFrames: ImageTypeParent[];
-}
-
-const formDataToKeyframes = ({
-  initialState,
-  animationKeyFrames,
-}: FormDataToKeyFramesArgs) => {
-  const combined = [{ ...initialState }, ...animationKeyFrames];
-
-  const init: ImageKeyframeType<ImageTypeAnimationValues> = {
-    x: [],
-    y: [],
-    height: [],
-    width: [],
-    rotation: [],
-  };
-
-  const keyframes = combined.reduce((acc, keyframe) => {
-    const keys = Object.keys(keyframe) as (keyof ImageTypeAnimationValues)[];
-    keys.forEach((key) => {
-      const value = keyframe[key];
-      const prev = acc[key];
-      if (!prev) {
-        return acc;
-      }
-      (acc[key] as number[]) = [...prev, Number(value)];
-    });
-    return acc;
-  }, init);
-
-  return keyframes;
-};
 
 function CanvasImageFormInner({
   selectedImage,
@@ -126,17 +77,22 @@ function CanvasImageFormInner({
       // TODO JTE error handling
       const animationOptions = JSON5.parse(animationOptionsString);
       console.log({ animationOptions });
-      const {
-        animationKeyFrames,
-        animationOptions: _animationOptions,
-        ...initialState
-      } = form;
+      // const {
+      //   animationKeyFrames,
+      //   animationOptions: _animationOptions,
+      //   ...initialState
+      // } = form;
+
+      const canvasImage = {
+        ...form,
+        animationOptions,
+      };
 
       const shapeRefMeta = shapeRefsMeta.find(
         (sr) => sr.id === selectedImage.id,
       );
 
-      if (shapeRefMeta && shapeRefMeta?.ref?.current && animationKeyFrames) {
+      if (shapeRefMeta && shapeRefMeta?.ref?.current) {
         const allTimelineObjectsByGroupId = findAllTimelineObjectsByGroupId({
           timelineModel,
         });
@@ -149,32 +105,9 @@ function CanvasImageFormInner({
             selectedGroup.keyframes[0].val - selectedGroup.keyframes[1].val,
           ) / 1000;
 
-        const animationObject = { ...initialState };
+        const animation = getAnimation({ canvasImage, duration, shapeRefMeta });
 
-        const keyframes = formDataToKeyframes({
-          initialState,
-          animationKeyFrames,
-        });
-
-        console.log({ keyframes });
-        animate(
-          animationObject,
-          {
-            ...keyframes,
-          },
-          {
-            ...animationOptions,
-            duration,
-            onUpdate: (...latest) => {
-              console.log(latest, animationObject);
-              shapeRefMeta.ref.current?.position(animationObject);
-              shapeRefMeta.ref.current?.rotation(animationObject.rotation);
-              shapeRefMeta.ref.current?.height(animationObject.height);
-              shapeRefMeta.ref.current?.width(animationObject.width);
-            },
-          },
-        );
-
+        animation?.play();
         console.log("click");
       }
     }

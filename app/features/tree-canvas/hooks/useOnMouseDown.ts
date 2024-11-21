@@ -38,18 +38,14 @@ export default function useOnMouseDown({ stageRef }: UseOnMouseDownArgs) {
   );
   return useCallback(
     (e: Konva.KonvaEventObject<MouseEvent>) => {
-      console.log("useOnMouseDown");
       if (canvasInteractionType === "drawing") {
         if (e.target === stageRef.current) {
           setCanvasSelectedId(null); // Deselect any selected images
         }
         const pos = e.target?.getStage()?.getPointerPosition();
-        console.log({ pos });
         if (pos && color) {
           setCanvasInteractionMode("drawing");
-          console.log("drawing");
           const newLine: LineType = {
-            // id: `${new Date().getTime()}`,
             id: v7(),
             type: "line",
             points: [pos.x, pos.y],

@@ -11,13 +11,11 @@ const isBetween = ({ keyframeA, keyframeB, keyframeTest }: IsBetweenArgs) => {
   const { val: valB } = keyframeB;
   const { val: valTest } = keyframeTest;
   const result = valTest >= valA && valTest < valB;
-  console.log({ result, valA, valB, valTest });
   return result;
 };
 
 const deconflictKeyframes = (keyframesIn: TimelineKeyframeExtra[]) => {
   if (keyframesIn.length <= 2) {
-    console.log("AAA not enough to deconflict");
     return keyframesIn;
   }
   const initial: [TimelineKeyframeExtra, TimelineKeyframeExtra][] = [];
@@ -33,12 +31,6 @@ const deconflictKeyframes = (keyframesIn: TimelineKeyframeExtra[]) => {
 
   const keyframes = keyframeGroups.flat();
 
-  console.log("deconflictKeyframes");
-  keyframes.forEach((e) => {
-    if (typeof e?.group !== "string") {
-      console.log(e.val, e?.group?.id);
-    }
-  });
   const deconflictedIndicies = [0, 1];
 
   while (deconflictedIndicies.length < keyframes.length) {
@@ -66,7 +58,6 @@ const deconflictKeyframes = (keyframesIn: TimelineKeyframeExtra[]) => {
           keyframeB,
           keyframeTest: keyframeTestD,
         });
-        console.log({ distance, isCBetween, isDBetween });
         if (isCBetween || isDBetween) {
           keyframeTestC.val = keyframeB.val;
           keyframeTestD.val = keyframeB.val + distance;
@@ -78,8 +69,6 @@ const deconflictKeyframes = (keyframesIn: TimelineKeyframeExtra[]) => {
       }
     }
   }
-  console.log("end");
-  keyframes.forEach((e) => console.log(e.val));
 };
 
 export default deconflictKeyframes;

@@ -4,12 +4,12 @@ import useEditorStore from "~/features/tree-editor/state/useEditorStore";
 import { useShallow } from "zustand/react/shallow";
 import { useEffect } from "react";
 
-const logMessage = (...args: Array<unknown>) => {
-  console.log("TIMELINE LOG", ...args);
+const logMessage = (..._args: Array<unknown>) => {
+  // console.log("TIMELINE LOG", ...args);
 };
 
-const logDraggingMessage = (...args: Array<unknown>) => {
-  console.log("TIMELINE DRAG", ...args);
+const logDraggingMessage = (..._args: Array<unknown>) => {
+  // console.log("TIMELINE DRAG", ...args);
 };
 
 interface UseInitTimelineListenersType {
@@ -104,11 +104,11 @@ const useInitTimelineListeners = ({
             if (unknownGroup?.id) {
               const groupExtra = unknownGroup as TimelineGroupExtra;
               groupId = groupExtra.id ?? null;
-              from = "keyframe";
+              // from = "keyframe";
             }
           }
           if (groupId) {
-            console.log("useInitTimelineListeners groupId", groupId, from);
+            // console.log("useInitTimelineListeners groupId", groupId, from);
             setTimelineSelectedGroupId(groupId);
           }
           logMessage(

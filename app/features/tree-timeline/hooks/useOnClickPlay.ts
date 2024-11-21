@@ -16,24 +16,32 @@ export default function useOnClickPlay({
   timelineElRef,
 }: UseOnPlayClickArgs) {
   //
-  const { setTimelineExportState, timelineExportState, setTimelineCoarseTime } =
-    useEditorStore(
-      useShallow((state) => ({
-        setTimelineCoarseTime: state.setTimelineCoarseTime,
-        timelineExportState: state.timelineExportState,
-        setTimelineExportState: state.setTimelineExportState,
-      })),
-    );
+  const {
+    timelinePlayingState,
+    setTimelinePlayingState,
+    setTimelineCoarseTime,
+    timelineKeyframeEnd,
 
-  const timelineIsPlaying = timelineExportState.status === "PLAY";
+    attributesByGroup,
+  } = useEditorStore(
+    useShallow((state) => ({
+      setTimelineCoarseTime: state.setTimelineCoarseTime,
+      timelinePlayingState: state.timelinePlayingState,
+      setTimelinePlayingState: state.setTimelinePlayingState,
+      timelineKeyframeEnd: state.timelineKeyframeEnd,
 
-  const max =
-    timelineExportState?.canvasCylinderImgUrlsData?.reduce((acc, datum) => {
-      if (datum.end > acc) {
-        return datum.end;
-      }
-      return acc;
-    }, -1) ?? 0;
+      attributesByGroup: state.attributesByGroup,
+    })),
+  );
+
+  const groupIds = Object.keys(attributesByGroup);
+  const potentialMax = groupIds.reduce((acc, groupId) => {
+    return Math.max(acc, attributesByGroup[groupId].timelineKeyframeEnd);
+  }, 0);
+
+  const max = Math.max(potentialMax, timelineKeyframeEnd);
+
+  const isTimelinePlaying = timelinePlayingState === "playing";
 
   const moveTimelineIntoTheBounds = useCallback(() => {
     if (timeline) {
@@ -61,7 +69,7 @@ export default function useOnClickPlay({
     // On component init
     if (timelineElRef.current) {
       intervalId = setInterval(() => {
-        if (timelineIsPlaying && timeline) {
+        if (isTimelinePlaying && timeline) {
           let newTime = timeline.getTime() + playStep;
           if (newTime - 1 > max) {
             newTime = 0;
@@ -82,19 +90,19 @@ export default function useOnClickPlay({
       }
     };
   }, [
+    isTimelinePlaying,
     max,
     moveTimelineIntoTheBounds,
     setTimelineCoarseTime,
     timeline,
     timelineElRef,
-    timelineIsPlaying,
   ]);
 
   const onClickPlay = useCallback(
     (_event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
       // const startPlaying = () => {
 
-      setTimelineExportState({ status: "START", groupIds: [] as string[] });
+      setTimelinePlayingState("playing");
 
       if (timeline) {
         moveTimelineIntoTheBounds();
@@ -105,7 +113,7 @@ export default function useOnClickPlay({
 
       // startPlaying();
     },
-    [moveTimelineIntoTheBounds, setTimelineExportState, timeline],
+    [moveTimelineIntoTheBounds, setTimelinePlayingState, timeline],
   );
 
   // useOnClickPlayStateMachine();

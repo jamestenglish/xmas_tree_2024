@@ -10,6 +10,7 @@ import { EditorState, GroupTypes } from "../useEditorStore";
 import findAllTimelineObjectsByGroupId, {
   FindAllGroupIdsType,
 } from "./findAllTimelineObjectsByGroupId";
+import getIsExportedByGroupId from "./getIsExportedByGroupId";
 
 const findAllGroupIds = ({ timelineModel }: FindAllGroupIdsType) => {
   const allGroupsById = findAllTimelineObjectsByGroupId({ timelineModel });
@@ -70,14 +71,18 @@ const copyAttributes = <T extends GroupTypes, V extends GroupTypes>({
   }
 };
 
+const timestamp = -1;
+//
 export const defaultByGroup: GroupTypes = {
   color: "#D0021B",
   canvasLines: [],
   canvasImages: [],
   treeViewerSelectedLightIds: [],
-  canvasCylinderImgUrls: ["/imgs/test_pattern.png"],
-  canvasLastEditTimestamp: null,
-  canvasLastExportTimestamp: null,
+  canvasExports: null,
+  canvasLastEditTimestamp: timestamp,
+  canvasLastExportTimestamp: timestamp,
+  timelineKeyframeStart: 0,
+  timelineKeyframeEnd: 1000,
 };
 
 const setAllGroupsToUnselected = ({
@@ -109,32 +114,53 @@ function setUnexportedGroups({
   timelineSelectedGroupId: string | null;
   timelineModel: TimelineModelExtra;
 }) {
-  const allGroupsIds = findAllGroupIds({ timelineModel });
-
   let modelUpdates = timelineModel;
-  allGroupsIds.forEach((groupId) => {
+
+  const isExportedByGroupId = getIsExportedByGroupId({
+    attributesByGroup: state.attributesByGroup,
+  });
+
+  console.log("setUnexportedGroups", { isExportedByGroupId });
+
+  Object.keys(isExportedByGroupId).forEach((groupId) => {
     if (groupId === timelineSelectedGroupId) {
       return;
     }
-
-    const attributes = state.attributesByGroup[groupId];
-    if (attributes) {
-      const { canvasLastEditTimestamp, canvasLastExportTimestamp } = attributes;
-
-      if (
-        canvasLastEditTimestamp &&
-        (canvasLastExportTimestamp === null ||
-          canvasLastEditTimestamp > canvasLastExportTimestamp)
-      ) {
-        const unexportedGroup = createUnexportedGroup(groupId);
-        modelUpdates = replaceGroupWithId({
-          timelineSelectedGroupId: groupId,
-          timelineModel: modelUpdates,
-          newGroup: unexportedGroup,
-        });
-      }
+    const isExported = isExportedByGroupId[groupId];
+    if (!isExported) {
+      const unexportedGroup = createUnexportedGroup(groupId);
+      state.isTimelinePlayable = false;
+      modelUpdates = replaceGroupWithId({
+        timelineSelectedGroupId: groupId,
+        timelineModel: modelUpdates,
+        newGroup: unexportedGroup,
+      });
     }
   });
+  // allGroupsIds.forEach((groupId) => {
+  //   if (groupId === timelineSelectedGroupId) {
+  //     return;
+  //   }
+
+  // const attributes = state.attributesByGroup[groupId];
+  // if (attributes) {
+  //   const { canvasLastEditTimestamp, canvasLastExportTimestamp } = attributes;
+
+  //   const isUnexported = getIsUnexported({
+  //     canvasLastEditTimestamp,
+  //     canvasLastExportTimestamp,
+  //   });
+  //   if (isUnexported) {
+  //     const unexportedGroup = createUnexportedGroup(groupId);
+  //     state.isTimelinePlayable = false;
+  //     modelUpdates = replaceGroupWithId({
+  //       timelineSelectedGroupId: groupId,
+  //       timelineModel: modelUpdates,
+  //       newGroup: unexportedGroup,
+  //     });
+  //   }
+  // }
+  // });
 
   return modelUpdates;
 }

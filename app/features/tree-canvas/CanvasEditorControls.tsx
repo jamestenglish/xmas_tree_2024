@@ -7,14 +7,17 @@ import useHandleExport from "./hooks/useHandleExport";
 import ColorPickerDialog from "./ColorPickerDialog";
 import { Stage } from "konva/lib/Stage";
 import ImageAddDialog from "./ImageAddDialog";
+import { ShapeRefMeta } from "./CanvasEditor.client";
 
 // const imgUrl =
 //   "https://images.chesscomfiles.com/uploads/v1/images_users/tiny_mce/petrikeckman/phpE4U0RQ.png";
 
 export default function CanvasEditorControls({
   stageRef,
+  shapeRefsMeta,
 }: {
   stageRef: React.RefObject<Stage>;
+  shapeRefsMeta: ShapeRefMeta[];
 }) {
   //
 
@@ -53,6 +56,7 @@ export default function CanvasEditorControls({
 
   const handleExport = useHandleExport({
     stageRef,
+    shapeRefsMeta,
   });
 
   const onClickColorOpen = useCallback(() => {
@@ -68,6 +72,7 @@ export default function CanvasEditorControls({
 
   // this is ugly but I can't store the ref in the store
   useEffect(() => {
+    // TODO JTE would be nice to remove this
     if (timelineActionId !== null) {
       handleExport();
     }

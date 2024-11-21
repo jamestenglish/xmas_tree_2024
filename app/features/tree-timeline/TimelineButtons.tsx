@@ -28,134 +28,31 @@ export default function TimelineButtons({
     deleteSeletedTimelineGroup,
 
     timelineInteractionMode,
-    setTimelineExportState,
-    timelineExportState,
+    timelinePlayingState,
+    setTimelinePlayingState,
+    isTimelinePlayable,
   } = useEditorStore(
     useShallow((state) => ({
       timelineSelectedGroupId: state.timelineSelectedGroupId,
       deleteSeletedTimelineGroup: state.deleteSeletedTimelineGroup,
 
-      timelineExportState: state.timelineExportState,
-      setTimelineExportState: state.setTimelineExportState,
       timelineInteractionMode: state.timelineInteractionMode,
+      timelinePlayingState: state.timelinePlayingState,
+      setTimelinePlayingState: state.setTimelinePlayingState,
+      isTimelinePlayable: state.isTimelinePlayable,
     })),
   );
 
-  const timelineIsPlaying = timelineExportState.status === "PLAY";
-
   const { onClickPlay } = useOnClickPlay({ timeline, timelineElRef });
 
-  // const moveTimelineIntoTheBounds = useCallback(() => {
-  //   if (timeline) {
-  //     if (
-  //       timeline._startPosMouseArgs ||
-  //       timeline._scrollAreaClickOrDragStarted
-  //     ) {
-  //       // User is manipulating items, don't move screen in this case.
-  //       return;
-  //     }
-  //     const fromPx = timeline.scrollLeft;
-  //     const toPx = timeline.scrollLeft + timeline.getClientWidth();
-
-  //     const positionInPixels =
-  //       timeline.valToPx(timeline.getTime()) + timeline._leftMargin();
-  //     // Scroll to timeline position if timeline is out of the bounds:
-  //     if (positionInPixels <= fromPx || positionInPixels >= toPx) {
-  //       timeline.scrollLeft = positionInPixels;
-  //     }
-  //   }
-  // }, [timeline]);
-
-  // useEffect(() => {
-  //   let intervalId: NodeJS.Timeout | undefined;
-  //   // On component init
-  //   if (timelineElRef.current) {
-  //     intervalId = setInterval(() => {
-  //       if (timelineIsPlaying && timeline) {
-  //         timeline.setTime(timeline.getTime() + playStep);
-  //         moveTimelineIntoTheBounds();
-  //       }
-  //     }, playStep);
-  //   }
-
-  //   // cleanup on component unmounted.
-  //   return () => {
-  //     if (intervalId) {
-  //       clearInterval(intervalId);
-  //     }
-  //   };
-  // }, [timelineElRef.current, timelineIsPlaying]);
-
-  // const onPlayClick = useCallback(
-  //   (_event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-  //     // const startPlaying = () => {
-
-  //     setTimelineIsPlaying(true);
-
-  //     if (timeline) {
-  //       moveTimelineIntoTheBounds();
-  //       // Don't allow to manipulate timeline during playing (optional).
-  //       timeline.setOptions({ timelineDraggable: false });
-  //     }
-  //     // };
-
-  //     // startPlaying();
-  //   },
-  //   [moveTimelineIntoTheBounds, setTimelineIsPlaying, timeline],
-  // );
-
-  // type TimelineExportStates =
-  //   | "IDLE"
-  //   | "START"
-  //   | "groupExportStart"
-  //   | "groupExportDone";
-
-  // let timelineExportState: TimelineExportStates = "IDLE";
-  // useEffect(() => {
-  //   if (timelineExportState === "IDLE") {
-  //     return;
-  //   }
-  //   if(timelineExportState === "START") {
-
-  //   }
-  // }, [timelineExportState]);
-
+  const isTimelinePlaying = timelinePlayingState === "playing";
   const onPauseClick = useCallback(() => {
-    setTimelineExportState({
-      status: "IDLE",
-      groupIds: [] as string[],
-      groupId: null,
-      errorMessage: null,
-      prevAttributes: null,
-      canvasCylinderImgUrlsData: null,
-      allTimelineObjectsByGroupId: null,
-    });
+    setTimelinePlayingState("idle");
 
     if (timeline) {
       timeline.setOptions({ timelineDraggable: true });
     }
-  }, [setTimelineExportState, timeline]);
-
-  // const onRemoveKeyFrame = useCallback(() => {
-  //   if (timeline) {
-  //     // Add keyframe
-  //     const currentModel = timeline.getModel();
-  //     if (currentModel && currentModel.rows) {
-  //       currentModel.rows.forEach((row) => {
-  //         if (row.keyframes) {
-  //           row.keyframes = row.keyframes.filter((p) => !p.selected);
-  //         }
-  //       });
-  //       timeline.setTimelineModel(currentModel);
-  //     }
-  //   }
-  // }, [timeline]);
-
-  // const onAddTrack = useCallback(() => {
-  //   if (timeline) {
-  //     addTimelineRow(timeline);
-  //   }
-  // }, [addTimelineRow, timeline]);
+  }, [setTimelinePlayingState, timeline]);
 
   const onDeleteGroup = useCallback(() => {
     if (timeline) {
@@ -220,22 +117,28 @@ export default function TimelineButtons({
         visibility
       </button>
       <div style={{ width: "1px", background: "gray", height: "100%}" }}></div>
-      {!timelineIsPlaying ? (
-        <button
-          className="button mat-icon material-icons mat-icon-no-color"
-          title="Use external player to play\stop the timeline. For the demo simple setInterval is used."
-          onClick={onClickPlay}
-        >
-          play_arrow
-        </button>
+      {isTimelinePlayable ? (
+        <>
+          {!isTimelinePlaying ? (
+            <button
+              className="button mat-icon material-icons mat-icon-no-color"
+              title="Use external player to play\stop the timeline. For the demo simple setInterval is used."
+              onClick={onClickPlay}
+            >
+              play_arrow
+            </button>
+          ) : (
+            <button
+              className="button mat-icon material-icons mat-icon-no-color button-hover"
+              title="Use external player to play\stop the timeline. For the demo simple setInterval is used."
+              onClick={onPauseClick}
+            >
+              pause
+            </button>
+          )}
+        </>
       ) : (
-        <button
-          className="button mat-icon material-icons mat-icon-no-color button-hover"
-          title="Use external player to play\stop the timeline. For the demo simple setInterval is used."
-          onClick={onPauseClick}
-        >
-          pause
-        </button>
+        <span className="pl-2 pr-2">Save All Canvases To Play</span>
       )}
       <button
         className="button mat-icon material-icons mat-icon-no-color"

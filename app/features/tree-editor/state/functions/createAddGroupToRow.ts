@@ -4,6 +4,7 @@ import { createUnselectedGroup } from "~/features/tree-timeline/functions/create
 import deconflictKeyframes from "./deconflictKeyframes";
 import { EditorState } from "../useEditorStore";
 import { setTimelineSelectedGroupIdRaw } from "./createSetTimelineSelectedGroupId";
+import updateTimelineKeyframes from "./updateTimelineKeyframes";
 
 export default function createAddGroupToRow(timeline: Timeline, rowId: string) {
   return produce((state: EditorState) => {
@@ -27,8 +28,6 @@ export default function createAddGroupToRow(timeline: Timeline, rowId: string) {
           newGroupId = groupId;
 
           if (prevRow?.keyframes) {
-            console.log("AAA can deconflict");
-
             deconflictKeyframes(prevRow.keyframes);
           }
         }
@@ -38,5 +37,6 @@ export default function createAddGroupToRow(timeline: Timeline, rowId: string) {
     if (newGroupId) {
       setTimelineSelectedGroupIdRaw(state, newGroupId);
     }
+    updateTimelineKeyframes({ state });
   });
 }

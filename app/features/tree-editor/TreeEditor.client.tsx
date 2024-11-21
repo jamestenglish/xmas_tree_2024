@@ -3,7 +3,7 @@ import { useRef } from "react";
 import CanvasEditor from "../tree-canvas/CanvasEditor.client";
 import { canvasHeight, canvasWidth } from "./constants";
 import TimelineComponent from "../tree-timeline/TimelineComponent.client";
-import useEditorStore from "./state/useEditorStore";
+import useEditorStore, { CanvasExport } from "./state/useEditorStore";
 import { useShallow } from "zustand/react/shallow";
 import ColorPicker from "../tree-canvas/ColorPicker.client";
 // import memoizedCanvasStateSelector from "./state/memoizedCanvasInteractionModeSelector";
@@ -11,23 +11,50 @@ import Konva from "konva";
 
 // const BLINK_SPEED = 300;
 
+function TimelineExportDebugRow({
+  canvasExports,
+}: {
+  canvasExports: CanvasExport[] | null;
+}) {
+  return (
+    <div className="flex max-h-64 flex-row gap-2">
+      {canvasExports &&
+        canvasExports.map((canvasExport, index) => (
+          <img
+            className="object-contain"
+            key={index}
+            src={canvasExport.canvasCylinderImgUrl}
+            alt="foo"
+          />
+        ))}
+    </div>
+  );
+}
+
 function TimelineExportStateDebugger() {
   //
 
-  const { canvasCylinderImgUrls } = useEditorStore(
+  const { canvasExports, attributesByGroup } = useEditorStore(
     useShallow((state) => ({
-      canvasCylinderImgUrls: state.canvasCylinderImgUrls,
+      canvasExports: state.canvasExports,
+      attributesByGroup: state.attributesByGroup,
     })),
   );
 
   // TODO JTE here use memo
   return (
     <>
+      <TimelineExportDebugRow canvasExports={canvasExports} />
+
       <div className="flex flex-row gap-2">
-        {canvasCylinderImgUrls &&
-          canvasCylinderImgUrls.map((canvasCylinderImgUrl, index) => (
-            <img key={index} src={canvasCylinderImgUrl} alt="foo" />
-          ))}
+        {attributesByGroup &&
+          Object.keys(attributesByGroup).map((key, j) => {
+            const { canvasExports } = attributesByGroup[key];
+
+            return (
+              <TimelineExportDebugRow key={j} canvasExports={canvasExports} />
+            );
+          })}
       </div>
     </>
   );
@@ -136,26 +163,30 @@ export default function TreeEditor() {
           <TimelineComponent></TimelineComponent>
         </div>
       </div>
-      <div className="flex flex-row gap-2">
+      <div className="flex max-h-64 flex-row gap-2">
         <canvas
           id="testCanvas"
+          className="object-contain"
           ref={testCanvasRef}
           width={canvasWidth}
           height={canvasHeight}
-          style={{
-            width: `${canvasWidth}px`,
-            height: `${canvasHeight}px`,
-          }}
+          // style={{
+          //   width: `${canvasWidth}px`,
+          //   height: `${canvasHeight}px`,
+          // }}
         />
         <canvas
           id="testCanvas2"
-          style={{
-            width: `${canvasWidth}px`,
-            height: `${canvasHeight}px`,
-          }}
+          className="object-contain"
+          // style={{
+          //   width: `${canvasWidth}px`,
+          //   height: `${canvasHeight}px`,
+          // }}
         />
       </div>
-      <img id="testImg" alt="foo" />
+      <div className="hidden max-h-64">
+        <img className="object-contain" id="testImg" alt="foo" />
+      </div>
       <TimelineExportStateDebugger />
     </>
   );
