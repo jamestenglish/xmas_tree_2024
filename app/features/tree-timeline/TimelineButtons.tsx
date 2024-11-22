@@ -11,8 +11,6 @@ interface TimelineButtonsProps {
   timelineElRef: React.RefObject<HTMLDivElement>;
 }
 
-// const playStep = 50;
-
 export default function TimelineButtons({
   timeline,
   timelineElRef,
@@ -148,13 +146,7 @@ export default function TimelineButtons({
         fast_rewind
       </button>
       <div style={{ flex: 1 }}></div>
-      {/* <button
-        className="flex-left button mat-icon material-icons mat-icon-no-color"
-        title="Remove selected keyframe"
-        onClick={onRemoveKeyFrame}
-      >
-        close
-      </button> */}
+
       {timelineSelectedGroupId && (
         <button
           className="flex-left button"
@@ -164,14 +156,6 @@ export default function TimelineButtons({
           <span> Remove Group</span>
         </button>
       )}
-      {/* <button
-        className="flex-left button"
-        title="Add new track with the keyframe"
-        onClick={onAddTrack}
-      >
-        <span className="mat-icon material-icons mat-icon-no-color">add</span>
-        <span> Add Track</span>
-      </button> */}
     </>
   );
 }

@@ -39,7 +39,6 @@ export default function ImageAddDialog() {
       );
 
       const newImage: ImageType = {
-        // id: `${new Date().getTime()}`,
         id: v7(),
         type: "image",
         src,

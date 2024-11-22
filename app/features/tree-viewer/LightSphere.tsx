@@ -78,7 +78,6 @@ export default function LightSphere({ sphere, index }: LightSphereProps) {
           console.log(`sphere onClick: ${index}`);
           toggleTreeViewerLightId(sphere.id);
         }}
-        // ref={sphereRef}
       >
         <sphereGeometry args={[isSelected ? 0.4 : 0.3, 16, 16]} />
 

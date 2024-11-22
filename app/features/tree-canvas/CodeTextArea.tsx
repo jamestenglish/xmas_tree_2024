@@ -1,5 +1,4 @@
 import CodeEditor from "@uiw/react-textarea-code-editor";
-// import { forwardRef, TextareaHTMLAttributes } from "react";
 import { useFormContext, Controller } from "react-hook-form";
 
 export const animationOptionsStringDefault = `{
@@ -7,7 +6,6 @@ export const animationOptionsStringDefault = `{
 }
 `;
 
-// const CodeTextArea = (props: TextareaHTMLAttributes<HTMLTextAreaElement>) => {
 const CodeTextArea = () => {
   const { control } = useFormContext();
 

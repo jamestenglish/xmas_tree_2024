@@ -73,12 +73,7 @@ const createRow = ({
   const groupId = group?.id;
   const row: TimelineRowExtra = {
     id: `row_${v7()}`,
-    // style: {
-    //   groupsStyle: {
-    //     // fillColor: "rgba(10, 71, 112, 1)",
-    //     fillColor: "rgba(10, 71, 255, 0.3)",
-    //   },
-    // },
+
     keyframes: [
       {
         id: `A_keyframe_${groupId}`,

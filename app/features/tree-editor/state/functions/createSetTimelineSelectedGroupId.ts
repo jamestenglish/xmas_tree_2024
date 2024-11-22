@@ -120,8 +120,6 @@ function setUnexportedGroups({
     attributesByGroup: state.attributesByGroup,
   });
 
-  console.log("setUnexportedGroups", { isExportedByGroupId });
-
   Object.keys(isExportedByGroupId).forEach((groupId) => {
     if (groupId === timelineSelectedGroupId) {
       return;
@@ -137,30 +135,6 @@ function setUnexportedGroups({
       });
     }
   });
-  // allGroupsIds.forEach((groupId) => {
-  //   if (groupId === timelineSelectedGroupId) {
-  //     return;
-  //   }
-
-  // const attributes = state.attributesByGroup[groupId];
-  // if (attributes) {
-  //   const { canvasLastEditTimestamp, canvasLastExportTimestamp } = attributes;
-
-  //   const isUnexported = getIsUnexported({
-  //     canvasLastEditTimestamp,
-  //     canvasLastExportTimestamp,
-  //   });
-  //   if (isUnexported) {
-  //     const unexportedGroup = createUnexportedGroup(groupId);
-  //     state.isTimelinePlayable = false;
-  //     modelUpdates = replaceGroupWithId({
-  //       timelineSelectedGroupId: groupId,
-  //       timelineModel: modelUpdates,
-  //       newGroup: unexportedGroup,
-  //     });
-  //   }
-  // }
-  // });
 
   return modelUpdates;
 }

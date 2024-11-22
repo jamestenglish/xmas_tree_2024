@@ -7,12 +7,10 @@ import useEditorStore, {
 import { ImageType } from "../EditableImage";
 import { ShapeRefMeta } from "../CanvasEditor.client";
 import getSequenceArgs, {
-  AnimationObject,
   resetAllAnimations,
   SAMPLE_TIME_IN_MS,
 } from "../functions/getSequenceArgs";
-import { animate, MotionValue } from "motion";
-import { AnimateArgs } from "../functions/getAnimationArgsTypes";
+import { animate } from "motion";
 
 interface UseHandleExportArgs {
   stageRef: React.RefObject<Stage>;
@@ -71,14 +69,6 @@ const getSequenceAnimationArgs = ({
         });
         console.log("sequenceArgs", sequenceArgs);
         if (sequenceArgs) {
-          // const [obj, animation, options] = animationArgs;
-          // const synchronizedSequenceArgs = [
-          //   obj,
-          //   animation,
-          //   { ...options, at: "0" },
-          // ];
-          // const [obj, animation, options] = animationArgs;
-          // const synchronizedSequenceArgs = animationArgs;
           console.groupEnd();
           return sequenceArgs;
         }
@@ -127,12 +117,6 @@ const getSequencedAnimationArgs = ({
       console.groupEnd();
 
       return sequenceAnimationArgs;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      // const args = sequenceAnimationArgs as any;
-      // const animationControls = animate(args);
-      // animationControls.pause();
-      // console.groupEnd();
-      // return animationControls;
     }
   }
   console.log("returning null");
@@ -179,24 +163,12 @@ export default function useHandleExport({
 
       console.log({ sequencedAnimationArgs });
 
-      // console.log("playing");
-      // const sequencedAnimationControls = animate(
-      //   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      //   sequencedAnimationArgs as any,
-      // );
-
-      // await sequencedAnimationControls;
-      // sequencedAnimationControls.stop();
-      // console.log("stop");
-
       if (sequencedAnimationArgs && sequencedAnimationArgs?.length > 0) {
         for (let t = 0; t < duration; t += SAMPLE_TIME_IN_MS) {
           console.log("animating");
           const timeInSeconds = t / 1000;
           console.log({ timeInSeconds });
-          // const animateArgs =
-          //   sequencedAnimationArgs[0] as AnimateArgs<AnimationObject>;
-          // const sequencedAnimationControls = animate(...animateArgs);
+
           const sequencedAnimationControls = animate(
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             sequencedAnimationArgs as any,
@@ -206,7 +178,6 @@ export default function useHandleExport({
 
           sequencedAnimationControls.time = timeInSeconds;
           sequencedAnimationControls.play();
-          // stop();
           sequencedAnimationControls.pause();
 
           console.log("sleeping");

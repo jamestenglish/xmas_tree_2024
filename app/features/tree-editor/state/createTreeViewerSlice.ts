@@ -17,12 +17,4 @@ const createTreeViewerSlice: StateCreator<
     set({ treeViewerCylinderOpacity }),
 });
 
-// const useTreeViewerStore = create<TreeViewerState>()(
-//   devtools((set) => ({
-//     treeViewerCylinderOpacity: 0.3,
-//     setTreeViewerCylinderOpacity: (treeViewerCylinderOpacity) =>
-//       set({ treeViewerCylinderOpacity }),
-//   })),
-// );
-
 export default createTreeViewerSlice;

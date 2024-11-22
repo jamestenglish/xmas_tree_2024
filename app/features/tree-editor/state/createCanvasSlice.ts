@@ -54,14 +54,6 @@ export interface CanvasState {
   setCanvasSelectedId: (canvasSelectedId: string | null) => void;
 }
 
-// export interface CanvasState {
-//   // treeViewerCylinderOpacity: number;
-//   // setTreeViewerCylinderOpacity: (treeViewerCylinderOpacity: number) => void;
-
-//   canvasSelectedId: string | null;
-//   setCanvasSelectedId: (canvasSelectedId: string | null) => void;
-// }
-
 const createCanvasSlice: StateCreator<
   StateIntersection,
   [["zustand/devtools", never]],

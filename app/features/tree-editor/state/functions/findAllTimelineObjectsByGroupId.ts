@@ -19,7 +19,6 @@ const findAllTimelineObjectsByGroupId = ({
   timelineModel,
 }: FindAllGroupIdsType) => {
   const init: { [key: string]: GroupMetaType } = {};
-  // console.group("findAllTimelineObjectsByGroupId");
   const allGroupsById = timelineModel?.rows?.reduce((acc, row) => {
     if (row?.keyframes) {
       row.keyframes.forEach((keyframe) => {
@@ -29,10 +28,6 @@ const findAllTimelineObjectsByGroupId = ({
 
           const existingMeta = acc[id] ?? {};
 
-          // console.log(
-          //   "findAllTimelineObjectsByGroupId existingMeta:",
-          //   existingMeta,
-          // );
           const existingGroups = existingMeta.groups ?? [];
           const existingKeyframes = existingMeta.keyframes ?? [];
 
@@ -49,7 +44,6 @@ const findAllTimelineObjectsByGroupId = ({
     }
     return acc;
   }, init);
-  // console.groupEnd();
   return allGroupsById;
 };
 

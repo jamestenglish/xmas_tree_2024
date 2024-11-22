@@ -100,17 +100,6 @@ function CanvasImageFormInner({
             selectedGroup.keyframes[0].val - selectedGroup.keyframes[1].val,
           ) / 1000;
 
-        // const animationArgs = getAnimationArgs({
-        //   canvasImage,
-        //   durationInSeconds,
-        //   shapeRefMeta,
-        // });
-
-        // if (animationArgs) {
-        //   animate(...animationArgs);
-        //   console.log("click");
-        // }
-
         const sequenceArgs = getSequenceArgs({
           canvasImage,
           durationInSeconds,
@@ -165,8 +154,6 @@ function CanvasImageFormInner({
         setCanvasImages(newCanvasImages);
       }
       setSelectedImage(null);
-      // setIsOpen(false);
-      // addImage(data.imgUrl);
     },
     [canvasImages, setCanvasImages, setSelectedImage],
   );
@@ -176,7 +163,7 @@ function CanvasImageFormInner({
   }
 
   const isAnimation = fields && fields.length > 0;
-  // TODO JTE animate: https://motion.dev/docs/animate
+  // animate: https://motion.dev/docs/animate
 
   return (
     <>
@@ -236,7 +223,6 @@ export default function CanvasImageForm({
     animationOptionsString:
       animationOptionsString ?? animationOptionsStringDefault,
   };
-  // console.log({ values });
   const methods = useForm<ImageTypeForm>({
     values,
     defaultValues: values,

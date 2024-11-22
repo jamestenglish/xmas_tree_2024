@@ -62,7 +62,6 @@ export default function EditableImage({
   const shapeRef = useRef<Konva.Image>(null);
   const trRef = useRef<Konva.Transformer>(null);
   const animate = undefined;
-  // const [shapeRef, animate] = useAnimate();
 
   // Attach transformer on image selection
   useEffect(() => {
@@ -96,12 +95,6 @@ export default function EditableImage({
         ref={shapeRef}
         onTransformEnd={onTransformEnd}
         onDragEnd={onTransformEnd}
-
-        // onDragEnd={(e) => {
-        //   // Update image position on drag end
-        //   const node = e.target;
-        //   onTransformEnd(e, img.id, { x: node.x(), y: node.y() });
-        // }}
       />
       {isSelected && (
         <Transformer

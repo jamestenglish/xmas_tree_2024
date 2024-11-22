@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from "react";
+import { useCallback } from "react";
 import Button from "~/features/ui/components/Button";
 import useEditorStore from "../tree-editor/state/useEditorStore";
 import { useShallow } from "zustand/shallow";
@@ -33,8 +33,6 @@ export default function CanvasEditorControls({
     canvasInteractionType,
     setCanvasInteractionType,
     setCanvasSelectedId,
-
-    timelineActionId,
   } = useEditorStore(
     useShallow((state) => ({
       color: state.color,
@@ -49,8 +47,6 @@ export default function CanvasEditorControls({
       canvasInteractionType: state.canvasInteractionType,
       setCanvasInteractionType: state.setCanvasInteractionType,
       setCanvasSelectedId: state.setCanvasSelectedId,
-
-      timelineActionId: state.timelineActionId,
     })),
   );
 
@@ -69,14 +65,6 @@ export default function CanvasEditorControls({
       addSelectedColor(color);
     }
   }, [addSelectedColor, color, setCanvasIsColorPickerOpen]);
-
-  // this is ugly but I can't store the ref in the store
-  useEffect(() => {
-    // TODO JTE would be nice to remove this
-    if (timelineActionId !== null) {
-      handleExport();
-    }
-  }, [handleExport, timelineActionId]);
 
   return (
     <>

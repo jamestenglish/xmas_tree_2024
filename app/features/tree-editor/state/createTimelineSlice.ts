@@ -9,12 +9,6 @@ export interface TimelineState {
   timelineCoarseTime: number;
   setTimelineCoarseTime: (timelineCoarseTime: number) => void;
 
-  // timelineExportState: TimelineExportState;
-  // setTimelineExportState: (timelineExportState: TimelineExportState) => void;
-
-  timelineActionId: string | null;
-  setTimelineActionId: (timelineActionId: string | null) => void;
-
   timelineInteractionMode: TimelineInteractionMode;
   setTimelineInteractionMode: (
     timelineInteractionMode: TimelineInteractionMode,
@@ -32,12 +26,6 @@ const createTimelineSlice: StateCreator<
 > = (set) => ({
   timelineCoarseTime: 0,
   setTimelineCoarseTime: (timelineCoarseTime) => set({ timelineCoarseTime }),
-
-  // timelineExportState: { status: "IDLE", groupIds: [] },
-  // setTimelineExportState: (timelineExportState) => set({ timelineExportState }),
-
-  timelineActionId: null,
-  setTimelineActionId: (timelineActionId) => set({ timelineActionId }),
 
   timelineInteractionMode: TimelineInteractionMode.Pan,
   setTimelineInteractionMode: (timelineInteractionMode) =>

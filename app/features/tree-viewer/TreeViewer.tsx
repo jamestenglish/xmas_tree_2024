@@ -1,22 +1,14 @@
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
-import { useRef, useEffect, useMemo } from "react";
-import pos2 from "./pos2";
+
 import {
   EffectComposer,
   Bloom,
   ToneMapping,
 } from "@react-three/postprocessing";
-import LightSphere, { SphereProps } from "./LightSphere";
-import useEditorStore, {
-  ByGroupType,
-  CanvasExport,
-  TimelineSelectedGroupIdType,
-} from "../tree-editor/state/useEditorStore";
-import { useShallow } from "zustand/react/shallow";
+
 import TreeViewerControls from "./TreeViewerControls";
-import memoize from "memoize";
 import CylinderScene from "./CylinderScene";
 
 THREE.ColorManagement.enabled = true;
@@ -38,7 +30,6 @@ export interface CylinderFormDataProps {
 }
 
 const TreeViewer = () => {
-  // const sphereRef = useEditorStore((state) => state.sphereRefs[0]);
   return (
     <>
       <div className="flex flex-col">
@@ -54,12 +45,10 @@ const TreeViewer = () => {
             <EffectComposer>
               <Bloom
                 mipmapBlur
-                // luminanceThreshold={1}
                 luminanceThreshold={0.1}
                 levels={8}
                 intensity={0.4 * 4}
               />
-              {/* <Outline selection={sphereRef ? [sphereRef] : []} /> */}
               <ToneMapping />
             </EffectComposer>
             <CylinderScene />

@@ -14,7 +14,6 @@ setAutoFreeze(false);
 function useSyncModel(timeline: Timeline | undefined) {
   const timelineModel = useEditorStore((state) => state.timelineModel);
   useEffect(() => {
-    // console.log("setting timelineModel", { timelineModel });
     timeline?.setModel(timelineModel);
   }, [timelineModel, timeline]);
 }

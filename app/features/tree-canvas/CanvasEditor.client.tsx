@@ -63,7 +63,6 @@ function CanvasImgs({ shapeRefsMeta }: { shapeRefsMeta: ShapeRefMeta[] }) {
           return (
             <div
               key={img.id}
-              // style={{ width: `${img.width}px`, height: `${img.height}px` }}
               className="grid max-h-16 max-w-16 grid-cols-12 grid-rows-12"
             >
               <img

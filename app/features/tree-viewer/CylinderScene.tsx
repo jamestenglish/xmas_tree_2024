@@ -57,7 +57,6 @@ const getTextureUrls = ({
     canvasExports?.[0]?.canvasCylinderImgUrl ?? defaultImage,
   ];
   if (isTimelinePlaying) {
-    // TODO JTE figure out
     const initial =
       allCanvasExports.map((obj) => obj.canvasCylinderImgUrl) ?? [];
     return [TRANSPARENT_IMG, ...initial];
@@ -167,8 +166,6 @@ const getSpheres = ({
   });
 
   return generatedSpheres;
-  // }
-  // return generateSpheres();
 };
 
 const CylinderScene = () => {

@@ -6,7 +6,6 @@ export default function createToggeLightId(selectedLightId: number | null) {
     if (selectedLightId !== null) {
       let treeViewerSelectedLightIds = state.treeViewerSelectedLightIds ?? [];
 
-      // const { treeViewerSelectedLightIds } = state;
       if (treeViewerSelectedLightIds.includes(selectedLightId)) {
         treeViewerSelectedLightIds = treeViewerSelectedLightIds.filter(
           (id) => id !== selectedLightId,

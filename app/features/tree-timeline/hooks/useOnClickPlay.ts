@@ -2,7 +2,6 @@ import { Timeline } from "animation-timeline-js";
 import { useCallback, useEffect } from "react";
 import { useShallow } from "zustand/shallow";
 import { SAMPLE_TIME_IN_MS } from "~/features/tree-canvas/functions/getSequenceArgs";
-// import useOnClickPlayStateMachine from "./useOnClickPlayStateMachine";
 import useEditorStore from "~/features/tree-editor/state/useEditorStore";
 
 const playStep = 50;
@@ -101,8 +100,6 @@ export default function useOnClickPlay({
 
   const onClickPlay = useCallback(
     (_event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-      // const startPlaying = () => {
-
       setTimelinePlayingState("playing");
 
       if (timeline) {
@@ -110,14 +107,9 @@ export default function useOnClickPlay({
         // Don't allow to manipulate timeline during playing (optional).
         timeline.setOptions({ timelineDraggable: false });
       }
-      // };
-
-      // startPlaying();
     },
     [moveTimelineIntoTheBounds, setTimelinePlayingState, timeline],
   );
-
-  // useOnClickPlayStateMachine();
 
   return { onClickPlay };
 }

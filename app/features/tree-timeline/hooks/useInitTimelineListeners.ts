@@ -52,12 +52,7 @@ const useInitTimelineListeners = ({
         if (obj.elements) {
           onDragTimeline(obj.elements, "continue");
         }
-        // logDraggingMessage(obj, "drag");
       });
-
-      // timeline.onKeyframeChanged(function (obj) {
-      //   console.log("keyframe: " + obj.val);
-      // });
 
       timeline.onDragFinished(function (obj) {
         if (obj.elements) {
@@ -66,36 +61,17 @@ const useInitTimelineListeners = ({
         logDraggingMessage(obj, "dragfinished");
       });
 
-      // timeline.onContextMenu(function (obj) {
-      //   if (obj.args) {
-      //     obj.args.preventDefault();
-      //   }
-      //   logDraggingMessage(obj, "addKeyframe");
-
-      //   obj.elements.forEach((p) => {
-      //     if (p.type === "row" && p.row) {
-      //       if (!p.row?.keyframes) {
-      //         p.row.keyframes = [];
-      //       }
-      //       p.row?.keyframes?.push({ val: obj.point?.val || 0 });
-      //     }
-      //   });
-      //   timeline.redraw();
-      // });
-
       timeline.onMouseDown(function (obj) {
         const type = obj.target ? obj.target.type : "";
         if (obj.pos) {
           console.log({ targ: obj.target });
           let groupId: string | null = null;
-          let from = "";
           if (obj?.target?.group) {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const unknownGroup = obj?.target?.group as any;
             if (unknownGroup?.id) {
               const groupExtra = unknownGroup as TimelineGroupExtra;
               groupId = groupExtra.id ?? null;
-              from = "group";
             }
           }
           if (obj?.target?.keyframe) {
@@ -104,11 +80,9 @@ const useInitTimelineListeners = ({
             if (unknownGroup?.id) {
               const groupExtra = unknownGroup as TimelineGroupExtra;
               groupId = groupExtra.id ?? null;
-              // from = "keyframe";
             }
           }
           if (groupId) {
-            // console.log("useInitTimelineListeners groupId", groupId, from);
             setTimelineSelectedGroupId(groupId);
           }
           logMessage(
@@ -155,7 +129,6 @@ const useInitTimelineListeners = ({
             }
           }
         }
-        // showActivePositionInformation();
       });
 
       timeline.onScrollFinished(function (_) {

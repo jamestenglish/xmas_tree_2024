@@ -38,7 +38,6 @@ export default function useOnMouseMove() {
         if (lastLine) {
           lastLine.points = lastLine.points.concat([point.x, point.y]);
           canvasLines.splice(canvasLines.length - 1, 1, lastLine);
-          // setCanvasLines(canvasLines.concat());
           setCanvasLines(canvasLines);
         }
       }

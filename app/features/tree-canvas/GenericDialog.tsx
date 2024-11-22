@@ -1,10 +1,6 @@
 /* eslint-disable react/jsx-no-comment-textnodes */
 import { PropsWithChildren, useEffect } from "react";
 
-// function HomePage({
-//   children,
-// }: PropsWithChildren<HomePageFormProviderProps>) {
-
 interface GenericDialogProps {
   onClickClose: () => void;
   id: string;

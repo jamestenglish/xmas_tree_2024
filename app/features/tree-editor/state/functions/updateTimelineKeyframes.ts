@@ -1,13 +1,7 @@
 import { EditorState } from "../useEditorStore";
 import findAllTimelineObjectsByGroupId from "./findAllTimelineObjectsByGroupId";
 
-const updateTimelineKeyframes = ({
-  state,
-  // timelineModel,
-}: {
-  // timelineModel: TimelineModelExtra;
-  state: EditorState;
-}) => {
+const updateTimelineKeyframes = ({ state }: { state: EditorState }) => {
   // ---
   const { timelineModel } = state;
   const allTimelineObjectsByGroupId = findAllTimelineObjectsByGroupId({

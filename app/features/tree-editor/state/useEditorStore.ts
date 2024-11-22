@@ -1,8 +1,5 @@
 import { create, StateCreator } from "zustand";
-import {
-  devtools,
-  // persist
-} from "zustand/middleware";
+import { devtools } from "zustand/middleware";
 import type {} from "@redux-devtools/extension"; // required for devtools typing
 import { TimelineModelExtra } from "~/features/tree-timeline/functions/createRow";
 import { Timeline, TimelineElementDragState } from "animation-timeline-js";
@@ -122,11 +119,6 @@ const createEditorSlice: StateCreator<
   timelineKeyframeStart: defaultByGroup.timelineKeyframeStart,
 
   canvasExports: defaultByGroup.canvasExports,
-  // setCanvasExports: (canvasExports) => {
-  //   const canvasLastExportTimestamp = new Date().getTime();
-  //   // TODO JTE here? isTimelinePlayable?
-  //   set({ canvasExports, canvasLastExportTimestamp });
-  // },
 
   setCanvasExports: (canvasExports) =>
     set(

@@ -9,18 +9,6 @@ import { motionValue } from "motion";
 
 export const SAMPLE_TIME_IN_MS = 100;
 
-// type ImageKeyframeType<T> = {
-//   [K in keyof T]: T[K][];
-// };
-
-// type ImageKeyframeType = {
-//   x: MotionValue<number>[];
-//   y: MotionValue<number>[];
-//   width: MotionValue<number>[];
-//   height: MotionValue<number>[];
-//   rotation: MotionValue<number>[];
-// };
-
 type ImageKeyframeType = {
   x: number[];
   y: number[];
@@ -51,14 +39,6 @@ const formDataToKeyframes = ({
 }: FormDataToKeyFramesArgs) => {
   const combined = [{ ...initialState }, ...animationKeyFrames];
 
-  // const init: ImageKeyframeType<ImageTypeAnimationValues> = {
-  //   x: [],
-  //   y: [],
-  //   height: [],
-  //   width: [],
-  //   rotation: [],
-  // };
-
   const init: ImageKeyframeType = {
     x: [],
     y: [],
@@ -75,7 +55,6 @@ const formDataToKeyframes = ({
       if (!prev) {
         return acc;
       }
-      // (acc[key] as number[]) = [...prev, Math.round(Number(value))];
       acc[key] = [...prev, Math.round(Number(value))];
     });
     return acc;
@@ -83,10 +62,6 @@ const formDataToKeyframes = ({
 
   return keyframes;
 };
-
-// interface GetAnimationArgs {
-//   initialState: InitialStateType;
-// }
 
 interface GetAnimationArgsArgs {
   canvasImage: ImageType;
@@ -105,50 +80,6 @@ export interface AnimationObject {
   height: number;
   rotation: number;
 }
-
-// export default function getAnimationArgs({
-//   canvasImage,
-//   durationInSeconds,
-//   shapeRefMeta,
-// }: GetAnimationArgsArgs) {
-//   const { animationKeyFrames, animationOptions, ...initialState } = canvasImage;
-//   const animationObject: AnimationObject = { ...initialState };
-//   if (animationKeyFrames) {
-//     const keyframes = formDataToKeyframes({
-//       initialState,
-//       animationKeyFrames,
-//     });
-
-//     console.log({ keyframes });
-
-//     const value = motionValue<AnimationObject>(animationObject);
-//     const result: AnimateArgs<MotionValue<AnimationObject>> = [
-//       // animationObject,
-//       value,
-//       {
-//         ...keyframes,
-//       },
-//       {
-//         ...animationOptions,
-//         duration: durationInSeconds - SAMPLE_TIME_IN_MS / 1000, // fence post problem
-//         onUpdate: (...latest) => {
-//           console.log("onUpdate", {
-//             latest,
-//             animationObject,
-//             shapeRefMeta: shapeRefMeta.ref.current,
-//           });
-//           shapeRefMeta.ref.current?.position(animationObject);
-//           shapeRefMeta.ref.current?.rotation(animationObject.rotation);
-//           shapeRefMeta.ref.current?.height(animationObject.height);
-//           shapeRefMeta.ref.current?.width(animationObject.width);
-//         },
-//       },
-//     ];
-
-//     return result;
-//   }
-//   return null;
-// }
 
 const keysObj = { x: 0, y: 0, height: 0, width: 0, rotation: 0 } as const;
 
@@ -174,18 +105,15 @@ const getAnimationArgForKey = ({
 
     const value = motionValue<number>(animationObject[key] as number);
     value.on("change", (latestValue) => {
-      // console.log(`${key} latestValue`, latestValue);
       shapeRefMeta.ref.current?.[key](latestValue);
     });
     const result: AnimateArgs = [
-      // animationObject,
       value,
-
       keyframes[key],
-
       {
         ...animationOptions,
-        duration: durationInSeconds - SAMPLE_TIME_IN_MS / 1000, // fence post problem
+        // fence post problem
+        duration: durationInSeconds - SAMPLE_TIME_IN_MS / 1000,
       },
     ];
 
@@ -199,7 +127,6 @@ function getAnimationArgs({
   durationInSeconds,
   shapeRefMeta,
 }: GetAnimationArgsArgs) {
-  // const { animationKeyFrames, animationOptions, ...initialState } = canvasImage;
   const args = Object.keys(keysObj).map((key) => {
     return getAnimationArgForKey({
       key: key as keyof typeof keysObj,
