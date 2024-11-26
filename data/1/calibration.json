@@ -1,0 +1,34 @@
+{
+  "1732594750559": {
+    "calibrationData": [
+      {
+        "position": "front",
+        "ledPositionMeta": {
+          "x": 441.0990268843807,
+          "y": 417.5187201055583,
+          "maxDifference": 144,
+          "ledIndex": 0
+        }
+      },
+      {
+        "position": "back",
+        "ledPositionMeta": {
+          "x": 235.3671355998437,
+          "y": 455.7747166862055,
+          "maxDifference": 21,
+          "ledIndex": 0
+        }
+      },
+      {
+        "position": "right",
+        "ledPositionMeta": {
+          "x": 449.8869500372856,
+          "y": 422.0802386278896,
+          "maxDifference": 26,
+          "ledIndex": 0
+        }
+      },
+      null
+    ]
+  }
+}

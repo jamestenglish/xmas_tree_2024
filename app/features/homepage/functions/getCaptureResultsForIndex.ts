@@ -2,6 +2,13 @@ import { VideoContainerRef } from "~/features/video-output/components/VideoSelec
 import { PromiseStateType } from "~/features/led-detection/functions/imageProcessingTypes";
 import { turnLightOff, turnLightOn } from "./lightApi";
 
+const sleep = async (time: number) => {
+  const p = new Promise<void>((resolve) => {
+    setTimeout(() => resolve(), time);
+  });
+  return p;
+};
+
 export type RefObjType = {
   frontRef: React.RefObject<VideoContainerRef>;
   backRef: React.RefObject<VideoContainerRef>;
@@ -109,6 +116,7 @@ const getCaptureResultsForIndex = async ({
   );
 
   const captureResults = await Promise.all(ledCapturePromises);
+  // await sleep(2000);
 
   // captureResults.forEach((captureResult) => {
   //   if (captureResult !== null) {

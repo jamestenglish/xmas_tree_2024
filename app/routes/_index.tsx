@@ -94,7 +94,10 @@ const defaultResult: HomepageDataType = {
 };
 
 const actionCapture = async (unverifiedFormData: unknown) => {
-  const formData = homepageSchema.parse(unverifiedFormData);
+  // const formData = homepageSchema.parse(unverifiedFormData);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const formData = unverifiedFormData as any;
+
   console.log("_index actionCapture formData: ", formData);
 
   // fs.writeFileSync(resultsFilePath, JSON.stringify(formData, null, 2));
