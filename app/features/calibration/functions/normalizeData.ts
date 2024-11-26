@@ -1,4 +1,4 @@
-import { LedPosProps } from "~/features/led-detection/functions/imageProcessingTypes";
+import { LedPosProps } from "~/routes/_index";
 import { MappedCaptureDataType, OptionLedPosArrayType } from "./mapData";
 
 type NormalizeArrayArgs = {

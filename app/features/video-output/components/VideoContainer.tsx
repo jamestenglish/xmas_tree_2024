@@ -7,16 +7,31 @@ import {
 } from "react";
 import Canvas from "./Canvas.client";
 import Button from "~/features/ui/components/Button";
-import { calibrateUsingCamera } from "~/features/led-detection/functions/imageProcessing.client";
-import useLocalStorageInternal from "~/features/common/hooks/useLocalStorageInternal";
-import type { CaptureArgs, VideoContainerRef } from "./VideoSelectorTypes";
+import {
+  getLightOffImage,
+  getLightOnPosition,
+} from "~/features/led-detection/functions/imageProcessing.client";
+// import useLocalStorageInternal from "~/features/common/hooks/useLocalStorageInternal";
+import type {
+  CaptureLedRefTypeArgs,
+  CaptureNoLedArgs,
+  VideoContainerRef,
+} from "./VideoSelectorTypes";
+import {
+  PositionMasksType,
+  PositionPathsType,
+  PositionsType,
+} from "~/routes/_index";
+import { FetcherWithComponents, useFetcher } from "@remix-run/react";
 
 interface PlayVideoProps {
   deviceId: string;
 }
 
 interface VideoContainerProps extends PlayVideoProps {
-  position: string;
+  position: PositionsType;
+  positionMasks: PositionMasksType;
+  positionPaths: PositionPathsType;
 }
 
 interface ImageMetaProps {
@@ -38,6 +53,24 @@ interface UsePlayVideoProps {
     } | null>
   >;
 }
+
+const uploadImage = (
+  deviceId: string,
+  fetcher: FetcherWithComponents<unknown>,
+  ledIndex: number,
+  position: PositionsType,
+) => {
+  const canvas = document.getElementById(
+    `calibrate${deviceId}`,
+  ) as HTMLCanvasElement;
+
+  const dataUrl = canvas.toDataURL("image/png");
+
+  fetcher.submit(
+    { dataUrl, ledIndex, position },
+    { method: "POST", encType: "application/json", action: "/image" },
+  );
+};
 
 const usePlayVideo = ({
   setVideoElement,
@@ -85,15 +118,27 @@ const usePlayVideo = ({
   }, [deviceId, position, setDimensions, setVideoElement]);
 };
 
+const defaultMaskArray = [false];
+
 const VideoContainer = forwardRef<VideoContainerRef, VideoContainerProps>(
-  ({ deviceId, position }: VideoContainerProps, ref) => {
+  (
+    { deviceId, position, positionMasks, positionPaths }: VideoContainerProps,
+    ref,
+  ) => {
     const [videoElement, setVideoElement] = useState<HTMLVideoElement | null>(
       null,
     );
     const [imgUrlMeta, setImgUrlMeta] = useState<ImageMetaProps | undefined>();
-    const [maskArrayStorage, setMaskArrayStorage] = useLocalStorageInternal<
-      Array<boolean>
-    >(`mask-${position}`, []);
+    // const { homepageMasks } = useHomepageStore(
+    //   useShallow((state) => ({
+    //     homepageMasks: state.homepageMasks,
+    //   })),
+    // );
+
+    const maskArray = positionMasks[position] ?? defaultMaskArray;
+
+    const fetcher = useFetcher();
+
     const [dimensions, setDimensions] = useState<{
       height: number;
       width: number;
@@ -126,24 +171,43 @@ const VideoContainer = forwardRef<VideoContainerRef, VideoContainerProps>(
 
     useImperativeHandle(ref, () => {
       return {
-        // TODO JTE
-        capture: async ({ ledIndex, promiseObj }: CaptureArgs) => {
+        captureNoLed: async ({ promiseObj }: CaptureNoLedArgs) => {
           if (videoElement !== null) {
             // const promiseArg = promiseObj ?? defaultPromiseArg;
-            const ledPositionMeta = await calibrateUsingCamera(
+            const imageBytesNoLeds = await getLightOffImage(
               deviceId,
               videoElement,
-              maskArrayStorage,
-              ledIndex,
+              maskArray,
               promiseObj,
             );
+
+            return { position, imageBytesNoLeds };
+          }
+          return null;
+        },
+
+        captureLed: async ({
+          ledIndex,
+          imageBytesNoLeds,
+        }: CaptureLedRefTypeArgs) => {
+          if (videoElement !== null) {
+            // const promiseArg = promiseObj ?? defaultPromiseArg;
+            const ledPositionMeta = await getLightOnPosition(
+              deviceId,
+              videoElement,
+              maskArray,
+              ledIndex,
+              imageBytesNoLeds,
+            );
+
+            uploadImage(deviceId, fetcher, ledIndex, position);
 
             return { position, ledPositionMeta };
           }
           return null;
         },
       };
-    }, [deviceId, maskArrayStorage, position, videoElement]);
+    }, [deviceId, fetcher, maskArray, position, videoElement]);
 
     return (
       <>
@@ -180,7 +244,7 @@ const VideoContainer = forwardRef<VideoContainerRef, VideoContainerProps>(
             width={imgUrlMeta?.width}
             deviceId={deviceId}
             position={position}
-            setMaskArrayStorage={setMaskArrayStorage}
+            positionPaths={positionPaths}
           />
           <canvas
             id={`onCreateMask${deviceId}`}

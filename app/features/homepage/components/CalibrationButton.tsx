@@ -3,23 +3,22 @@ import { useCallback, useState } from "react";
 import Button from "~/features/ui/components/Button";
 import { PromiseStateType } from "~/features/led-detection/functions/imageProcessingTypes";
 import getPromiseWithResolver from "~/features/common/functions/getPromiseWithResolver";
-import { CaptureDataType } from "../hooks/useCaptureDataLocalStorage";
-import saveCaptureResultsForIndex, {
+import getCaptureResultsForIndex, {
   RefObjType,
-} from "../functions/saveCaptureResultsForIndex";
+} from "../functions/getCaptureResultsForIndex";
+import { useFetcher } from "@remix-run/react";
 
 export type CalibrationButtonProps = {
   refsObj: RefObjType;
-  setCaptureData: React.Dispatch<React.SetStateAction<CaptureDataType>>;
 };
 
 type CalibrationStateType =
   | "Calibrate A"
   | "Calibrate A Finish"
-  | "Calibrate B"
-  | "Calibrate B Finish"
-  | "Calibrate C"
-  | "Calibrate C Finish"
+  // | "Calibrate B"
+  // | "Calibrate B Finish"
+  // | "Calibrate C"
+  // | "Calibrate C Finish"
   | "Restart";
 
 type CalibrationStateMachineType = {
@@ -37,32 +36,37 @@ const calibrationStateMachine: CalibrationStateMachineType = {
     doCreatePromise: true,
   },
   ["Calibrate A Finish"]: {
-    nextState: "Calibrate B",
+    nextState: "Restart",
     ledIndex: 0,
     doCreatePromise: false,
   },
+  // ["Calibrate A Finish"]: {
+  //   nextState: "Calibrate B",
+  //   ledIndex: 0,
+  //   doCreatePromise: false,
+  // },
 
-  ["Calibrate B"]: {
-    nextState: "Calibrate B Finish",
-    ledIndex: 1,
-    doCreatePromise: true,
-  },
-  ["Calibrate B Finish"]: {
-    nextState: "Calibrate C",
-    ledIndex: 1,
-    doCreatePromise: false,
-  },
+  // ["Calibrate B"]: {
+  //   nextState: "Calibrate B Finish",
+  //   ledIndex: 1,
+  //   doCreatePromise: true,
+  // },
+  // ["Calibrate B Finish"]: {
+  //   nextState: "Calibrate C",
+  //   ledIndex: 1,
+  //   doCreatePromise: false,
+  // },
 
-  ["Calibrate C"]: {
-    nextState: "Calibrate C Finish",
-    ledIndex: 2,
-    doCreatePromise: true,
-  },
-  ["Calibrate C Finish"]: {
-    nextState: "Restart",
-    ledIndex: 2,
-    doCreatePromise: false,
-  },
+  // ["Calibrate C"]: {
+  //   nextState: "Calibrate C Finish",
+  //   ledIndex: 2,
+  //   doCreatePromise: true,
+  // },
+  // ["Calibrate C Finish"]: {
+  //   nextState: "Restart",
+  //   ledIndex: 2,
+  //   doCreatePromise: false,
+  // },
   ["Restart"]: {
     nextState: "Calibrate A",
     ledIndex: -1,
@@ -78,10 +82,9 @@ const advanceCalibrationState = (prev: CalibrationStateType) => {
   return nextState;
 };
 
-const CalibrationButton = ({
-  refsObj,
-  setCaptureData,
-}: CalibrationButtonProps) => {
+const CalibrationButton = ({ refsObj }: CalibrationButtonProps) => {
+  const fetcher = useFetcher();
+
   const [calibrationState, setCalibrationState] =
     useState<CalibrationStateType>("Calibrate A");
 
@@ -101,17 +104,24 @@ const CalibrationButton = ({
 
     const saveCaptureResult = async () => {
       console.group("onCalibrationClick.saveCaptureResult");
-      await saveCaptureResultsForIndex({
+      // TODO JTE SAVE w/ form
+      const calibrationData = await getCaptureResultsForIndex({
         refsObj,
         ledIndex,
-        setCaptureData,
+        // setCaptureData,
         promiseObj: newPromiseObj,
       });
+
+      console.log({ calibrationData });
 
       console.log("advance 2");
 
       setCalibrationState(advanceCalibrationState);
       console.groupEnd();
+      fetcher.submit(
+        { calibrationData, intent: "calibrate" },
+        { method: "POST", encType: "application/json" },
+      );
     };
 
     console.info({ doCreatePromise });
@@ -119,7 +129,7 @@ const CalibrationButton = ({
       saveCaptureResult();
     }
     console.groupEnd();
-  }, [calibrationState, refsObj, setCaptureData]);
+  }, [calibrationState, fetcher, refsObj]);
 
   const onCalibrationFinishClick = useCallback(() => {
     const { doCreatePromise } = calibrationStateMachine[calibrationState];

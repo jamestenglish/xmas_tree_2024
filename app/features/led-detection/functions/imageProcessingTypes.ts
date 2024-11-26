@@ -1,10 +1,9 @@
-export interface LedPosProps {
-  x: number;
-  y: number;
-  maxDifference: number;
-  ledIndex: number;
-  highlightedImageData?: ImageData;
-}
+// export interface LedPosProps {
+//   x: number;
+//   y: number;
+//   maxDifference: number;
+//   ledIndex: number;
+// }
 
 export type ResolveType = () => void;
 

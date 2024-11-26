@@ -4,14 +4,21 @@ import VideoContainer from "~/features/video-output/components/VideoContainer";
 import type { VideoContainerRef } from "./VideoSelectorTypes";
 import { DeviceMetaType } from "~/features/homepage/hooks/useDeviceMeta";
 import { useFormContext } from "react-hook-form";
+import {
+  PositionMasksType,
+  PositionPathsType,
+  PositionsType,
+} from "~/routes/_index";
 
 interface DeviceSelectorProps {
   deviceMetas: DeviceMetaType[];
-  position: string;
+  position: PositionsType;
 }
 
 export interface VideoSelectorProps extends DeviceSelectorProps {
   selectedDeviceId?: string;
+  positionMasks: PositionMasksType;
+  positionPaths: PositionPathsType;
 }
 
 const DeviceSelector = ({ position, deviceMetas }: DeviceSelectorProps) => {
@@ -33,7 +40,10 @@ const DeviceSelector = ({ position, deviceMetas }: DeviceSelectorProps) => {
 };
 
 const VideoSelector = forwardRef<VideoContainerRef, VideoSelectorProps>(
-  ({ deviceMetas, position }: VideoSelectorProps, ref) => {
+  (
+    { deviceMetas, position, positionMasks, positionPaths }: VideoSelectorProps,
+    ref,
+  ) => {
     const { watch } = useFormContext();
     const selectedDeviceId = watch(`${position}DeviceId`);
     return (
@@ -44,6 +54,8 @@ const VideoSelector = forwardRef<VideoContainerRef, VideoSelectorProps>(
             ref={ref}
             deviceId={selectedDeviceId}
             position={position}
+            positionMasks={positionMasks}
+            positionPaths={positionPaths}
           />
         )}
       </>

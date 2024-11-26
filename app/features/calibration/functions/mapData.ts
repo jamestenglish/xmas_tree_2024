@@ -1,5 +1,5 @@
-import { CaptureDataType } from "~/features/homepage/hooks/useCaptureDataLocalStorage";
-import { LedPosProps } from "~/features/led-detection/functions/imageProcessingTypes";
+import { CaptureDataType } from "~/features/homepage/components/Homepage";
+import { LedPosProps } from "~/routes/_index";
 
 export type MapDataArgs = {
   captureData: CaptureDataType;

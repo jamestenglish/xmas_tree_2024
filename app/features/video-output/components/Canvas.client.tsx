@@ -5,7 +5,13 @@ import {
 } from "react-sketch-canvas";
 import { useCallback, useEffect, useRef, useState } from "react";
 import Button from "~/features/ui/components/Button";
-import useLocalStorageInternal from "~/features/common/hooks/useLocalStorageInternal";
+import {
+  HomepageDataType,
+  loader,
+  PositionPathsType,
+  PositionsType,
+} from "~/routes/_index";
+import { useFetcher, useLoaderData } from "@remix-run/react";
 
 interface useInitializeProps {
   canvasRef: React.RefObject<ReactSketchCanvasRef>;
@@ -33,13 +39,15 @@ const useInitialize = ({
 
 const styles = {};
 
+const defaultPathsStorage = [] as CanvasPath[];
+
 interface CanvasProps {
   imgUrl?: string;
   height?: number;
   width?: number;
   deviceId: string;
-  position: string;
-  setMaskArrayStorage: React.Dispatch<React.SetStateAction<boolean[]>>;
+  position: PositionsType;
+  positionPaths: PositionPathsType;
 }
 export default function Canvas({
   deviceId,
@@ -47,16 +55,44 @@ export default function Canvas({
   width,
   height,
   position,
-  setMaskArrayStorage,
+  positionPaths,
 }: CanvasProps) {
   const canvasRef = useRef<ReactSketchCanvasRef>(null);
   const [eraseMode, setEraseMode] = useState<boolean>(false);
   const [strokeWidth, setStrokeWidth] = useState<number>(40);
   const [doShowBackground, setDoShowBackground] = useState<boolean>(true);
-  const [pathsStorage, setPathsStorage] = useLocalStorageInternal<CanvasPath[]>(
-    `paths-${position}`,
-    [],
+  const [currentPositionPaths, setCurrentPositionPaths] =
+    useState<PositionPathsType>(positionPaths);
+
+  const loaderData = useLoaderData<typeof loader>();
+  const fetcher = useFetcher();
+  // const [pathsStorage, setPathsStorage] = useLocalStorageInternal<CanvasPath[]>(
+  //   `paths-${position}`,
+  //   [],
+  // );
+
+  // const { homepagePaths, setHomepagePaths, setHomepageMasks } =
+  //   useHomepageStore(
+  //     useShallow((state) => ({
+  //       homepagePaths: state.homepagePaths,
+  //       setHomepagePaths: state.setHomepagePaths,
+  //       setHomepageMasks: state.setHomepageMasks,
+  //     })),
+  //   );
+
+  const setPaths = useCallback(
+    (paths: CanvasPath[]) => {
+      setCurrentPositionPaths((prev) => {
+        return {
+          ...prev,
+          [position]: paths,
+        };
+      });
+    },
+    [position],
   );
+
+  const pathsStorage = currentPositionPaths[position] ?? defaultPathsStorage;
 
   useInitialize({ canvasRef, imgUrl, pathsStorage });
 
@@ -80,8 +116,8 @@ export default function Canvas({
 
   const handleClearClick = useCallback(() => {
     canvasRef.current?.clearCanvas();
-    setPathsStorage([]);
-  }, [setPathsStorage]);
+    setPaths([]);
+  }, [setPaths]);
 
   const handlePlus = useCallback(() => {
     setStrokeWidth((prev) => prev + 5);
@@ -99,7 +135,7 @@ export default function Canvas({
     const save = async () => {
       if (canvasRef.current && width && height) {
         const paths = await canvasRef.current.exportPaths();
-        setPathsStorage(paths);
+        setPaths(paths);
 
         const canvas = document.getElementById(
           `maskCanvas-${deviceId}`,
@@ -134,7 +170,19 @@ export default function Canvas({
             }
           }
         }
-        setMaskArrayStorage(maskArray);
+        const newData: HomepageDataType = {
+          ...loaderData,
+          intent: "state",
+          positionMasks: {
+            ...loaderData.positionMasks,
+            [position]: maskArray,
+          },
+          positionPaths: currentPositionPaths,
+        };
+        fetcher.submit(newData, {
+          method: "POST",
+          encType: "application/json",
+        });
       }
     };
     save();

@@ -4,4 +4,5 @@ export interface FormDataProps {
   leftDeviceId?: string;
   backDeviceId?: string;
   numLights?: number;
+  currentLedIndex?: number;
 }

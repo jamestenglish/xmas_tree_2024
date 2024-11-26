@@ -1,6 +1,6 @@
 import { StateCreator } from "zustand";
 
-import { TimelineInteractionMode } from "animation-timeline-js";
+import { TimelineInteractionMode } from "animation-timeline-js/lib/enums/timelineInteractionMode";
 import { StateIntersection } from "./useEditorStore";
 
 export type TimelinePlayingState = "idle" | "loading" | "playing";
