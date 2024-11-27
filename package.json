@@ -11,7 +11,8 @@
     "start": "mkdir -p ignore/imgs && PORT=5173 remix-serve ./build/server/index.js",
     "typecheck": "tsc",
     "prod": "npm run build && npm run start",
-    "prettier": "prettier"
+    "prettier": "prettier",
+    "crunch": "node data/cruncher.mjs"
   },
   "dependencies": {
     "@react-spring/web": "^9.7.5",
