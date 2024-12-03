@@ -15,11 +15,16 @@ export const action = async (actionArgs: ActionFunctionArgs) => {
   const { request } = actionArgs;
   console.log(request.headers);
   const data = await request.json();
-  const { dataUrl, ledIndex, position } = data;
+  const { dataUrl, blurDataUrl, ledIndex, position } = data;
 
   await imageDataURI.outputFile(
     dataUrl,
     `${resultsDefaultPath}/${ledIndex}-${position}-img.png`,
+  );
+
+  await imageDataURI.outputFile(
+    blurDataUrl,
+    `${resultsDefaultPath}/${ledIndex}-${position}-blur-img.png`,
   );
   return json({});
 };

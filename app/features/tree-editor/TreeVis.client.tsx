@@ -7,153 +7,81 @@ import {
   Bloom,
   ToneMapping,
 } from "@react-three/postprocessing";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 
-import json from "./functions/getCrunchedNumbers";
+import getCrunchedNumbers from "./functions/getCrunchedNumbers";
+import { PositionsType } from "~/routes/_index";
+import { create } from "zustand";
+import { devtools } from "zustand/middleware";
+import type {} from "@redux-devtools/extension"; // required for devtools typing
+import { useShallow } from "zustand/shallow";
+import TreeVisScatter from "./TreeVisScatter";
+import { useForm } from "react-hook-form";
 
-/*
-{
-    "sphere": {
-        "position": [
-            41.849492900608524,
-            39.988403041825094,
-            3.3580121703853956
-        ],
-        "color": 16777215,
-        "id": "890",
-        "ledIndex": "890",
-        "positionsUsed": [
-            "front",
-            "left"
-        ]
-    }
-}
-  {
-    "sphere": {
-        "position": [
-            41.849492900608524,
-            40.1734335839599,
-            3.3580121703853956
-        ],
-        "color": 65280,
-        "id": "890",
-        "ledIndex": "890",
-        "positionsUsed": [
-            "front",
-            "right"
-        ]
-    }
+interface BearState {
+  sphere: SphereVisProps | null;
+  setSphere: (sphere: SphereVisProps) => void;
+  min: number;
+  setMin: (min: number) => void;
+  max: number;
+  setMax: (max: number) => void;
+  radius: number;
+  setRadius: (radius: number) => void;
+  plotsOn: string;
+  setPlotsOn: (plotsOn: string) => void;
 }
 
----
+export const useStore = create<BearState>()(
+  devtools((set) => ({
+    sphere: null,
+    setSphere: (sphere) => set({ sphere }),
+    min: 59,
+    setMin: (min) => set({ min }),
+    max: 63,
+    setMax: (max) => set({ max }),
+    radius: 6,
+    setRadius: (radius) => set({ radius }),
+    plotsOn: "01234",
+    setPlotsOn: (plotsOn) => set({ plotsOn }),
+  })),
+);
 
-{
-    "sphere": {
-        "position": [
-            38.818938547486034,
-            46.40632350434635,
-            16.8495530726257
-        ],
-        "color": 16777215,
-        "id": "952",
-        "ledIndex": "952",
-        "positionsUsed": [
-            "front",
-            "left"
-        ]
-    }
-}
-{
-    "sphere": {
-        "position": [
-            38.818938547486034,
-            46.34678899082569,
-            16.8495530726257
-        ],
-        "color": 16711680,
-        "id": "952",
-        "ledIndex": "952",
-        "positionsUsed": [
-            "front",
-            "right"
-        ]
-    }
-}
-    ------------
-{
-  "position": [
-    55.98634285714286,
-    51.1138067061144,
-    38.469771428571434
-  ],
-  "color": 16777215,
-  "id": "61",
-  "ledIndex": "61",
-  "positionsUsed": [
-    "front",
-    "right"
-  ]
-}
-{
-  "position": [
-    55.98634285714286,
-    46.83925065117211,
-    38.469771428571434
-  ],
-  "color": 65280,
-  "id": "61",
-  "ledIndex": "61",
-  "positionsUsed": [
-    "front",
-    "left"
-  ]
+interface PositionMeta {
+  x: number;
+  y: number;
+  maxDifference: number;
+  ledIndex: number;
 }
 
+interface PositionData {
+  position: PositionsType;
+  ledPositionMeta: PositionMeta;
+}
 
---------------
-{
-  "position": [
-    56.09371007371008,
-    47.09867498051442,
-    38.23061425061425
-  ],
-  "color": 16777215,
-  "id": "60",
-  "ledIndex": "60",
-  "positionsUsed": [
-    "front",
-    "left"
-  ]
+interface PositionsObj {
+  front?: Array<PositionData>;
+  back?: Array<PositionData>;
+  left?: Array<PositionData>;
+  right?: Array<PositionData>;
 }
-TreeVis.client.tsx:103 {
-  "position": [
-    56.09371007371008,
-    51.80886762360446,
-    38.23061425061425
-  ],
-  "color": 16711680,
-  "id": "60",
-  "ledIndex": "60",
-  "positionsUsed": [
-    "front",
-    "right"
-  ]
+
+interface CandidatePoint {
+  ledIndex: string;
+  x: number;
+  y: number;
+  z: number;
+  maxDifference: number;
+  positionsUsed: Array<PositionsType>;
 }
-TreeVis.client.tsx:103 {
-  "position": [
-    59.4887306501548,
-    47.09867498051442,
-    41.473065015479875
-  ],
-  "color": 65280,
-  "id": "60",
-  "ledIndex": "60",
-  "positionsUsed": [
-    "back",
-    "left"
-  ]
+
+interface DataElement {
+  positionsObj: PositionsObj;
+  candidatePoints: Array<CandidatePoint>;
 }
-    */
+
+interface Data {
+  [key: string]: DataElement;
+}
 
 interface LightSphereVisProps {
   sphere: SphereVisProps;
@@ -161,20 +89,24 @@ interface LightSphereVisProps {
 }
 function LightSphereVis({ sphere }: LightSphereVisProps) {
   //
-
+  const { setSphere, radius } = useStore(
+    useShallow((state) => ({
+      radius: state.radius,
+      setSphere: state.setSphere,
+    })),
+  );
   const { color } = sphere;
+
+  const onClick = useCallback(() => {
+    console.log(JSON.stringify(sphere, null, 2));
+
+    setSphere(sphere);
+  }, [setSphere, sphere]);
 
   return (
     <group>
-      {/* Sphere */}
-      <mesh
-        position={sphere.position}
-        frustumCulled={false}
-        onClick={() => {
-          console.log(JSON.stringify(sphere, null, 2));
-        }}
-      >
-        <sphereGeometry args={[0.1, 16, 16]} />
+      <mesh position={sphere.position} frustumCulled={false} onClick={onClick}>
+        <sphereGeometry args={[radius, 16, 16]} />
 
         <meshStandardMaterial
           color={color}
@@ -183,7 +115,6 @@ function LightSphereVis({ sphere }: LightSphereVisProps) {
           opacity={undefined}
         />
       </mesh>
-      {/* Line from sphere to sample point on the cylinder */}
     </group>
   );
 }
@@ -193,22 +124,22 @@ export interface SphereVisProps {
   color: THREE.Color;
   id: unknown;
   ledIndex: unknown;
-  positionsUsed: unknown;
+  positionsUsed: Array<PositionsType>;
 }
 
-const getSpheres = () => {
-  const generatedSpheres: SphereVisProps[] = [];
+const getSpheres = (min: number, max: number) => {
+  const json = getCrunchedNumbers() as Data;
+  const allSpheres: SphereVisProps[] = [];
+  const bestSpheres: SphereVisProps[] = [];
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const newJson = json as any;
   Object.keys(json).forEach((key, _index) => {
-    if (_index > 63 || _index < 59) {
+    if (_index > max || _index < min) {
       return;
     }
-    const led = newJson[key];
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    led.candidatePoints.forEach((candidatePoint: any, i: number) => {
+    const led = json[key];
+    led.candidatePoints.forEach((candidatePoint, i) => {
       const { x, y, z, ledIndex, positionsUsed } = candidatePoint;
+
       let color: THREE.Color = new THREE.Color(0xffffff);
       if (i === 0) {
         color = new THREE.Color(0xffffff);
@@ -220,61 +151,124 @@ const getSpheres = () => {
         color = new THREE.Color(0x0000ff);
       }
 
-      generatedSpheres.push({
-        position: [x / 10, y / 10, z / 10],
+      console.log({ x, y, z });
+      const sphere: SphereVisProps = {
+        // position: [x / 10.0, y / 10.0, z / 10.0],
+        position: [x, y, z],
+
         color,
         id: key,
         ledIndex,
         positionsUsed,
-      });
+      };
+      allSpheres.push(sphere);
+
+      if (i === 0) {
+        bestSpheres.push(sphere);
+      }
     });
   });
 
-  return generatedSpheres;
+  console.log(allSpheres.length);
+  return { allSpheres, bestSpheres };
 };
 
-const TreeVisScene = () => {
-  const spheres = useMemo(() => getSpheres(), []);
+// const TreeVisScene = () => {
+//   const { min, max } = useStore(
+//     useShallow((state) => ({ min: state.min, max: state.max })),
+//   );
+//   const spheres = useMemo(() => getSpheres(min, max), [max, min]);
 
-  return (
-    <>
-      {spheres.map((sphere, index) => {
-        return <LightSphereVis key={index} index={index} sphere={sphere} />;
-      })}
-    </>
-  );
-};
+//   return (
+//     <>
+//       {spheres.map((sphere, index) => {
+//         return <LightSphereVis key={index} index={index} sphere={sphere} />;
+//       })}
+//     </>
+//   );
+// };
 
 export default function TreeVis() {
+  const {
+    plotsOn,
+    setPlotsOn,
+    sphere,
+    setMin,
+    setMax,
+    setRadius,
+    radius,
+    min,
+    max,
+  } = useStore(
+    useShallow((state) => ({
+      sphere: state.sphere,
+      setMin: state.setMin,
+      setMax: state.setMax,
+      setRadius: state.setRadius,
+      radius: state.radius,
+      min: state.min,
+      max: state.max,
+      plotsOn: state.plotsOn,
+      setPlotsOn: state.setPlotsOn,
+    })),
+  );
+
+  const { register } = useForm({ values: { plotsOn, radius, min, max } });
+
+  const { allSpheres, bestSpheres } = useMemo(
+    () => getSpheres(min, max),
+    [max, min],
+  );
+  console.log({ sphere2: sphere });
   return (
     <>
       <div className="app-container">
         <div className="tmp-main">
           <div className="content">
             <div className="p-6">
-              <div className="grid grid-cols-1 gap-2">
-                <Canvas
-                  style={{ height: "100vh" }}
-                  camera={{
-                    position: [0, 0, 50],
-                    fov: 75,
-                    near: 0.01,
-                    far: 8000,
-                  }}
-                >
-                  <color attach="background" args={["#112233"]} />
-                  <EffectComposer>
-                    <Bloom
-                      mipmapBlur
-                      luminanceThreshold={0.1}
-                      levels={8}
-                      intensity={0.4 * 4}
-                    />
-                    <ToneMapping />
-                  </EffectComposer>
-                  <TreeVisScene />
-                  <OrbitControls />
-                </Canvas>
+              <div className="grid grid-cols-12 gap-2">
+                <div className="col-span-8">
+                  <TreeVisScatter
+                    allSpheres={allSpheres}
+                    bestSpheres={bestSpheres}
+                  />
+                </div>
+                <div>
+                  <input
+                    style={{ border: "1px solid black" }}
+                    type="number"
+                    {...register("min", { valueAsNumber: true })}
+                    onBlur={(
+                      event: React.FocusEvent<HTMLInputElement, Element>,
+                    ) => setMin(Number(event.target.value))}
+                  />
+                  <input
+                    style={{ border: "1px solid black" }}
+                    type="number"
+                    {...register("max", { valueAsNumber: true })}
+                    onBlur={(
+                      event: React.FocusEvent<HTMLInputElement, Element>,
+                    ) => setMax(Number(event.target.value))}
+                  />
+
+                  <input
+                    style={{ border: "1px solid black" }}
+                    type="number"
+                    {...register("radius", { valueAsNumber: true })}
+                    onBlur={(
+                      event: React.FocusEvent<HTMLInputElement, Element>,
+                    ) => setRadius(Number(event.target.value))}
+                  />
+                  <input
+                    style={{ border: "1px solid black" }}
+                    {...register("plotsOn")}
+                    onBlur={(
+                      event: React.FocusEvent<HTMLInputElement, Element>,
+                    ) => setPlotsOn(event.target.value)}
+                  />
+
+                  <pre>{sphere ? JSON.stringify(sphere, null, 2) : <></>}</pre>
+                </div>
               </div>
             </div>
           </div>
@@ -283,3 +277,29 @@ export default function TreeVis() {
     </>
   );
 }
+
+/*
+
+     <Canvas
+                    style={{ height: "100vh" }}
+                    camera={{
+                      position: [0, 0, 50],
+                      fov: 75,
+                      near: 0.01,
+                      far: 8000,
+                    }}
+                  >
+                    <color attach="background" args={["#112233"]} />
+                    <EffectComposer>
+                      <Bloom
+                        mipmapBlur
+                        luminanceThreshold={0.1}
+                        levels={8}
+                        intensity={0.4 * 4}
+                      />
+                      <ToneMapping />
+                    </EffectComposer>
+                    <TreeVisScene />
+                    <OrbitControls />
+                  </Canvas> 
+                  */

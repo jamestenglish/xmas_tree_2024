@@ -1,12 +1,6 @@
 import { LedPosProps } from "~/routes/_index";
 import { PromiseStateType } from "./imageProcessingTypes";
 
-const _delay = async (time: number) => {
-  return new Promise((resolve) => {
-    setTimeout(() => resolve(null), time);
-  });
-};
-
 type ForEachPixelCallbackArgs = { x: number; y: number };
 type ForEachPixelCallbackType = (args: ForEachPixelCallbackArgs) => void;
 
@@ -124,10 +118,15 @@ function blur(
   return vertical;
 }
 
-function debugImage(bytes: Uint8Array, canvas: HTMLCanvasElement) {
+function debugImage(
+  bytes: Uint8Array,
+  canvas: HTMLCanvasElement,
+  canvasBlur: HTMLCanvasElement,
+) {
   const width = canvas.width;
   const height = canvas.height;
   const context = canvas.getContext("2d");
+  const contextBlur = canvasBlur.getContext("2d");
   const imageData = context!.getImageData(0, 0, width, height);
 
   const debugImageCallback = ({ x, y }: ForEachPixelCallbackArgs) => {
@@ -137,7 +136,7 @@ function debugImage(bytes: Uint8Array, canvas: HTMLCanvasElement) {
   };
   forEachPixel({ height, width, callback: debugImageCallback });
 
-  context!.putImageData(imageData, 0, 0);
+  contextBlur!.putImageData(imageData, 0, 0);
   return imageData;
 }
 
@@ -152,36 +151,30 @@ export async function getLightOffImage(
   const height = video.videoHeight;
   // create a canvas element to capture video stills
   const canvas = document.getElementById(
-    `calibrate${deviceId}`,
+    `initial${deviceId}`,
   ) as HTMLCanvasElement;
   canvas.width = width;
   canvas.height = height;
 
-  // const sleepA = 1000;
-  // console.info(`sleepA ${sleepA}`);
-  // await delay(sleepA);
-  // capture a frame with all the LEDs off
+  const canvasBlur = document.getElementById(
+    `initialBlur${deviceId}`,
+  ) as HTMLCanvasElement;
+  canvas.width = width;
+  canvas.height = height;
+
   const imageBytesNoLeds = blur(
     getVideoFrame(video, canvas, maskArray),
     width,
     height,
     maskArray,
   );
-  debugImage(imageBytesNoLeds, canvas);
-  // await api.setLeds(espHost, colors);
-  // await delay(200);
-  // capture a frame
+  debugImage(imageBytesNoLeds, canvas, canvasBlur);
 
   if (promiseObj !== undefined && promiseObj !== null) {
     console.info("awaiting custom promise");
     await promiseObj.promise;
     console.info("custom promise resolved");
   }
-  //  else {
-  //   const sleepB = 5000;
-  //   console.info(`sleepB ${sleepB}`);
-  //   await delay(sleepB);
-  // }
 
   console.groupEnd();
   return imageBytesNoLeds;
@@ -203,14 +196,20 @@ export async function getLightOnPosition(
   canvas.width = width;
   canvas.height = height;
 
+  const blurCanvas = document.getElementById(
+    `blur${deviceId}`,
+  ) as HTMLCanvasElement;
+  blurCanvas.width = width;
+  blurCanvas.height = height;
+
   const imageBytesOneLed = blur(
     getVideoFrame(video, canvas, maskArray),
     width,
     height,
     maskArray,
   );
-  debugImage(imageBytesOneLed, canvas);
-  // get the maximum difference between the two images
+  debugImage(imageBytesOneLed, canvas, blurCanvas);
+
   let maxDifference = 0;
   for (let i = 0; i < imageBytesNoLeds.length; i++) {
     maxDifference = Math.max(
@@ -239,8 +238,7 @@ export async function getLightOnPosition(
     maxDifference,
     ledIndex,
   };
-  // await api.setLeds(espHost, colors);
-  // }
+
   const context = canvas.getContext("2d");
   context!.strokeStyle = "red";
   context!.strokeRect(ledPosMetaInitial.x - 2, ledPosMetaInitial.y - 2, 4, 4);
@@ -253,96 +251,3 @@ export async function getLightOnPosition(
   console.groupEnd();
   return ledPosMeta;
 }
-
-// export async function calibrateUsingCamera(
-//   deviceId: string,
-//   video: HTMLVideoElement,
-//   maskArray: Array<boolean>,
-//   ledIndex: number,
-//   promiseObj?: PromiseStateType,
-// ) {
-//   console.group("calibrateUsingCamera");
-//   const width = video.videoWidth;
-//   const height = video.videoHeight;
-//   // create a canvas element to capture video stills
-//   const canvas = document.getElementById(
-//     `calibrate${deviceId}`,
-//   ) as HTMLCanvasElement;
-//   canvas.width = width;
-//   canvas.height = height;
-
-//   const sleepA = 1000;
-//   console.info(`sleepA ${sleepA}`);
-//   await delay(sleepA);
-//   // capture a frame with all the LEDs off
-//   const imageBytesNoLeds = blur(
-//     getVideoFrame(video, canvas, maskArray),
-//     width,
-//     height,
-//     maskArray,
-//   );
-//   debugImage(imageBytesNoLeds, canvas);
-//   // await api.setLeds(espHost, colors);
-//   // await delay(200);
-//   // capture a frame
-
-//   if (promiseObj !== undefined && promiseObj !== null) {
-//     console.info("awaiting custom promise");
-//     await promiseObj.promise;
-//     console.info("custom promise resolved");
-//   } else {
-//     const sleepB = 5000;
-//     console.info(`sleepB ${sleepB}`);
-//     await delay(sleepB);
-//   }
-
-//   const imageBytesOneLed = blur(
-//     getVideoFrame(video, canvas, maskArray),
-//     width,
-//     height,
-//     maskArray,
-//   );
-//   debugImage(imageBytesOneLed, canvas);
-//   // get the maximum difference between the two images
-//   let maxDifference = 0;
-//   for (let i = 0; i < imageBytesNoLeds.length; i++) {
-//     maxDifference = Math.max(
-//       maxDifference,
-//       imageBytesOneLed[i] - imageBytesNoLeds[i],
-//     );
-//   }
-//   // now work out the approximate location of the led
-//   let xPos = 0;
-//   let yPos = 0;
-//   let total = 0;
-//   const positionCallback = ({ x, y }: ForEachPixelCallbackArgs) => {
-//     const index = y * width + x;
-//     const diff = imageBytesOneLed[index] - imageBytesNoLeds[index];
-//     if (diff > 0.5 * maxDifference) {
-//       xPos += x * diff;
-//       yPos += y * diff;
-//       total += diff;
-//     }
-//   };
-//   forEachPixel({ height, width, callback: positionCallback });
-
-//   const ledPosMetaInitial: LedPosProps = {
-//     x: xPos / total,
-//     y: yPos / total,
-//     maxDifference,
-//     ledIndex,
-//   };
-//   // await api.setLeds(espHost, colors);
-//   // }
-//   const context = canvas.getContext("2d");
-//   context!.strokeStyle = "red";
-//   context!.strokeRect(ledPosMetaInitial.x - 2, ledPosMetaInitial.y - 2, 4, 4);
-
-//   const ledPosMeta: LedPosProps = {
-//     ...ledPosMetaInitial,
-//   };
-//   console.info({ ledPosMeta, maxDifference, total, ledPosMetaInitial });
-
-//   console.groupEnd();
-//   return ledPosMeta;
-// }

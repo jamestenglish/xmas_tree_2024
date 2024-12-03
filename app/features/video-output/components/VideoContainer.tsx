@@ -64,10 +64,15 @@ const uploadImage = (
     `calibrate${deviceId}`,
   ) as HTMLCanvasElement;
 
+  const blurCanvas = document.getElementById(
+    `blur${deviceId}`,
+  ) as HTMLCanvasElement;
+
   const dataUrl = canvas.toDataURL("image/png");
+  const blurDataUrl = blurCanvas.toDataURL("image/png");
 
   fetcher.submit(
-    { dataUrl, ledIndex, position },
+    { dataUrl, blurDataUrl, ledIndex, position },
     { method: "POST", encType: "application/json", action: "/image" },
   );
 };
@@ -129,11 +134,6 @@ const VideoContainer = forwardRef<VideoContainerRef, VideoContainerProps>(
       null,
     );
     const [imgUrlMeta, setImgUrlMeta] = useState<ImageMetaProps | undefined>();
-    // const { homepageMasks } = useHomepageStore(
-    //   useShallow((state) => ({
-    //     homepageMasks: state.homepageMasks,
-    //   })),
-    // );
 
     const maskArray = positionMasks[position] ?? defaultMaskArray;
 
@@ -227,7 +227,41 @@ const VideoContainer = forwardRef<VideoContainerRef, VideoContainerProps>(
             }
           />
           <canvas
+            id={`initial${deviceId}`}
+            style={
+              dimensions
+                ? {
+                    width: `${dimensions.width}px`,
+                    height: `${dimensions.height}px`,
+                  }
+                : undefined
+            }
+          />
+          <canvas
+            id={`initialBlur${deviceId}`}
+            style={
+              dimensions
+                ? {
+                    width: `${dimensions.width}px`,
+                    height: `${dimensions.height}px`,
+                  }
+                : undefined
+            }
+          />
+          <canvas
             id={`calibrate${deviceId}`}
+            style={
+              dimensions
+                ? {
+                    width: `${dimensions.width}px`,
+                    height: `${dimensions.height}px`,
+                  }
+                : undefined
+            }
+          />
+
+          <canvas
+            id={`blur${deviceId}`}
             style={
               dimensions
                 ? {

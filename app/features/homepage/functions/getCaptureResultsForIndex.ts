@@ -1,13 +1,7 @@
 import { VideoContainerRef } from "~/features/video-output/components/VideoSelectorTypes";
 import { PromiseStateType } from "~/features/led-detection/functions/imageProcessingTypes";
 import { turnLightOff, turnLightOn } from "./lightApi";
-
-const sleep = async (time: number) => {
-  const p = new Promise<void>((resolve) => {
-    setTimeout(() => resolve(), time);
-  });
-  return p;
-};
+import sleep from "~/features/common/functions/sleep";
 
 export type RefObjType = {
   frontRef: React.RefObject<VideoContainerRef>;
@@ -53,47 +47,19 @@ const getLedCapturePromises = (
 
   return promises;
 };
-// const getCapturePromises = (
-//   refsObj: RefObjType,
-//   ledIndex: number,
-//   promiseObj?: PromiseStateType,
-// ) => {
-//   const { frontRef, backRef, leftRef, rightRef } = refsObj;
-//   const refs = [frontRef, backRef, rightRef, leftRef];
-
-//   const promises = refs.map((ref) => {
-//     return ref && ref?.current
-//       ? ref.current.capture({
-//           ledIndex,
-//           promiseObj,
-//         })
-//       : Promise.resolve(null);
-//   });
-
-//   return promises;
-// };
 
 export type GetCaptureResultsForIndexArgs = {
   refsObj: RefObjType;
   ledIndex: number;
-  // setCaptureData: React.Dispatch<React.SetStateAction<CaptureDataType>>;
   promiseObj?: PromiseStateType;
-  // positionPrefix?: string;
 };
 
 const getCaptureResultsForIndex = async ({
   refsObj,
   ledIndex,
-  // setCaptureData,
   promiseObj,
-  // positionPrefix,
 }: GetCaptureResultsForIndexArgs) => {
   const { frontRef, backRef, leftRef, rightRef } = refsObj;
-  // const capturePromises = getCapturePromises(
-  //   { frontRef, backRef, leftRef, rightRef },
-  //   ledIndex,
-  //   promiseObj,
-  // );
 
   await turnLightOff(ledIndex - 1);
   const noLedCapturePromises = getNoLedCapturePromises(
@@ -116,27 +82,7 @@ const getCaptureResultsForIndex = async ({
   );
 
   const captureResults = await Promise.all(ledCapturePromises);
-  // await sleep(2000);
-
-  // captureResults.forEach((captureResult) => {
-  //   if (captureResult !== null) {
-  //     const { position, ledPositionMeta } = captureResult;
-  //     setCaptureData((prev) => {
-  //       const key = positionPrefix ? `${positionPrefix}${position}` : position;
-  //       const oldArray = prev[key] ?? [];
-  //       const newArray = [...oldArray, ledPositionMeta];
-  //       const newValue = {
-  //         ...prev,
-  //         [key]: newArray,
-  //       };
-  //       console.group("saveCaptureResultsForIndex.setCaptureData");
-  //       console.info({ newValue });
-
-  //       console.groupEnd();
-  //       return newValue;
-  //     });
-  //   }
-  // });
+  // await sleep(10000);
 
   return captureResults;
 };

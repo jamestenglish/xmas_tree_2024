@@ -11,6 +11,7 @@ import getSequenceArgs, {
   SAMPLE_TIME_IN_MS,
 } from "../functions/getSequenceArgs";
 import { animate } from "motion";
+import sleep from "~/features/common/functions/sleep";
 
 interface UseHandleExportArgs {
   stageRef: React.RefObject<Stage>;
@@ -18,13 +19,6 @@ interface UseHandleExportArgs {
 }
 
 const SLEEP_TIME_IN_MS = 50;
-
-const sleep = async (time: number) => {
-  const p = new Promise<void>((resolve) => {
-    setTimeout(() => resolve(), time);
-  });
-  return p;
-};
 
 const getHasAnimation = (canvasImages: ImageType[]) => {
   console.group("getHasAnimation");
